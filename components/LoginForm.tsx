@@ -1,4 +1,4 @@
-import { Button } from '@mui/material';
+import { Alert, Button } from '@mui/material';
 import React, { useState } from 'react';
 import styles from '@styles/Auth.module.css';
 import { User } from '@prisma/client';
@@ -35,6 +35,7 @@ const LoginForm = () => {
       setErrorInfo({ userId: noError, password: noError });
       // login api 호출
       setLoading(true);
+      setLoginError('');
       fetch('/api/auth/login', {
         method: 'POST',
         body: JSON.stringify(values),
@@ -57,7 +58,7 @@ const LoginForm = () => {
   };
   return (
     <form className={styles.form} onSubmit={onSubmit}>
-      {loginError ? <p className={styles.message}>{loginError}</p> : null}
+      {loginError ? <Alert severity="error">{loginError}</Alert> : null}
       <CustomInput
         label="ID"
         value={userId}
