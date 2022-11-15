@@ -1,0 +1,25 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow-y: hidden;
+  height: calc(100vh - var(--hh));
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+@media screen and (max-width: 600px) {
+  .main {
+    height: calc(var(--vh, 1vh) * 100 - var(--hh));
+  }
+}
