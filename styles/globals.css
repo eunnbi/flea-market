@@ -1,9 +1,15 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.6/dist/web/static/pretendard.css');
+
+:root {
+  --vh: 100%;
+  --hh: 80px;
+}
+
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: Pretendard, sans-serif;
 }
 
 a {
@@ -15,12 +21,20 @@ a {
   box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-  body {
-    color: white;
-    background: black;
-  }
+input,
+button {
+  font-family: Pretendard, sans-serif !important;
+}
+
+ul,
+li,
+ol {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
 }
