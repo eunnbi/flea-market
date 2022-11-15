@@ -10,6 +10,7 @@ type State = Pick<User, 'userId' | 'password'>;
 
 const LoginForm = () => {
   const [loading, setLoading] = useState(false);
+  const [loginError, setLoginError] = useState('');
   const [errorInfo, setErrorInfo] = useState({
     userId: noError,
     password: noError,
@@ -33,23 +34,30 @@ const LoginForm = () => {
     } else {
       setErrorInfo({ userId: noError, password: noError });
       // login api 호출
-    }
-
-    return;
-
-    setLoading(true);
-    fetch('/api/auth/login', { method: 'POST' })
-      .then(response => response.json())
-      .then(data => {
-        const { success } = data;
-        if (success) {
+      setLoading(true);
+      fetch('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(values),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          const { success, user } = data;
           setLoading(false);
-          Router.push('/');
-        }
-      });
+          if (success) {
+            console.log(user);
+            Router.push('/');
+          } else {
+            setLoginError('아이디 혹은 비밀번호가 일치하지 않습니다.');
+          }
+        });
+    }
   };
   return (
     <form className={styles.form} onSubmit={onSubmit}>
+      {loginError ? <p className={styles.message}>{loginError}</p> : null}
       <CustomInput
         label="ID"
         value={userId}
