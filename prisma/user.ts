@@ -1,50 +1,66 @@
-// /prisma/user.js
-import prisma from './prisma'
+import { User } from '@prisma/client';
+import prisma from './prisma';
 
 // READ
 export const getAllUsers = async () => {
-  const users = await prisma.user.findMany({})
-  return users
-}
+  const users = await prisma.user.findMany({});
+  return users;
+};
 
-export const getUser = async (id: User["id"]) => {
+export const getUser = async (userId: User['userId']) => {
   const user = await prisma.user.findUnique({
-    where: { id }
-  })
-  return user
-}
+    where: { userId },
+  });
+  return user;
+};
+
+export const getUserByLogin = async ({ userId, password }: Pick<User, 'userId' | 'password'>) => {
+  const user = await prisma.user.findFirst({
+    where: {
+      userId,
+      password,
+    },
+  });
+  return user;
+};
 
 // CREATE
-export const createUser = async ({email, name, birthYear} : Pick<User, "email" | "name" | "birthYear">) => {
+export const createUser = async ({
+  name,
+  userId,
+  password,
+  role,
+}: Pick<User, 'name' | 'userId' | 'password' | 'role'>) => {
   const user = await prisma.user.create({
     data: {
-      email,
       name,
-      birthYear
-    }
-  })
-  return user
-}
+      userId,
+      password,
+      role,
+    },
+  });
+  return user;
+};
 
 // UPDATE
-export const updateUser = async (id: User["id"], updateData : Partial<User>) => {
+export const updateUser = async (id: User['id'], updateData: Partial<User>) => {
   const user = await prisma.user.update({
     where: {
-      id
+      id,
     },
     data: {
-      ...updateData
-    }
-  })
-  return user
-}
+      ...updateData,
+    },
+  });
+  return user;
+};
 
 // DELETE
-export const deleteUser = async (id: User["id"]) => {
+export const deleteUser = async (id: User['id']) => {
   const user = await prisma.user.delete({
     where: {
-      id
-    }
-  })
-  return user
-}
+      id,
+    },
+  });
+  return user;
+};
