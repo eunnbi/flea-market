@@ -15,7 +15,7 @@ const RegisterForm = () => {
   });
   const [helperText, setHelperText] = useState({
     userId: '',
-    password: '영문자 및 숫자 포함, 8자 이상 15자 이하',
+    password: '영문자와 숫자 포함, 8자 이상 15자 이하',
     name: '',
   });
   const [values, setValues] = useState<Pick<User, 'userId' | 'password' | 'name' | 'role'>>({
@@ -24,6 +24,7 @@ const RegisterForm = () => {
     userId: '',
     password: '',
   });
+  const isCheckIdDuplicate = useRef(false);
   const isIdDuplicate = useRef(false);
   const { name, userId, password } = values;
   const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,6 +56,7 @@ const RegisterForm = () => {
           setHelperText(text => ({ ...text, userId: '사용 가능한 아이디입니다.' }));
           setErrorInfo(errorInfo => ({ ...errorInfo, userId: noError }));
         }
+        isCheckIdDuplicate.current = true;
       });
   };
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -65,16 +67,32 @@ const RegisterForm = () => {
         password: password === '' ? createErrorObject('비밀번호를 입력하세요') : noError,
         name: name === '' ? createErrorObject('이름을 입력하세요') : noError,
       });
+    } else if (!isCheckIdDuplicate.current) {
+      setErrorInfo({
+        userId: createErrorObject('아이디 중복 확인이 필요합니다.'),
+        password: noError,
+        name: noError,
+      });
     } else if (isIdDuplicate.current) {
-      setErrorInfo(errorInfo => ({ ...errorInfo, userId: createErrorObject('중복된 아이디입니다') }));
-    } else if (password) {
+      setErrorInfo({
+        userId: createErrorObject('중복된 아이디입니다'),
+        password: noError,
+        name: noError,
+      });
+    } else if (!/(?=.*\d)(?=.*[a-zA-ZS]).{8,15}/.test(password)) {
       // password 정규식 검사
+      setErrorInfo({
+        userId: noError,
+        password: createErrorObject('비밀번호 형식과 맞지 않습니다.'),
+        name: noError,
+      });
     } else {
       setErrorInfo({
         userId: noError,
         password: noError,
         name: noError,
       });
+      // register api 호출
     }
   };
   return (
