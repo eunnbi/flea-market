@@ -4,10 +4,12 @@ import styles from '@styles/Auth.module.css';
 import type { User } from '@prisma/client';
 import CustomInput from './common/CustomInput';
 import { noError, createErrorObject } from '@lib/formValidation';
+import Router from 'next/router';
 
 type State = Pick<User, 'userId' | 'password' | 'name' | 'role'>;
 
 const RegisterForm = () => {
+  const [loading, setLoading] = useState(false);
   const [errorInfo, setErrorInfo] = useState({
     userId: noError,
     password: noError,
@@ -93,6 +95,22 @@ const RegisterForm = () => {
         name: noError,
       });
       // register api 호출
+      setLoading(true);
+      fetch('/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(values),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          const { success, user } = data;
+          setLoading(false);
+          if (success) {
+            Router.push('/login?signUp=success');
+          }
+        });
     }
   };
   return (
@@ -136,7 +154,7 @@ const RegisterForm = () => {
         </RadioGroup>
       </FormControl>
       <Button variant="contained" type="submit">
-        Sign Up
+        {loading ? '회원가입 중...' : '회원가입'}
       </Button>
     </form>
   );
