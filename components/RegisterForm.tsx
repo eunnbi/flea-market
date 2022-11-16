@@ -5,6 +5,7 @@ import type { User } from '@prisma/client';
 import CustomInput from './common/CustomInput';
 import { noError, createErrorObject } from '@lib/formValidation';
 import Router from 'next/router';
+import axios from 'axios';
 
 type State = Pick<User, 'userId' | 'password' | 'name' | 'role'>;
 
@@ -96,19 +97,15 @@ const RegisterForm = () => {
       });
       // register api 호출
       setLoading(true);
-      fetch('/api/auth/register', {
-        method: 'POST',
-        body: JSON.stringify(values),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(response => response.json())
-        .then(data => {
-          const { success, user } = data;
+      axios
+        .post<{ success: boolean }>('/api/auth/register', {
+          ...values,
+        })
+        .then(result => {
+          const { success } = result.data;
           setLoading(false);
           if (success) {
-            Router.push('/login?signUp=success');
+            Router.push('/?login=true&signUp=success');
           }
         });
     }
