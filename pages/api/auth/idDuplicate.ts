@@ -1,12 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getUser } from '@db/user';
+import { getUserByUserId } from '@db/user';
 
 export default async function idDuplicate(req: NextApiRequest, res: NextApiResponse) {
   try {
     switch (req.method) {
       case 'GET': {
         const { userId } = req.query;
-        const user = await getUser(userId as string);
+        const user = await getUserByUserId(userId as string);
         return res.status(200).json({ idDuplicate: user === null ? false : true });
       }
       default:
