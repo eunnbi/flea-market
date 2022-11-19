@@ -1,5 +1,5 @@
 import { FormControl, InputLabel, Input, IconButton, InputAdornment, FormHelperText } from '@mui/material';
-import React, { ChangeEventHandler, useState } from 'react';
+import { ChangeEventHandler, useState } from 'react';
 import { BsEyeSlashFill, BsEyeFill } from 'react-icons/bs';
 
 interface Props {
@@ -8,6 +8,7 @@ interface Props {
   isPassword: boolean;
   htmlFor: string;
   onChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+  value: string | number;
   errorInfo: {
     isError: boolean;
     message: string;
@@ -17,7 +18,18 @@ interface Props {
   icon?: React.ReactNode;
 }
 
-const CustomInput = ({ type, label, isPassword, htmlFor, onChange, helperText, errorInfo, disabled, icon }: Props) => {
+const CustomInput = ({
+  type,
+  label,
+  isPassword,
+  htmlFor,
+  onChange,
+  value,
+  helperText,
+  errorInfo,
+  disabled,
+  icon,
+}: Props) => {
   const { isError, message } = errorInfo;
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => {
@@ -52,7 +64,7 @@ const CustomInput = ({ type, label, isPassword, htmlFor, onChange, helperText, e
       ) : icon ? (
         <Input id={htmlFor} type={type ? type : 'text'} onChange={onChange} error={isError} endAdornment={icon} />
       ) : (
-        <Input id={htmlFor} type={type ? type : 'text'} onChange={onChange} error={isError} />
+        <Input id={htmlFor} type={type ? type : 'text'} value={value} onChange={onChange} error={isError} />
       )}
       {helperText ? <FormHelperText>{helperText}</FormHelperText> : null}
       {message ? <FormHelperText error>{message}</FormHelperText> : null}
@@ -60,4 +72,4 @@ const CustomInput = ({ type, label, isPassword, htmlFor, onChange, helperText, e
   );
 };
 
-export default React.memo(CustomInput);
+export default CustomInput;
