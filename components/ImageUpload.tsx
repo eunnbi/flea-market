@@ -1,5 +1,5 @@
 import { MdOutlineAddPhotoAlternate } from 'react-icons/md';
-import { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import styled from '@emotion/styled';
 import { noError } from '@lib/formValidation';
 
@@ -65,4 +65,4 @@ const Wrapper = styled.div`
   }
 `;
 
-export default ImageUpload;
+export default React.memo(ImageUpload);
