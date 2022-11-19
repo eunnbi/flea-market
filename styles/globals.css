@@ -44,3 +44,14 @@ button {
   background-color: transparent;
   border: none;
 }
+
+#map {
+  width: 100%;
+  height: 500px;
+}
+
+#date-picker .MuiFormControl-root label,
+#date-picker .MuiFormControl-root input {
+  color: #000 !important;
+  -webkit-text-fill-color: #000;
+}
