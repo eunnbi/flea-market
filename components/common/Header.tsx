@@ -5,15 +5,16 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 
 const getHeaderInfo = (pathname: string) => {
-  if (pathname === '/admin') {
+  const page = pathname.split('/')[1];
+  if (page === 'admin') {
     return {
-      basePath: pathname,
+      basePath: `/${page}`,
       NAV: [],
     };
-  } else if (pathname === 'sell') {
+  } else if (page === 'sell') {
     return {
-      basePath: pathname,
-      NAV: [],
+      basePath: `/${page}`,
+      NAV: [{ to: '/sell/register', name: 'Register Your Products' }],
     };
   } else {
     return {
