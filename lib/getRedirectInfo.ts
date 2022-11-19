@@ -1,11 +1,12 @@
 import { User } from '@prisma/client';
 
 export const getRedirectInfo = (url: string, role: User['role']) => {
-  if (role === 'ADMIN' && url !== '/admin') {
+  const page = url.split('/')[1];
+  if (role === 'ADMIN' && page !== 'admin') {
     return {
       destination: '/admin',
     };
-  } else if (role === 'SELLER' && url !== '/sell') {
+  } else if (role === 'SELLER' && page !== 'sell') {
     return {
       destination: '/sell',
     };
