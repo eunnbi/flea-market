@@ -7,7 +7,7 @@ export default async function login(req: NextApiRequest, res: NextApiResponse) {
       case 'POST': {
         const user = await getUserByLogin(req.body);
         if (user === null) {
-          res.status(400).json({ message: 'Wrong ID or password' });
+          res.status(200).json({ message: 'Wrong ID or password' });
         } else {
           const { id } = user;
           res.setHeader('Set-Cookie', `id=${id}; path=/; Secure; HttpOnly; SameSite=Strict`);
