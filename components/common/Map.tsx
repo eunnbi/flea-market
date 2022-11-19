@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface Props {
   location: string;
@@ -68,4 +68,4 @@ function Map({ location, setLocationErrorInfo }: Props) {
   return <div id="map" />;
 }
 
-export default Map;
+export default React.memo(Map);
