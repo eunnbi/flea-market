@@ -1,39 +1,38 @@
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import React from 'react'
-import { getAbsoluteUrl } from '../lib/getAbsoluteUrl'
+import React, { useEffect, useState } from 'react';
+import CustomHead from '@components/common/CustomHead';
+import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import ProductList from '@components/ProductList';
+import styled from '@emotion/styled';
+import { useRouter } from 'next/router';
 
-const Homepage = ({ users }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const Home = ({ products }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const router = useRouter();
   return (
-    <div>
-      {users.map((user: User) => (
-        <div key={user.id}>
-          <p>{user.id}</p>
-          <p>{user.birthYear}</p>
-          <p>{user.name}</p>
-        </div>
-      ))}
-    </div>
-  )
-}
+    <>
+      <CustomHead title="Home" />
+      <Main>
+        <ProductList products={products} />
+      </Main>
+    </>
+  );
+};
+
+const Main = styled.main`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+`;
 
 export const getServerSideProps = async ({ req }: GetServerSidePropsContext) => {
   const baseUrl = getAbsoluteUrl(req);
-  const response = await fetch(`${baseUrl}/api/user`, {
-    method: "GET"
-  });
-  const users = await response.json();
+  const res = await fetch(`${baseUrl}/api/product`);
+  const products = await res.json();
+  return {
+    props: {
+      products,
+    },
+  };
+};
 
-  // Convert the updatedAt and createdAt in each user to string
-  // Otherwise, Next.js will throw an error
-  // Not required if you are not using the date fields
-
-  const updatedUsers = users.map((user: User) => ({
-    ...user,
-    updatedAt: user.updatedAt.toString(),
-    createdAt: user.createdAt.toString()
-  }))
-
-  return { props: { users: updatedUsers } }
-}
-
-export default Homepage
+export default Home;
