@@ -16,7 +16,7 @@ import { IoMdTrash } from 'react-icons/io';
 import { FaEdit } from 'react-icons/fa';
 import { tableCellClasses } from '@mui/material/TableCell';
 import { useState, useEffect } from 'react';
-import { DeleteDialog } from './DeleteDialog';
+import { DeleteDialog } from '../common/DeleteDialog';
 import EditDialog from './EditDialog';
 import axios from 'axios';
 import { BsArrowUpShort, BsArrowDownShort } from 'react-icons/bs';
@@ -90,29 +90,17 @@ const MemberTable = ({ initialMembers }: { initialMembers: User[] }) => {
   };
 
   const deleteMember = (id: string) => async () => {
-    fetch(`/api/user/${id}`, { method: 'DELETE' }).then(() => {
-      fetch(`/api/user`, {
-        method: 'GET',
-      })
-        .then(response => response.json())
-        .then(data => {
-          setMembers(data);
-          setMessage('삭제가 완료되었습니다.');
-        });
-    });
+    await axios.delete(`/api/user/${id}`);
+    const { data } = await axios.get('/api/user');
+    setMembers(data);
+    setMessage('삭제가 완료되었습니다.');
   };
 
   const editMember = (id: string) => async (state: State) => {
-    axios.patch(`/api/user/${id}`, state).then(() => {
-      fetch(`/api/user`, {
-        method: 'GET',
-      })
-        .then(response => response.json())
-        .then(data => {
-          setMembers(data);
-          setMessage('수정이 완료되었습니다.');
-        });
-    });
+    await axios.patch(`/api/user/${id}`, state);
+    const { data } = await axios.get(`/api/user`);
+    setMembers(data);
+    setMessage('수정이 완료되었습니다.');
   };
 
   const onChangeFilter = (e: any) => {
@@ -196,7 +184,7 @@ const MemberTable = ({ initialMembers }: { initialMembers: User[] }) => {
       <DeleteDialog
         open={deleteState.open}
         handleClose={handleClose('delete')}
-        deleteMember={deleteMember(deleteState.id)}
+        onDelete={deleteMember(deleteState.id)}
       />
       <EditDialog
         open={editState.open}
