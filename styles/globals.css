@@ -21,6 +21,15 @@ a {
   box-sizing: border-box;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+p {
+  margin: 0;
+}
+
 input,
 button {
   font-family: Pretendard, sans-serif !important;
@@ -43,6 +52,7 @@ button {
   cursor: pointer;
   background-color: transparent;
   border: none;
+  padding: 0;
 }
 
 #map {
@@ -54,4 +64,15 @@ button {
 #date-picker .MuiFormControl-root input {
   color: #000 !important;
   -webkit-text-fill-color: #000;
+}
+
+.heart_icon {
+  color: red;
+  font-size: 1.2rem;
+}
+
+.likeCnt {
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
