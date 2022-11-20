@@ -15,5 +15,5 @@ export const getRedirectInfo = (url: string, role: User['role']) => {
       destination: '/',
     };
   }
-  return;
+  return undefined;
 };
