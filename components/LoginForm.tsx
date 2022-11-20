@@ -15,8 +15,6 @@ type State = Pick<User, 'userId' | 'password'>;
 const LoginForm = () => {
   const router = useRouter();
   const { pathname } = router;
-  const { signUp } = router.query;
-  const [show, setShow] = useState(true);
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [errorInfo, setErrorInfo] = useState({
@@ -31,7 +29,7 @@ const LoginForm = () => {
   const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues(values => ({ ...values, [prop]: event.target.value }));
   };
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // form validation
     if (userId === '' || password == '') {
@@ -44,38 +42,34 @@ const LoginForm = () => {
       // login api 호출
       setLoading(true);
       setLoginError('');
-      axios
-        .post<{ success: boolean; user: User }>('/api/auth/login', {
+      try {
+        const result = await axios.post<{ success: boolean; user: User }>('/api/auth/login', {
           ...values,
-        })
-        .then(result => {
-          const { success, user } = result.data;
-          setLoading(false);
-          if (success) {
-            const info = getRedirectInfo('/login', user.role);
-            if (info) {
-              window.location.href = info.destination;
-            }
-          } else {
-            setLoginError('아이디 혹은 비밀번호가 일치하지 않습니다.');
-          }
         });
+        const { success, user } = result.data;
+        setLoading(false);
+        if (success) {
+          const info = getRedirectInfo('/login', user.role);
+          if (info) {
+            window.location.replace(info.destination);
+          }
+        } else {
+          setLoginError('아이디 혹은 비밀번호가 일치하지 않습니다.');
+        }
+      } catch (e) {
+        setLoading(false);
+        setLoginError('아이디 혹은 비밀번호가 일치하지 않습니다.');
+      }
     }
   };
 
-  useEffect(() => {
-    setTimeout(() => {
-      setShow(false);
-    }, 2000);
-  }, []);
   return (
     <Wrapper>
       <Form onSubmit={onSubmit}>
-        <CloseButton type="button" onClick={() => router.push(pathname)}>
+        <CloseButton type="button" onClick={() => router.replace(pathname)}>
           <IoClose />
         </CloseButton>
         <h1>로그인</h1>
-        {show && signUp ? <Alert>회원가입 성공!</Alert> : null}
         {loginError ? <Alert severity="error">{loginError}</Alert> : null}
         <CustomInput
           label="ID"
@@ -93,7 +87,7 @@ const LoginForm = () => {
           htmlFor="password"
           errorInfo={errorInfo.password}
         />
-        <Button variant="contained" type="submit">
+        <Button variant="contained" type="submit" disabled={loading}>
           {loading ? '로그인 중...' : '로그인'}
         </Button>
         <Link href="/register">회원가입하러 가기</Link>

@@ -62,7 +62,7 @@ const RegisterForm = () => {
         isCheckIdDuplicate.current = true;
       });
   };
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (name === '' || userId === '' || password === '') {
       setErrorInfo({
@@ -97,17 +97,16 @@ const RegisterForm = () => {
       });
       // register api 호출
       setLoading(true);
-      axios
-        .post<{ success: boolean }>('/api/auth/register', {
+      try {
+        await axios.post<{ success: boolean }>('/api/auth/register', {
           ...values,
-        })
-        .then(result => {
-          const { success } = result.data;
-          setLoading(false);
-          if (success) {
-            Router.push('/?login=true&signUp=success');
-          }
         });
+        setLoading(false);
+        Router.push(`/?login=true&signUp=true`, '/');
+      } catch (e) {
+        setLoading(false);
+        alert('회원가입에 실패하였습니다. 다시 진행해주세요');
+      }
     }
   };
   return (
@@ -150,7 +149,7 @@ const RegisterForm = () => {
           <FormControlLabel value="BUYER" control={<Radio size="small" />} label="Buyer" />
         </RadioGroup>
       </FormControl>
-      <Button variant="contained" type="submit">
+      <Button variant="contained" type="submit" disabled={loading}>
         {loading ? '회원가입 중...' : '회원가입'}
       </Button>
     </form>
