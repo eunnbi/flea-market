@@ -19,10 +19,7 @@ const getHeaderInfo = (pathname: string) => {
   } else {
     return {
       basePath: '/',
-      NAV: [
-        { to: '/', name: 'Home' },
-        { to: '/products', name: 'Products' },
-      ],
+      NAV: [],
     };
   }
 };
@@ -51,9 +48,9 @@ const Header = ({ isLogin }: { isLogin: boolean }) => {
             ))}
           </Nav>
           {!isLogin ? (
-            <Link href={`${pathname}?login=true`}>
-              <StyledButton variant="outlined">로그인</StyledButton>
-            </Link>
+            <StyledButton variant="outlined" onClick={() => router.push(`${pathname}?login=true`, pathname)}>
+              로그인
+            </StyledButton>
           ) : (
             <StyledButton variant="outlined" onClick={onLogout}>
               로그아웃
@@ -76,6 +73,7 @@ const HeaderBox = styled.header`
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 100%;
   }
   h1 {
     font-weight: normal;
