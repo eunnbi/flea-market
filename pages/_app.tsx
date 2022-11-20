@@ -8,22 +8,36 @@ import { User } from '@prisma/client';
 import { getRedirectInfo } from '@lib/getRedirectInfo';
 import Header from '@components/common/Header';
 import LoginForm from '@components/LoginForm';
+import { useEffect } from 'react';
+import Router from 'next/router';
 
 export default function App({ Component, pageProps }: AppProps) {
-  const { id, query } = pageProps;
-  const { login } = query;
+  const { id, query, pathname } = pageProps;
+  useEffect(() => {
+    let timerId: NodeJS.Timeout;
+    if (query && query.alert) {
+      timerId = setTimeout(() => {
+        alert(query.alert);
+        if (query.login) {
+          Router.replace(`${pathname}?login=true`, pathname);
+        } else {
+          Router.replace(pathname);
+        }
+      }, 1000);
+    }
+    return () => clearTimeout(timerId);
+  }, [query, pathname]);
   return (
     <ThemeProvider theme={theme}>
       <Header isLogin={id} />
       <Component {...pageProps} />
-      {!id && login && <LoginForm />}
+      {!id && query && query.login && <LoginForm />}
     </ThemeProvider>
   );
 }
 
-App.getInitialProps = async ({ ctx, Component }: AppContext) => {
+App.getInitialProps = async ({ ctx }: AppContext) => {
   const { id } = cookies(ctx);
-  console.log(id);
   const baseUrl = ctx.req ? getAbsoluteUrl(ctx.req) : '';
   if (id) {
     const response = await fetch(`${baseUrl}/api/user?id=${id}`, {
