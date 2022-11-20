@@ -4,14 +4,14 @@ import { useState } from 'react';
 interface Props {
   open: boolean;
   handleClose: () => void;
-  deleteMember: () => Promise<void>;
+  onDelete: () => Promise<void>;
 }
 
-export const DeleteDialog = ({ open, handleClose, deleteMember }: Props) => {
+export const DeleteDialog = ({ open, handleClose, onDelete }: Props) => {
   const [loading, setLoading] = useState(false);
   const onConfirm = () => {
     setLoading(true);
-    deleteMember().then(() => {
+    onDelete().then(() => {
       setLoading(false);
       handleClose();
     });
@@ -22,9 +22,7 @@ export const DeleteDialog = ({ open, handleClose, deleteMember }: Props) => {
       onClose={handleClose}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description">
-      <DialogTitle id="alert-dialog-title" sx={{ fontFamily: 'Pretendard' }}>
-        {loading ? '삭제 중...' : '정말 삭제하시겠습니까?'}
-      </DialogTitle>
+      <DialogTitle id="alert-dialog-title">{loading ? '삭제 중...' : '정말 삭제하시겠습니까?'}</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description"></DialogContentText>
       </DialogContent>
