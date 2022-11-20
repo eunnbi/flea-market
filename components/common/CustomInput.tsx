@@ -15,6 +15,7 @@ interface Props {
   };
   helperText?: string;
   disabled?: boolean;
+  multiline?: boolean;
   icon?: React.ReactNode;
 }
 
@@ -29,6 +30,7 @@ const CustomInput = ({
   errorInfo,
   disabled,
   icon,
+  multiline,
 }: Props) => {
   const { isError, message } = errorInfo;
   const [showPassword, setShowPassword] = useState(false);
@@ -62,9 +64,23 @@ const CustomInput = ({
           }
         />
       ) : icon ? (
-        <Input id={htmlFor} type={type ? type : 'text'} onChange={onChange} error={isError} endAdornment={icon} />
+        <Input
+          id={htmlFor}
+          type={type ? type : 'text'}
+          onChange={onChange}
+          error={isError}
+          endAdornment={icon}
+          value={value}
+        />
       ) : (
-        <Input id={htmlFor} type={type ? type : 'text'} value={value} onChange={onChange} error={isError} />
+        <Input
+          id={htmlFor}
+          type={type ? type : 'text'}
+          value={value}
+          onChange={onChange}
+          error={isError}
+          multiline={multiline}
+        />
       )}
       {helperText ? <FormHelperText>{helperText}</FormHelperText> : null}
       {message ? <FormHelperText error>{message}</FormHelperText> : null}
