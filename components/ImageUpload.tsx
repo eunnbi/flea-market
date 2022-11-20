@@ -4,19 +4,26 @@ import styled from '@emotion/styled';
 import { noError } from '@lib/formValidation';
 
 interface Props {
+  imageUrl?: string;
   imageFile: any;
   changeImageFile: (e: any) => void;
   errorInfo: typeof noError;
 }
 
-const ImageUpload = ({ imageFile, changeImageFile, errorInfo }: Props) => {
+const ImageUpload = ({ imageUrl, imageFile, changeImageFile, errorInfo }: Props) => {
   const ref = useRef<HTMLInputElement | null>(null);
   return (
     <Wrapper>
-      {imageFile && (
-        <div className="w-full">
+      {imageFile ? (
+        <div>
           <img src={URL.createObjectURL(imageFile)} />
         </div>
+      ) : (
+        imageUrl && (
+          <div>
+            <img src={imageUrl} />
+          </div>
+        )
       )}
       <div>
         <button onClick={() => ref.current?.click()} type="button">
