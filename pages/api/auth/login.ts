@@ -10,7 +10,7 @@ export default async function login(req: NextApiRequest, res: NextApiResponse) {
           res.status(200).json({ message: 'Wrong ID or password' });
         } else {
           const { id } = user;
-          res.setHeader('Set-Cookie', `id=${id}; path=/; Secure; HttpOnly; SameSite=Strict`);
+          res.setHeader('Set-Cookie', `id=${id}; path=/; Secure; SameSite=Strict`);
           return res.status(200).json({ success: true, user });
         }
       }
