@@ -102,7 +102,7 @@ const RegisterForm = () => {
           ...values,
         });
         setLoading(false);
-        Router.push(`/?login=true&signUp=true`, '/');
+        Router.push(`/?login=true&alert=🖤 회원가입에 성공하셨습니다.`, '/');
       } catch (e) {
         setLoading(false);
         alert('회원가입에 실패하였습니다. 다시 진행해주세요');
