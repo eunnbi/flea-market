@@ -14,4 +14,7 @@ export const theme = createTheme({
       light: '#42a5f5',
     },
   },
+  typography: {
+    fontFamily: ['Pretendard', 'sans-serif'].join(','),
+  },
 });
