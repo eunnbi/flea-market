@@ -35,7 +35,9 @@ export const getServerSideProps = async ({ query, req }: GetServerSidePropsConte
     };
   } else {
     return {
-      props: {},
+      props: {
+        data: undefined,
+      },
     };
   }
 };
