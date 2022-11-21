@@ -11,6 +11,13 @@ export const createImage = async ({ publicId, version, format }: Pick<Image, 'fo
   return res;
 };
 
+export const deleteImage = async (id: Image['id']) => {
+  const res = await prisma.image.delete({
+    where: { id },
+  });
+  return res;
+};
+
 export const getImageById = async (id: Image['id']) => {
   const res = await prisma.image.findUnique({
     where: { id },
