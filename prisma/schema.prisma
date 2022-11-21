@@ -71,6 +71,6 @@ enum Role {
 
 enum Status {
   AUCTION
-  PUCHASED
+  PURCHASED
   PROGRESS
 }
