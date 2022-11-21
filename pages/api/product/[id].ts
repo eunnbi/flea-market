@@ -1,17 +1,20 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { deleteProduct, updateProduct } from '@db/product';
+import { getImageById, deleteImage } from '@db/image';
+import cloudinary from '@lib/cloudinary';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     switch (req.method) {
       case 'DELETE': {
-        // Delete an existing user
         const { id } = req.query;
         const product = await deleteProduct(id as string);
-        return res.json(product);
+        const response = await getImageById(product.imageId);
+        await cloudinary.v2.uploader.destroy(response!.publicId, () => {});
+        const image = await deleteImage(product.imageId);
+        return res.json({ product, image });
       }
       case 'PATCH': {
-        // Update an existing user
         const { id } = req.query;
         const product = await updateProduct(id as string, req.body);
         return res.json(product);
