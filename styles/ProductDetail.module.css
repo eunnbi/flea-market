@@ -1,0 +1,48 @@
+.main {
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 500px;
+  width: 100%;
+  gap: 2rem;
+}
+
+.main h2 {
+  font-weight: normal;
+}
+
+.main > section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.main > section:first-child {
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.main > section:first-child > p {
+  font-weight: bold;
+}
+
+.main img {
+  width: 100%;
+  border-radius: 5px;
+}
+
+.main > section p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+}
+
+.main > div {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
