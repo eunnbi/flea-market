@@ -14,12 +14,12 @@ const getHeaderInfo = (pathname: string) => {
   } else if (page === 'sell') {
     return {
       basePath: `/${page}`,
-      NAV: [{ to: '/sell/register', name: 'Register Your Products' }],
+      NAV: [{ to: '/sell/register', name: 'Register Product' }],
     };
   } else {
     return {
       basePath: '/',
-      NAV: [],
+      NAV: [{ to: '/products/search', name: 'Search Product' }],
     };
   }
 };
