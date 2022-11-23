@@ -26,7 +26,7 @@ model Product {
   tradingPlace String
   content      String
   phoneNumber  String
-  sellerId     String    @db.ObjectId()
+  sellerId     String
   imageId      String    @db.ObjectId()
   status       Status
   likeCnt      Int       @default(0)
@@ -41,25 +41,25 @@ model Image {
   version  String
 }
 
-model Auction {
+model Bidding {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   price     Int
   productId String   @db.ObjectId()
-  bidderId  String   @db.ObjectId
+  bidderId  String 
   createdAt DateTime @default(now())
 }
 
 model Wish {
   id        String @id @default(auto()) @map("_id") @db.ObjectId
   productId String @db.ObjectId()
-  buyerId   String @db.ObjectId()
+  buyerId   String
 }
 
 model Shopping {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   price     Int
   productId String   @unique @db.ObjectId
-  buyerId   String   @db.ObjectId()
+  buyerId   String
   createdAt DateTime @default(now())
 }
 
