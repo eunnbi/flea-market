@@ -1,6 +1,8 @@
 import styled from '@emotion/styled';
+import { getDiffDay } from '@lib/getDiffDay';
 import { getImageUrl } from '@lib/getImageUrl';
 import { getTimeForToday } from '@lib/getTimeForToday';
+import { Chip } from '@mui/material';
 import { Image, Product } from '@prisma/client';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -30,15 +32,22 @@ const Section = styled.section`
 
 const Item = ({ product }: { product: ProductItem }) => {
   const { pathname } = useRouter();
-  const { id, name, price, status, image, createdAt, likeCnt } = product;
+  const { id, name, price, status, image, createdAt, likeCnt, endingAt } = product;
   return (
-    <StyledLink href={`${pathname}/products/${id}`}>
+    <StyledLink href={`/${pathname.split('/')[1] === 'products' ? '' : pathname.split('/')[1]}/products/${id}`}>
       <article>
-        <Image src={getImageUrl(image)} alt="product thumbnail" />
+        <div className="imageBox">
+          <Image src={getImageUrl(image)} alt="product thumbnail" />
+          <Chip label={status === 'AUCTION' ? '경매' : status === 'PROGRESS' ? '판매 진행중' : '판매 완료'} />
+        </div>
         <div className="wrapper">
           <div>
             <h3>{name}</h3>
-            <p className="price">{price.toLocaleString()}원</p>
+            {status != 'AUCTION' ? (
+              <p className="price">{price.toLocaleString()}원</p>
+            ) : (
+              <p>D-{getDiffDay(String(endingAt))}</p>
+            )}
           </div>
           <div className="row">
             <p className="date">{getTimeForToday(String(createdAt))}</p>
@@ -81,6 +90,16 @@ const StyledLink = styled(Link)`
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
+  }
+  .imageBox {
+    position: relative;
+    .MuiChip-root {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      z-index: 2;
+      background-color: lightgray;
+    }
   }
 `;
 
