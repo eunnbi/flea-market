@@ -31,6 +31,13 @@ export const getUserByLogin = async ({ userId, password }: Pick<User, 'userId' |
   return user;
 };
 
+export const getUsersByRole = async (role: User['role']) => {
+  const users = await prisma.user.findMany({
+    where: { role },
+  });
+  return users;
+};
+
 // CREATE
 export const createUser = async ({
   name,
