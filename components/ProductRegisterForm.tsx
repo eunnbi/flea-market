@@ -18,7 +18,7 @@ type State = Pick<Product, 'name' | 'phoneNumber' | 'tradingPlace' | 'status' | 
   price: string;
 };
 
-const ProductRegisterForm = ({ initialProduct }: { initialProduct?: ProductItem }) => {
+const ProductRegisterForm = ({ initialProduct }: { initialProduct: ProductItem | null }) => {
   const [errorInfo, setErrorInfo] = useState({
     name: noError,
     phoneNumber: noError,
@@ -28,17 +28,28 @@ const ProductRegisterForm = ({ initialProduct }: { initialProduct?: ProductItem 
     imageFile: noError,
     content: noError,
   });
-  const [values, setValues] = useState<State>({
-    name: initialProduct?.name ? initialProduct.name : '',
-    phoneNumber: initialProduct?.phoneNumber ? initialProduct.phoneNumber : '',
-    price: initialProduct?.price ? String(initialProduct.price) : '',
-    tradingPlace: initialProduct?.tradingPlace ? initialProduct.tradingPlace : '',
-    status: initialProduct?.status ? initialProduct?.status : 'PROGRESS',
-    content: initialProduct?.content ? initialProduct.content : '',
-  });
-  const [location, setLocation] = useState(initialProduct?.tradingPlace ? initialProduct.tradingPlace : '');
+  const [values, setValues] = useState<State>(
+    initialProduct === null
+      ? {
+          name: '',
+          phoneNumber: '',
+          price: '',
+          tradingPlace: '',
+          status: 'PROGRESS',
+          content: '',
+        }
+      : {
+          name: initialProduct.name,
+          phoneNumber: initialProduct.phoneNumber,
+          price: String(initialProduct.price),
+          tradingPlace: initialProduct.tradingPlace,
+          status: initialProduct.status,
+          content: initialProduct.content,
+        },
+  );
+  const [location, setLocation] = useState(initialProduct !== null ? initialProduct.tradingPlace : '');
   const [endingAt, setEndingAt] = useState<Dayjs | null>(
-    initialProduct?.endingAt ? dayjs(initialProduct?.endingAt) : null,
+    initialProduct != null ? dayjs(initialProduct.endingAt) : null,
   );
   const [imageFile, setImageFile] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -326,13 +337,13 @@ const ProductRegisterForm = ({ initialProduct }: { initialProduct?: ProductItem 
     <Form onSubmit={onSubmit}>
       <div className="row">
         <Chip
-          label="Not Auction"
+          label="판매"
           variant={status === 'PROGRESS' ? 'filled' : 'outlined'}
           onClick={toggleStatus}
           color="primary"
         />
         <Chip
-          label="Auction"
+          label="경매"
           variant={status === 'AUCTION' ? 'filled' : 'outlined'}
           onClick={toggleStatus}
           color="primary"
