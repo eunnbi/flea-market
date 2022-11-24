@@ -1,9 +1,19 @@
-import styled from '@emotion/styled';
-import { Avatar, Button, Tooltip } from '@mui/material';
+import {
+  Avatar,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Chip,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+} from '@mui/material';
 import { User } from '@prisma/client';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { searchState } from 'store/searchState';
+import { BiUser } from 'react-icons/bi';
 
 function stringToColor(string: string) {
   let hash = 0;
@@ -33,57 +43,53 @@ function stringAvatar(name: string) {
 }
 
 const SellerFilter = ({ sellers }: { sellers: User[] }) => {
+  const [open, setOpen] = useState(false);
   const [state, setState] = useRecoilState(searchState);
-  const onClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const { id } = e.currentTarget.dataset;
-    if (id === undefined) return;
-    setState(state => ({ ...state, sellerId: id }));
+  const handleClose = () => setOpen(false);
+  const onClick = (e: React.MouseEvent<HTMLLIElement>) => {
+    const { id, name } = e.currentTarget.dataset;
+    if (id === undefined || name === undefined) return;
+    setState(state => ({ ...state, seller: { id, name } }));
+    handleClose();
+  };
+  const onDelete = () => {
+    setState(state => ({ ...state, seller: { id: '', name: '' } }));
   };
   return (
-    <Div>
-      <h4>Sellers</h4>
-      <div>
-        {sellers.map(seller => (
-          <Button
-            key={seller.userId}
-            className={state.sellerId === seller.userId ? 'selected' : ''}
-            onClick={onClick}
-            data-id={seller.userId}>
-            <Avatar {...stringAvatar(seller.name)} />
-            <span>{seller.name.split(' ')[0]}</span>
-          </Button>
-        ))}
-      </div>
-    </Div>
+    <>
+      <Chip
+        icon={<BiUser />}
+        label={`판매자 : ${state.seller.name}`}
+        variant={state.seller.name === '' ? 'outlined' : 'filled'}
+        onClick={() => setOpen(true)}
+        onDelete={state.seller.name === '' ? undefined : onDelete}
+      />
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description">
+        <DialogTitle id="alert-dialog-title">판매자</DialogTitle>
+        <DialogContent>
+          <List>
+            {sellers.map(seller => (
+              <ListItem
+                disablePadding
+                key={seller.id}
+                data-id={seller.userId}
+                data-name={seller.name}
+                onClick={onClick}>
+                <ListItemButton sx={{ display: 'flex', gap: '1rem' }}>
+                  <Avatar {...stringAvatar(seller.name)} />
+                  <ListItemText primary={seller.name} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
-
-const Div = styled.div`
-  width: 100%;
-  h4 {
-    font-weight: 500;
-    margin-bottom: 10px;
-  }
-  & > div {
-    display: flex;
-    align-items: center;
-  }
-  button {
-    display: flex;
-    flex-direction: column;
-  }
-  span {
-    color: gray;
-  }
-  .selected {
-    div {
-      border: 2px solid #000;
-    }
-    span {
-      font-weight: bold;
-      color: #000;
-    }
-  }
-`;
 
 export default SellerFilter;
