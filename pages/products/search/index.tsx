@@ -1,29 +1,43 @@
 import CustomHead from '@components/common/CustomHead';
-import ProductList from '@components/ProductList';
+import ProductList from '@components/common/ProductList';
 import SearchBar from '@components/SearchBar';
 import SellerFilter from '@components/SellerFilter';
 import styled from '@emotion/styled';
 import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
-import { ProductItem } from '@components/ProductList';
+import { ProductItem } from '@components/common/ProductList';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { useEffect, useState } from 'react';
 import { searchState } from 'store/searchState';
 import { useRecoilValue } from 'recoil';
 import PriceFilter from '@components/PriceFilter';
+import Header from '@components/common/Header';
 
-const ProductsSearch = ({ sellers }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const ProductsSearch = ({ sellers, isLogin, token }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { name, seller, startPrice, lastPrice } = useRecoilValue(searchState);
   const [products, setProducts] = useState<ProductItem[] | []>([]);
   useEffect(() => {
-    fetch(`/api/product?name=${name}`)
-      .then(res => res.json())
-      .then(data => {
-        setProducts(data);
-      });
+    if (!isLogin) {
+      fetch(`/api/product?name=${name}`)
+        .then(res => res.json())
+        .then(data => {
+          setProducts(data);
+        });
+    } else {
+      fetch(`/api/product?name=${name}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then(res => res.json())
+        .then(data => {
+          setProducts(data);
+        });
+    }
   }, [name]);
   return (
     <>
       <CustomHead title="Search Products" />
+      <Header isLogin={isLogin} />
       <Main>
         <SearchBar />
         <div className="row">
@@ -76,12 +90,39 @@ const Main = styled.main`
 `;
 
 export const getServerSideProps = async ({ req }: GetServerSidePropsContext) => {
+  const { cookies } = req;
   const baseUrl = getAbsoluteUrl(req);
-  const response = await fetch(`${baseUrl}/api/user?role=SELLER`);
-  const sellers = await response.json();
+  const response = await fetch(`${baseUrl}/api/user/verify`, {
+    headers: {
+      Authorization: cookies.access_token ? `Bearer ${cookies.access_token}` : 'Bearer',
+    },
+  });
+  const { verify, user } = await response.json();
+  if (verify) {
+    if (user.role === 'ADMIN') {
+      return {
+        redirect: {
+          destination: '/admin',
+          permanent: false,
+        },
+      };
+    }
+    if (user.role === 'SELLER') {
+      return {
+        redirect: {
+          destination: '/sell',
+          permanent: false,
+        },
+      };
+    }
+  }
+  const res = await fetch(`${baseUrl}/api/user?role=SELLER`);
+  const sellers = await res.json();
   return {
     props: {
       sellers,
+      isLogin: verify,
+      token: cookies.access_token === undefined ? null : cookies.access_token,
     },
   };
 };
