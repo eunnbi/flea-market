@@ -37,7 +37,7 @@ const Item = ({ product }: { product: ProductItem }) => {
   const { pathname } = useRouter();
   const { id, name, price, status, image, createdAt, likeCnt, endingAt } = product;
   return (
-    <StyledLink href={`/${pathname.split('/')[1] === 'products' ? '' : pathname.split('/')[1]}/products/${id}`}>
+    <StyledLink href={`/${pathname.split('/')[1] === 'products' ? '' : pathname.split('/')[1]}products/${id}`} passHref>
       <article>
         <div className="imageBox">
           <Image src={getImageUrl(image)} alt="product thumbnail" />
