@@ -1,11 +1,14 @@
 import CustomHead from '@components/common/CustomHead';
-import ProductList, { ProductItem } from '@components/ProductList';
+import ProductList, { ProductItem } from '@components/common/ProductList';
 import { useState, useEffect } from 'react';
 import StatusFilter from '@components/StatusFilter';
 import SortFilter from '@components/SortFilter';
 import styled from '@emotion/styled';
+import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import Header from '@components/common/Header';
 
-const Home = () => {
+const Home = ({ isLogin, token }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [filter, setFilter] = useState({
     AUCTION: true,
     PURCHASED: true,
@@ -14,13 +17,24 @@ const Home = () => {
   const [products, setProducts] = useState<ProductItem[] | []>([]);
   const [sort, setSort] = useState('최신순');
   useEffect(() => {
-    fetch(`/api/product`)
-      .then(res => res.json())
-      .then(data => setProducts(data));
+    if (!isLogin) {
+      fetch(`/api/product`)
+        .then(res => res.json())
+        .then(data => setProducts(data));
+    } else {
+      fetch(`/api/product`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then(res => res.json())
+        .then(data => setProducts(data));
+    }
   }, []);
   return (
     <>
       <CustomHead title="Home" />
+      <Header isLogin={isLogin} />
       <Main>
         <h1>Products</h1>
         <StatusFilter filter={filter} setFilter={setFilter} />
@@ -78,5 +92,35 @@ const Main = styled.main`
     margin-bottom: 2rem;
   }
 `;
+
+export const getServerSideProps = async ({ req }: GetServerSidePropsContext) => {
+  const { cookies } = req;
+  const baseUrl = getAbsoluteUrl(req);
+  const response = await fetch(`${baseUrl}/api/user/verify`, {
+    headers: {
+      Authorization: cookies.access_token ? `Bearer ${cookies.access_token}` : 'Bearer',
+    },
+  });
+  const { verify, user } = await response.json();
+  if (verify) {
+    if (user.role === 'SELLER') {
+      return {
+        redirect: {
+          destination: '/sell',
+          permanent: false,
+        },
+      };
+    }
+    if (user.role === 'ADMIN') {
+      return {
+        redirect: {
+          destination: '/admin',
+          permanent: false,
+        },
+      };
+    }
+  }
+  return { props: { isLogin: verify, token: cookies.access_token === undefined ? null : cookies.access_token } };
+};
 
 export default Home;
