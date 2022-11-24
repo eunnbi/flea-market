@@ -7,27 +7,48 @@ import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
 import { ProductItem } from '@components/ProductList';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { useEffect, useState } from 'react';
+import { searchState } from 'store/searchState';
+import { useRecoilValue } from 'recoil';
+import PriceFilter from '@components/PriceFilter';
 
 const ProductsSearch = ({ sellers }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const { name, seller, startPrice, lastPrice } = useRecoilValue(searchState);
   const [products, setProducts] = useState<ProductItem[] | []>([]);
   useEffect(() => {
-    fetch(`/api/product`)
+    fetch(`/api/product?name=${name}`)
       .then(res => res.json())
-      .then(data => setProducts(data));
-  }, []);
+      .then(data => {
+        setProducts(data);
+      });
+  }, [name]);
   return (
     <>
       <CustomHead title="Search Products" />
       <Main>
         <SearchBar />
-        <SellerFilter sellers={sellers} />
-        <ProductList products={products} />
+        <div className="row">
+          <SellerFilter sellers={sellers} />
+          <PriceFilter />
+        </div>
+        <div style={{ marginTop: '1rem' }}>
+          <h2>검색 결과</h2>
+          <ProductList
+            result={true}
+            products={products
+              .filter(product => (seller.id === '' ? true : product.sellerId === seller.id))
+              .filter(product =>
+                startPrice === 0 && lastPrice === 0
+                  ? true
+                  : product.price >= startPrice && (lastPrice === 0 ? true : product.price <= lastPrice),
+              )}
+          />
+        </div>
       </Main>
     </>
   );
 };
 const Main = styled.main`
-  max-width: 1200px;
+  max-width: 720px;
   margin: 3rem auto;
   padding: 0 1rem;
   display: flex;
@@ -36,6 +57,21 @@ const Main = styled.main`
   gap: 1.2rem;
   h1 {
     margin-bottom: 2rem;
+  }
+  h2 {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  .result {
+    color: gray;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
 `;
 
