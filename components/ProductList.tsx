@@ -12,13 +12,16 @@ export interface ProductItem extends Product {
   image: Image;
 }
 
-const ProductList = ({ products }: { products: ProductItem[] }) => {
+const ProductList = ({ products, result }: { products: ProductItem[]; result?: true }) => {
   return (
-    <Section>
-      {products.map(product => (
-        <Item product={product} key={product.id} />
-      ))}
-    </Section>
+    <>
+      {result && <p className="result">{products.length}개의 상품</p>}
+      <Section>
+        {products.map(product => (
+          <Item product={product} key={product.id} />
+        ))}
+      </Section>
+    </>
   );
 };
 
