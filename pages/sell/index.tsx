@@ -1,10 +1,12 @@
 import CustomHead from '@components/common/CustomHead';
-import ProductList, { ProductItem } from '@components/ProductList';
+import ProductList, { ProductItem } from '@components/common/ProductList';
 import { useState, useEffect } from 'react';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import StatusFilter from '@components/StatusFilter';
 import SortFilter from '@components/SortFilter';
 import styled from '@emotion/styled';
+import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
+import Header from '@components/common/Header';
 
 const Sell = ({ token }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [filter, setFilter] = useState({
@@ -26,6 +28,7 @@ const Sell = ({ token }: InferGetServerSidePropsType<typeof getServerSideProps>)
   return (
     <>
       <CustomHead title="Home" />
+      <Header isLogin={true} />
       <Main>
         <h1>Your Products</h1>
         <StatusFilter filter={filter} setFilter={setFilter} />
@@ -86,8 +89,33 @@ const Main = styled.main`
 
 export const getServerSideProps = async ({ req }: GetServerSidePropsContext) => {
   const { cookies } = req;
+  const baseUrl = getAbsoluteUrl(req);
+  const res = await fetch(`${baseUrl}/api/user/verify`, {
+    headers: {
+      Authorization: cookies.access_token ? `Bearer ${cookies.access_token}` : 'Bearer',
+    },
+  });
+  const { verify, user } = await res.json();
+  if (verify) {
+    if (user.role === 'ADMIN') {
+      return {
+        redirect: {
+          destination: '/admin',
+          permanent: false,
+        },
+      };
+    }
+    if (user.role === 'SELLER') {
+      return {
+        props: { token: cookies.access_token },
+      };
+    }
+  }
   return {
-    props: { token: cookies.access_token },
+    redirect: {
+      destination: '/',
+      permanent: false,
+    },
   };
 };
 
