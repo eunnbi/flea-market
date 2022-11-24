@@ -21,17 +21,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       case 'GET': {
         if (req.query.id) {
-          const product = await getProductById(req.query.id as string);
-          return res.status(200).json(product);
+          if (req.headers.authorization) {
+            const token = req.headers.authorization.split(' ')[1];
+            const decoded = jwt.verify(token, KEY);
+            const { userId }: User = decoded as User;
+            const product = await getProductById(req.query.id as string, userId);
+            return res.status(200).json(product);
+          } else {
+            const product = await getProductById(req.query.id as string);
+            return res.status(200).json(product);
+          }
+        } else if (req.query.name) {
+          if (req.headers.authorization) {
+            const token = req.headers.authorization.split(' ')[1];
+            const decoded = jwt.verify(token, KEY);
+            const { userId }: User = decoded as User;
+            const products = await getProductsByName(req.query.name as string, userId);
+            return res.status(200).json(products);
+          } else {
+            const products = await getProductsByName(req.query.id as string);
+            return res.status(200).json(products);
+          }
         } else if (req.headers.authorization) {
           const token = req.headers.authorization.split(' ')[1];
           const decoded = jwt.verify(token, KEY);
-          const { userId }: User = decoded as User;
-          const product = await getProductBySeller(userId as string);
-          return res.status(200).json(product);
-        } else if (req.query.name) {
-          const products = await getProductsByName(req.query.name as string);
-          return res.status(200).json(products);
+          const { userId, role }: User = decoded as User;
+          if (role === 'SELLER') {
+            const product = await getProductBySeller(userId);
+            return res.status(200).json(product);
+          } else {
+            const products = await getAllProducts(userId);
+            return res.status(200).json(products);
+          }
         } else {
           const products = await getAllProducts();
           return res.status(200).json(products);
