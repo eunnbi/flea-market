@@ -11,7 +11,7 @@ import ImageUpload from './ImageUpload';
 import styled from '@emotion/styled';
 import axios from 'axios';
 import Router from 'next/router';
-import { ProductItem } from './ProductList';
+import { ProductItem } from './common/ProductList';
 import { getImageUrl } from '@lib/getImageUrl';
 
 type State = Pick<Product, 'name' | 'phoneNumber' | 'tradingPlace' | 'status' | 'content'> & {

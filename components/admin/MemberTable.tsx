@@ -16,7 +16,7 @@ import { IoMdTrash } from 'react-icons/io';
 import { FaEdit } from 'react-icons/fa';
 import { tableCellClasses } from '@mui/material/TableCell';
 import { useState, useEffect } from 'react';
-import { DeleteDialog } from '../common/DeleteDialog';
+import SimpleDialog from '../common/SimpleDialog';
 import EditDialog from './EditDialog';
 import axios from 'axios';
 import { BsArrowUpShort, BsArrowDownShort } from 'react-icons/bs';
@@ -181,10 +181,13 @@ const MemberTable = ({ initialMembers }: { initialMembers: User[] }) => {
           </TableBody>
         </Table>
       </TableContainer>
-      <DeleteDialog
+      <SimpleDialog
         open={deleteState.open}
         handleClose={handleClose('delete')}
-        onDelete={deleteMember(deleteState.id)}
+        onConfirm={deleteMember(deleteState.id)}
+        basicTitle="정말 삭제하시겠습니까?"
+        loadingTitle="삭제 중..."
+        content="유저 관련 데이터도 전부 삭제됩니다."
       />
       <EditDialog
         open={editState.open}
