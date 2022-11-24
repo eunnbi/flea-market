@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 
-const getHeaderInfo = (pathname: string) => {
+const getHeaderInfo = (pathname: string, isLogin: boolean) => {
   const page = pathname.split('/')[1];
   if (page === 'admin') {
     return {
@@ -19,7 +19,12 @@ const getHeaderInfo = (pathname: string) => {
   } else {
     return {
       basePath: '/',
-      NAV: [{ to: '/products/search', name: 'Search Product' }],
+      NAV: isLogin
+        ? [
+            { to: '/products/search', name: 'Search Product' },
+            { to: '/mypage', name: ' My Page' },
+          ]
+        : [{ to: '/products/search', name: 'Search Product' }],
     };
   }
 };
@@ -27,7 +32,7 @@ const getHeaderInfo = (pathname: string) => {
 const Header = ({ isLogin }: { isLogin: boolean }) => {
   const router = useRouter();
   const { pathname } = router;
-  const { basePath, NAV } = getHeaderInfo(pathname);
+  const { basePath, NAV } = getHeaderInfo(pathname, isLogin);
   const onLogout = () => {
     axios.post('/api/auth/logout').then(response => {
       router.push('/');
@@ -67,7 +72,7 @@ const HeaderBox = styled.header`
   color: #fff;
   height: var(--hh);
   & > div {
-    max-width: 1200px;
+    max-width: 1020px;
     margin: 0 auto;
     padding: 0 1rem;
     display: flex;
