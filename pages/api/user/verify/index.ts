@@ -25,6 +25,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         break;
     }
   } catch (error: any) {
-    return res.status(500).json({ ...error, message: error.message });
+    return res.status(500).json({ ...error, message: error.message, verify: false });
   }
 }
