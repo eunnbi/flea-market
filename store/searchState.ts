@@ -4,7 +4,10 @@ export const searchState = atom({
   key: 'searchState',
   default: {
     name: '',
-    sellerId: '',
+    seller: {
+      id: '',
+      name: '',
+    },
     startPrice: 0,
     lastPrice: 0,
   },
