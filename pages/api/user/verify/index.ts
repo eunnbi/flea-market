@@ -12,9 +12,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           return res.json({ verify: false, user: undefined });
         } else {
           const token = req.headers.authorization.split(' ')[1];
-          const decoded = jwt.verify(token, KEY);
-          const user: User = decoded as User;
-          return res.status(200).json({ verify: true, user });
+          if (token) {
+            const decoded = jwt.verify(token, KEY);
+            const user: User = decoded as User;
+            return res.status(200).json({ verify: true, user });
+          } else {
+            return res.json({ verify: false, user: undefined });
+          }
         }
       }
       default:

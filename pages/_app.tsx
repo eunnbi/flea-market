@@ -44,7 +44,7 @@ App.getInitialProps = async ({ ctx }: AppContext) => {
   const response = await fetch(`${baseUrl}/api/user/verify`, {
     method: 'GET',
     headers: {
-      Authorization: `Bearer ${access_token}`,
+      Authorization: access_token === undefined ? `Bearer ` : `Bearer ${access_token}`,
     },
   });
   const { verify, user } = await response.json();
