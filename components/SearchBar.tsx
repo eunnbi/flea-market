@@ -11,26 +11,48 @@ import {
   Slider,
 } from '@mui/material';
 import React, { useState } from 'react';
-import { BiSearchAlt, BiFilterAlt } from 'react-icons/bi';
+import { BiSearchAlt } from 'react-icons/bi';
+import { IoCloseCircle } from 'react-icons/io5';
 import { useRecoilState } from 'recoil';
 import { searchState } from 'store/searchState';
 
 const SearchBar = () => {
   const [open, setOpen] = useState(false);
+  const [input, setInput] = useState('');
   const [state, setState] = useRecoilState(searchState);
   const handleClose = () => setOpen(false);
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setState(state => ({ ...state, keyword: e.currentTarget.value }));
+    setInput(e.currentTarget.value);
+  };
+  const onClickSearchButton = () => {
+    setInput(input => {
+      setState(state => ({ ...state, name: input }));
+      return input;
+    });
+  };
+  const onClickClearButton = () => {
+    setInput(() => {
+      setState(state => ({ ...state, name: '' }));
+      return '';
+    });
   };
   return (
     <>
       <Div>
-        <Input placeholder="상품 이름 검색" onChange={onChange} value={state.name} />
-        <IconButton>
+        <Input
+          placeholder="상품 이름 검색"
+          onChange={onChange}
+          value={input}
+          endAdornment={
+            state.name !== '' && (
+              <IconButton onClick={onClickClearButton}>
+                <IoCloseCircle />
+              </IconButton>
+            )
+          }
+        />
+        <IconButton onClick={onClickSearchButton}>
           <BiSearchAlt />
-        </IconButton>
-        <IconButton onClick={() => setOpen(true)}>
-          <BiFilterAlt />
         </IconButton>
       </Div>
       <Dialog
