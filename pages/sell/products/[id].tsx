@@ -31,7 +31,7 @@ const ProductDetail = ({ product }: InferGetServerSidePropsType<typeof getServer
         <section>
           <img src={getImageUrl(image)} alt="product" />
           <h2>{name}</h2>
-          {status != 'AUCTION' && <p>{price}원</p>}
+          {status != 'AUCTION' && <p>{price.toLocaleString()}원</p>}
         </section>
         <section>
           <Chip label={status === 'AUCTION' ? '경매' : status === 'PROGRESS' ? '판매 진행중' : '판매 완료'} />

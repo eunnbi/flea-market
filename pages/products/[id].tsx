@@ -11,8 +11,9 @@ import { Button, Chip } from '@mui/material';
 import { User } from '@prisma/client';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
+import cookies from 'next-cookies';
 
-const ProductDetail = ({ product }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const ProductDetail = ({ verify, product }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [open, setOpen] = useState(false);
   const { id, name, price, tradingPlace, endingAt, status, image, content, likeCnt, phoneNumber, user } = product;
   return (
@@ -22,7 +23,7 @@ const ProductDetail = ({ product }: InferGetServerSidePropsType<typeof getServer
         <section>
           <img src={getImageUrl(image)} alt="product" />
           <h2>{name}</h2>
-          {status != 'AUCTION' && <p>{price}원</p>}
+          {status != 'AUCTION' && <p>{price.toLocaleString()}원</p>}
         </section>
         <section>
           <Chip label={status === 'AUCTION' ? '경매' : status === 'PROGRESS' ? '판매 진행중' : '판매 완료'} />
@@ -63,13 +64,16 @@ const ProductDetail = ({ product }: InferGetServerSidePropsType<typeof getServer
   );
 };
 
-export const getServerSideProps = async ({ req, query }: GetServerSidePropsContext) => {
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const { query, req } = ctx;
+  const { access_token } = cookies(ctx);
   const baseUrl = getAbsoluteUrl(req);
   const response = await fetch(`${baseUrl}/api/product?id=${query.id as string}`);
   const product = await response.json();
   return {
     props: {
       product,
+      verify: access_token === undefined ? null : access_token,
     },
   };
 };
