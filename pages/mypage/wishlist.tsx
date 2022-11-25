@@ -19,7 +19,12 @@ const MyPage = ({ wish, user }: InferGetServerSidePropsType<typeof getServerSide
 };
 
 const Main = styled.main`
-  margin: 2rem auto;
+  margin: 3rem auto;
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
   h2 {
     text-align: center;
     margin-bottom: 1.5rem;
