@@ -66,7 +66,7 @@ const LoginForm = () => {
   return (
     <Wrapper>
       <Form onSubmit={onSubmit}>
-        <CloseButton type="button" onClick={() => router.replace(pathname)}>
+        <CloseButton type="button" onClick={() => router.replace(window.location.pathname)}>
           <IoClose />
         </CloseButton>
         <h1>로그인</h1>
