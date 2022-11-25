@@ -80,6 +80,7 @@ const SearchBar = () => {
 };
 
 const Div = styled.div`
+  max-width: 720px;
   width: 100%;
   display: flex;
   align-items: center;
