@@ -36,7 +36,7 @@ const Item = ({ product }: { product: ProductItem }) => {
             ) : (
               <p>D-{getDiffDay(String(endingAt))}</p>
             )}
-            <div className="likeCnt">
+            <div className="cnt">
               <IoMdHeart className="heart_icon" />
               <span>{likeCnt}</span>
             </div>
