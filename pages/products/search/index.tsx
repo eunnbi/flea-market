@@ -62,9 +62,6 @@ const ProductsSearch = ({ sellers, isLogin, token }: InferGetServerSidePropsType
   );
 };
 const Main = styled.main`
-  max-width: 720px;
-  margin: 3rem auto;
-  padding: 0 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
