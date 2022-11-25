@@ -3,7 +3,7 @@ import Script from 'next/script';
 
 interface Props {
   location: string;
-  setLocationErrorInfo: (isError: boolean) => void;
+  setLocationErrorInfo?: (isError: boolean) => void;
 }
 
 function Map({ location, setLocationErrorInfo }: Props) {
@@ -40,9 +40,9 @@ function Map({ location, setLocationErrorInfo }: Props) {
             position: markerPosition,
           });
           marker.setMap(map);
-          setLocationErrorInfo(false);
+          if (setLocationErrorInfo) setLocationErrorInfo(false);
         } else {
-          setLocationErrorInfo(true);
+          if (setLocationErrorInfo) setLocationErrorInfo(true);
         }
       });
     }
