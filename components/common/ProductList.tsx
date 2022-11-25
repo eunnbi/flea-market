@@ -3,15 +3,17 @@ import { getDiffDay } from '@lib/getDiffDay';
 import { getImageUrl } from '@lib/getImageUrl';
 import { getTimeForToday } from '@lib/getTimeForToday';
 import { Chip } from '@mui/material';
-import { Image as ImageType, Product, Wish } from '@prisma/client';
+import { Bidding, Image as ImageType, Product, Wish } from '@prisma/client';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { IoMdHeartEmpty, IoMdHeart } from 'react-icons/io';
+import { BsFillPeopleFill } from 'react-icons/bs';
 import Image from 'next/image';
 
 export interface ProductItem extends Product {
   image: ImageType;
   wish: Wish;
+  bid: Bidding[];
 }
 
 interface ItemProps {
@@ -56,7 +58,7 @@ const FlexSection = styled.section`
 const GridSection = styled.section`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 1rem;
+  gap: 2rem;
   @media screen and (max-width: 920px) {
     grid-template-columns: 1fr 1fr;
   }
@@ -67,7 +69,7 @@ const GridSection = styled.section`
 
 const DefaultItem = ({ product }: ItemProps) => {
   const { pathname } = useRouter();
-  const { id, name, price, status, image, createdAt, likeCnt, endingAt, wish } = product;
+  const { id, name, price, status, image, createdAt, likeCnt, endingAt, wish, bid } = product;
   return (
     <StyledLink
       href={`${pathname.split('/')[1] === 'products' ? '/' : `/${pathname.split('/')[1]}/`}products/${id}`}
@@ -83,7 +85,13 @@ const DefaultItem = ({ product }: ItemProps) => {
               blurDataURL="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg=="
             />
           </ImageWrapper>
-          <Chip label={status === 'AUCTION' ? '경매' : status === 'PROGRESS' ? '판매 진행중' : '판매 완료'} />
+          <Chip
+            label={status === 'AUCTION' ? '경매' : status === 'PROGRESS' ? '판매 진행중' : '판매 완료'}
+            className="status"
+          />
+          {status === 'AUCTION' && (
+            <Chip label={`D-${getDiffDay(String(endingAt))}`} className="dday" variant="outlined" />
+          )}
         </div>
         <div className="wrapper">
           <div>
@@ -91,12 +99,20 @@ const DefaultItem = ({ product }: ItemProps) => {
             {status != 'AUCTION' ? (
               <p className="price">{price.toLocaleString()}원</p>
             ) : (
-              <p>D-{getDiffDay(String(endingAt))}</p>
+              <div className="row">
+                <p className="price">
+                  {bid.length === 0 ? '입찰 없음' : `${Math.max(bid.map(elem => elem.price)).toLocaleString()}원`}
+                </p>
+                <p className="cnt">
+                  <BsFillPeopleFill />
+                  <span>{bid.length}</span>
+                </p>
+              </div>
             )}
           </div>
           <div className="row">
             <p className="date">{getTimeForToday(String(createdAt))}</p>
-            <div className="likeCnt">
+            <div className="cnt">
               {wish ? <IoMdHeart className="heart_icon" /> : <IoMdHeartEmpty className="heart_icon" />}
               <span>{likeCnt}</span>
             </div>
@@ -108,11 +124,10 @@ const DefaultItem = ({ product }: ItemProps) => {
 };
 
 export const StyledLink = styled(Link)`
-  padding: 1rem;
   border-radius: 5px;
   h3 {
     font-weight: normal;
-    margin-bottom: 5px;
+    margin: 3px 0;
     font-size: 1.3rem;
   }
   .price {
@@ -134,7 +149,7 @@ export const StyledLink = styled(Link)`
   }
   .imageBox {
     position: relative;
-    .MuiChip-root {
+    .status {
       position: absolute;
       bottom: 10px;
       right: 10px;
@@ -143,6 +158,14 @@ export const StyledLink = styled(Link)`
       color: white;
       font-size: 0.7rem;
       height: 30px;
+    }
+    .dday {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 2;
+      border-color: gray;
+      color: gray;
     }
   }
 `;
