@@ -14,33 +14,7 @@ import React, { useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { searchState } from 'store/searchState';
 import { BiUser } from 'react-icons/bi';
-
-function stringToColor(string: string) {
-  let hash = 0;
-  let i;
-
-  for (i = 0; i < string.length; i += 1) {
-    hash = string.charCodeAt(i) + ((hash << 5) - hash);
-  }
-
-  let color = '#';
-
-  for (i = 0; i < 3; i += 1) {
-    const value = (hash >> (i * 8)) & 0xff;
-    color += `00${value.toString(16)}`.slice(-2);
-  }
-
-  return color;
-}
-
-function stringAvatar(name: string) {
-  return {
-    sx: {
-      bgcolor: stringToColor(name),
-    },
-    children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
-  };
-}
+import SellerAvatar from './common/SellerAvatar';
 
 const SellerFilter = ({ sellers }: { sellers: User[] }) => {
   const [open, setOpen] = useState(false);
@@ -80,7 +54,7 @@ const SellerFilter = ({ sellers }: { sellers: User[] }) => {
                 data-name={seller.name}
                 onClick={onClick}>
                 <ListItemButton sx={{ display: 'flex', gap: '1rem' }}>
-                  <Avatar {...stringAvatar(seller.name)} />
+                  <SellerAvatar name={seller.name} />
                   <ListItemText primary={seller.name} />
                 </ListItemButton>
               </ListItem>
