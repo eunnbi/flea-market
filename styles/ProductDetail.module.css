@@ -1,18 +1,20 @@
 .main {
-  padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   max-width: 500px;
   width: 100%;
   gap: 2rem;
+  margin-top: 1rem;
 }
 
 .main h2 {
   font-weight: normal;
+  text-align: center;
+  margin-top: 5px;
 }
 
-.main > section {
+.contentBox {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -20,25 +22,35 @@
   align-items: flex-start;
 }
 
-.main > section:first-child {
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.main > section:first-child > p {
-  font-weight: bold;
-}
-
 .main img {
   width: 100%;
   border-radius: 5px;
 }
 
-.main > section p {
+.price {
+  font-weight: bold;
+  text-align: center;
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+}
+
+.content {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
-  font-size: 1rem;
+  font-size: 1.05rem;
+  width: 100%;
+  text-transform: capitalize;
+}
+.content svg {
+  margin-top: 3px;
+}
+.content > div {
+  flex-grow: 1;
+}
+
+.bidTable {
+  width: 100%;
 }
 
 .main > div {
@@ -56,4 +68,10 @@
 
 .likeCnt svg {
   margin-top: 2px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
