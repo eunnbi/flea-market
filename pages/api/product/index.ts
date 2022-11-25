@@ -1,4 +1,11 @@
-import { createProduct, getAllProducts, getProductById, getProductBySeller, getProductsByName } from '@db/product';
+import {
+  createProduct,
+  getAllProducts,
+  getProductById,
+  getProductBySeller,
+  getProductsByName,
+  updateAuctionProduct,
+} from '@db/product';
 import { NextApiRequest, NextApiResponse } from 'next';
 import jwt from 'jsonwebtoken';
 import { User } from '@prisma/client';
@@ -20,6 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       }
       case 'GET': {
+        await updateAuctionProduct();
         if (req.query.id) {
           if (req.headers.authorization) {
             const token = req.headers.authorization.split(' ')[1];
