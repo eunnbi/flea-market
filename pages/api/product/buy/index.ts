@@ -1,4 +1,4 @@
-import { updateProduct } from '@db/product';
+import { updateAuctionProduct, updateProduct } from '@db/product';
 import { NextApiRequest, NextApiResponse } from 'next';
 import jwt from 'jsonwebtoken';
 import { User } from '@prisma/client';
@@ -25,6 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!req.headers.authorization) {
           return res.status(200).json({ success: false, message: 'No Access Token' });
         } else {
+          await updateAuctionProduct();
           const token = req.headers.authorization.split(' ')[1];
           const decoded = jwt.verify(token, KEY);
           const { userId }: User = decoded as User;
