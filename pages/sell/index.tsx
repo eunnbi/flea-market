@@ -8,14 +8,14 @@ import styled from '@emotion/styled';
 import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
 import Header from '@components/common/Header';
 
-const Sell = ({ token }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const Sell = ({ token, data }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [filter, setFilter] = useState({
     AUCTION: true,
     PURCHASED: true,
     PROGRESS: true,
   });
+  const [products, setProducts] = useState<ProductItem[]>(data);
   const [sort, setSort] = useState('최신순');
-  const [products, setProducts] = useState<ProductItem[] | []>([]);
   useEffect(() => {
     fetch(`/api/product`, {
       headers: {
@@ -30,10 +30,11 @@ const Sell = ({ token }: InferGetServerSidePropsType<typeof getServerSideProps>)
       <CustomHead title="Home" />
       <Header isLogin={true} />
       <Main>
-        <h1>Your Products</h1>
+        <h2>Your Products</h2>
         <StatusFilter filter={filter} setFilter={setFilter} />
         <SortFilter sort={sort} setSort={setSort} />
         <ProductList
+          emptyText="등록한 상품이 없습니다. 상품을 등록해주세요!"
           products={
             sort === '최신순'
               ? products
@@ -77,13 +78,15 @@ const Sell = ({ token }: InferGetServerSidePropsType<typeof getServerSideProps>)
 
 const Main = styled.main`
   max-width: 1200px;
-  margin: 3rem auto;
-  padding: 0 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  h1 {
+  min-height: calc(100vh - var(--hh));
+  h2 {
     margin-bottom: 2rem;
+  }
+  @media screen and (max-width: 620px) {
+    min-height: calc(var(--vh, 1vh) * 100 - var(--hh));
   }
 `;
 
@@ -106,8 +109,14 @@ export const getServerSideProps = async ({ req }: GetServerSidePropsContext) => 
       };
     }
     if (user.role === 'SELLER') {
+      const response = await fetch(`${baseUrl}/api/product`, {
+        headers: {
+          Authorization: `Bearer ${cookies.access_token}`,
+        },
+      });
+      const data = await response.json();
       return {
-        props: { token: cookies.access_token },
+        props: { token: cookies.access_token, data },
       };
     }
   }

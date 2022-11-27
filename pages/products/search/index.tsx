@@ -77,7 +77,7 @@ const Main = styled.main`
   .result {
     color: gray;
     text-align: center;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
   }
   .row {
     display: flex;
@@ -117,7 +117,14 @@ export const getServerSideProps = async ({ req }: GetServerSidePropsContext) => 
   const sellers = await res.json();
   return {
     props: {
-      sellers,
+      //@ts-ignore
+      sellers: sellers.sort(({ rating: a }, { rating: b }) => {
+        if (Number(a) < Number(b)) {
+          return 1;
+        } else if (Number(a) > Number(b)) {
+          return -1;
+        } else return 0;
+      }),
       isLogin: verify,
       token: cookies.access_token === undefined ? null : cookies.access_token,
     },
