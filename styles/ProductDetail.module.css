@@ -36,6 +36,15 @@
 
 .content {
   display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.05rem;
+  width: 100%;
+  text-transform: capitalize;
+}
+
+.contentStart {
+  display: flex;
   align-items: flex-start;
   gap: 10px;
   font-size: 1.05rem;
@@ -45,7 +54,12 @@
 .content svg {
   margin-top: 3px;
 }
-.content > div {
+
+.contentStart svg {
+  margin-top: 3px;
+}
+
+.grow {
   flex-grow: 1;
 }
 

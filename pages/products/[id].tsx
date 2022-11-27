@@ -3,31 +3,43 @@ import { getImageUrl } from '@lib/getImageUrl';
 import { useEffect, useState } from 'react';
 import styles from '@styles/ProductDetail.module.css';
 import { IoLocationOutline, IoCallOutline } from 'react-icons/io5';
+import { AiFillStar } from 'react-icons/ai';
 import { FaRegComment } from 'react-icons/fa';
 import { IoMdHeartEmpty, IoMdHeart } from 'react-icons/io';
 import { BsCalendarDate } from 'react-icons/bs';
 import { BiUser } from 'react-icons/bi';
-import { Button, Chip, Tooltip } from '@mui/material';
+import { FiMapPin } from 'react-icons/fi';
+import { RiHistoryLine } from 'react-icons/ri';
+import { TbChevronDown, TbChevronUp } from 'react-icons/tb';
+import { Badge, Button, Chip, Dialog, Tooltip } from '@mui/material';
 import Router from 'next/router';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
 import SimpleDialog from '@components/common/SimpleDialog';
 import axios from 'axios';
 import Header from '@components/common/Header';
-import { Wish } from '@prisma/client';
+import { Bidding, Wish } from '@prisma/client';
+import BiddingDialog from '@components/BiddingDialog';
+import AuctionHistory from '@components/AuctionHistory';
+import { getDiffDay } from '@lib/getDiffDay';
+import Map from '@components/common/Map';
 
 const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const [open, setOpen] = useState(false);
-  const handleClose = () => setOpen(false);
+  const [openBuy, setOpenBuy] = useState(false);
+  const [openBid, setOpenBid] = useState(false);
+  const [openMap, setOpenMap] = useState(false);
+  const handleCloseBuy = () => setOpenBuy(false);
+  const handleCloseBid = () => setOpenBid(false);
   const onClickBuyButton = () => {
     if (token) {
-      setOpen(true);
+      setOpenBuy(true);
     } else {
       alert('🔒 로그인이 필요합니다.');
     }
   };
   const onClickBidButton = () => {
     if (token) {
+      setOpenBid(true);
     } else {
       alert('🔒 로그인이 필요합니다.');
     }
@@ -69,6 +81,7 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
     try {
       const { data } = await axios.post('/api/product/buy', {
         price,
+        sellerId,
         productId: id,
       });
       const { success } = data;
@@ -81,8 +94,39 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
       alert('⚠️ 상품 구입에 실패했습니다. 다시 시도해주세요.');
     }
   };
-  const { id, name, price, tradingPlace, endingAt, status, image, content, likeCnt, phoneNumber, user, wish } = product;
-  console.log(wish);
+  const onConfirmBidding = async (price: number) => {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    try {
+      const { data } = await axios.post('/api/product/bid', {
+        price,
+        productId: id,
+      });
+      const { success } = data;
+      if (success) {
+        Router.replace(`/products/${id}?alert=🎉 입찰 완료되었습니다!`);
+      } else {
+        alert('⚠️ 상품 구입에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (e) {
+      alert('⚠️ 입찰에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+  const {
+    id,
+    name,
+    price,
+    tradingPlace,
+    endingAt,
+    status,
+    image,
+    content,
+    likeCnt,
+    phoneNumber,
+    user,
+    wish,
+    bid,
+    sellerId,
+  } = product;
   return (
     <>
       <CustomHead title={product.name} />
@@ -90,34 +134,60 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
       <main className={styles.main}>
         <section>
           <img src={getImageUrl(image)} alt="product" />
-          <h2>{product.name}</h2>
-          {status != 'AUCTION' && <p>{price.toLocaleString()}원</p>}
+          <h2>{name}</h2>
+          {status != 'AUCTION' && <p className={styles.price}>{price.toLocaleString()}원</p>}
         </section>
-        <section>
-          <Chip label={status === 'AUCTION' ? '경매' : status === 'PROGRESS' ? '판매 진행중' : '판매 완료'} />
+        <section className={styles.contentBox}>
+          <div className={styles.row}>
+            <Chip label={status === 'AUCTION' ? '경매' : status === 'PROGRESS' ? '판매 진행중' : '판매 완료'} />
+            {endingAt && <Chip label={`D-${getDiffDay(String(endingAt))}`} />}
+          </div>
           {endingAt && (
-            <p>
+            <p className={styles.content}>
               <BsCalendarDate />
               <span>{String(endingAt).split('T')[0]}</span>
             </p>
           )}
-          <p>
+          <div className={styles.content}>
             <BiUser />
-            {user.name}
-          </p>
-          <p>
-            <IoLocationOutline />
-            {tradingPlace}
-          </p>
-          <p>
+            <div>
+              {user.firstName} {user.lastName}
+            </div>
+            <Chip label={`⭐ ${user.rating}`} size="small" variant="outlined" />
+          </div>
+          <p className={styles.content}>
             <IoCallOutline />
             {phoneNumber}
           </p>
-          <p>
+          <div className={styles.contentStart}>
+            <FiMapPin />
+            <div className={styles.grow}>
+              <span className={styles.row}>
+                {tradingPlace}
+                <Tooltip title={openMap ? '지도 숨기기' : '지도 보기'} arrow>
+                  <button onClick={() => setOpenMap(state => !state)}>
+                    {openMap ? <TbChevronUp /> : <TbChevronDown />}
+                  </button>
+                </Tooltip>
+              </span>
+              {openMap && <Map location={tradingPlace} />}
+            </div>
+          </div>
+          <p className={styles.content}>
             <FaRegComment />
             {content}
           </p>
+          {status === 'AUCTION' && (
+            <div className={styles.content}>
+              <RiHistoryLine />
+              <div className={styles.bidTable}>
+                <span>입찰목록 ({bid.length})</span>
+                <AuctionHistory history={bid} />
+              </div>
+            </div>
+          )}
         </section>
+
         <p className={styles.likeCnt}>
           <Tooltip title="위시리스트" arrow>
             <button onClick={() => onClickLikeButton(wish)}>
@@ -133,18 +203,26 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
             </Button>
           ) : (
             <Button variant="outlined" onClick={onClickBidButton}>
-              경매 참여하기
+              입찰하기
             </Button>
           ))}
       </main>
       <SimpleDialog
-        open={open}
-        handleClose={handleClose}
+        open={openBuy}
+        handleClose={handleCloseBuy}
         onConfirm={onConfirmBuying}
         basicTitle="정말 구매하시겠습니까?"
         loadingTitle="처리중..."
         content=""
       />
+      {status === 'AUCTION' && (
+        <BiddingDialog
+          open={openBid}
+          handleClose={handleCloseBid}
+          onConfirm={onConfirmBidding}
+          maxPrice={bid.length === 0 ? 0 : Math.max(bid.map((elem: Bidding) => elem.price))}
+        />
+      )}
     </>
   );
 };
