@@ -179,7 +179,7 @@ const Wrapper = styled.div`
     &.mobile {
       display: none;
       background-color: #000;
-      padding-bottom: 1rem;
+
       &.open {
         display: block;
       }
@@ -195,7 +195,7 @@ const Nav = styled.nav`
   z-index: 10;
   @media screen and (max-width: 620px) {
     flex-direction: column;
-    margin-bottom: 1.4rem;
+    gap: 0;
   }
 `;
 
@@ -204,6 +204,7 @@ const StyledLink = styled(Link)<{ to: string; path: string }>`
   @media screen and (max-width: 620px) {
     width: 100%;
     text-align: center;
+    padding: 1rem 0;
   }
 `;
 
@@ -216,6 +217,7 @@ const StyledButton = styled(Button)`
   @media screen and (max-width: 620px) {
     width: 100%;
     text-align: center;
+    padding: 1rem 0;
   }
 `;
 
