@@ -5,7 +5,6 @@
   max-width: 500px;
   width: 100%;
   gap: 2rem;
-  margin-top: 1rem;
 }
 
 .main h2 {
@@ -40,7 +39,6 @@
   gap: 10px;
   font-size: 1.05rem;
   width: 100%;
-  text-transform: capitalize;
 }
 
 .contentStart {
@@ -49,7 +47,6 @@
   gap: 10px;
   font-size: 1.05rem;
   width: 100%;
-  text-transform: capitalize;
 }
 .content svg {
   margin-top: 3px;
@@ -57,6 +54,10 @@
 
 .contentStart svg {
   margin-top: 3px;
+}
+
+.name {
+  text-transform: capitalize;
 }
 
 .grow {
