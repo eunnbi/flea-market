@@ -155,7 +155,7 @@ const MemberTable = ({ initialMembers }: { initialMembers: User[] }) => {
                   <StyledTableCell component="th" scope="row">
                     {member.userId}
                   </StyledTableCell>
-                  <StyledTableCell>
+                  <StyledTableCell sx={{ textTransform: 'capitalize' }}>
                     {member.firstName} {member.lastName}
                   </StyledTableCell>
                   <StyledTableCell
