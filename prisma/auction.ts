@@ -16,7 +16,7 @@ export const createBidding = async ({
   return res;
 };
 
-export const getBiddingByProductId = async (productId: Bidding['productId']) => {
+export const getBidding = async (productId: Bidding['productId']) => {
   const bidding = await prisma.bidding.findMany({
     where: { productId },
     orderBy: [
@@ -30,7 +30,7 @@ export const getBiddingByProductId = async (productId: Bidding['productId']) => 
       const user = await prisma.user.findUnique({
         where: { userId: bid.bidderId },
       });
-      return { ...bid, ...user };
+      return { ...user, ...bid };
     }),
   );
   return res;
