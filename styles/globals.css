@@ -45,8 +45,8 @@ ol {
 
 main {
   max-width: 1020px;
-  margin: 3rem auto;
-  padding: 0 1rem;
+  margin: 0 auto;
+  padding: 3rem 1rem;
 }
 
 button {
@@ -76,4 +76,14 @@ button {
   display: flex;
   align-items: center;
   gap: 2px;
+  margin-left: 6px;
+}
+
+.emptyText {
+  text-align: center;
+  color: gray;
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
