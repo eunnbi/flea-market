@@ -1,5 +1,5 @@
 import { Product, Wish } from '@prisma/client';
-import { getBiddingByProductId } from './auction';
+import { getBidding } from './auction';
 import { getImageById } from './image';
 import prisma from './prisma';
 import { createShopping } from './shopping';
@@ -53,7 +53,7 @@ export const getAllProducts = async (userId?: Wish['buyerId']) => {
 
 const getProduct = async (product: Product, userId?: Wish['buyerId']) => {
   const image = await getImageById(product.imageId);
-  const bid = await getBiddingByProductId(product.id);
+  const bid = await getBidding(product.id);
   if (userId) {
     const wish = await getWish({ productId: product.id, buyerId: userId });
     return { ...product, image, bid, wish };
@@ -77,7 +77,7 @@ export const getProductById = async (id: Product['id'], buyerId?: Wish['buyerId'
   const rating = ratings.length === 0 ? 0 : ratings.reduce((acc, cur) => acc + cur.rating, 0) / ratings.length;
   //@ts-ignore
   product['rating'] = rating.toFixed(1);
-  const bid = await getBiddingByProductId(product!.id);
+  const bid = await getBidding(product!.id);
   if (withSeller) {
     const user = await prisma.user.findUnique({
       where: { userId: product?.sellerId },
@@ -192,7 +192,7 @@ export const updateAuctionProduct = async () => {
     },
   });
   products.forEach(async product => {
-    const bidding = await getBiddingByProductId(product.id);
+    const bidding = await getBidding(product.id);
     if (bidding.length !== 0) {
       const buyerId = bidding[0].userId!;
       await createShopping({ price: bidding[0].price, buyerId, productId: product.id, sellerId: product.sellerId });
