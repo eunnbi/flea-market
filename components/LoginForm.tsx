@@ -2,7 +2,7 @@ import { Alert, Button } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { IoClose } from 'react-icons/io5';
 import { User } from '@prisma/client';
-import Router, { useRouter } from 'next/router';
+import Router from 'next/router';
 import CustomInput from './common/CustomInput';
 import { noError, createErrorObject } from '@lib/formValidation';
 import axios from 'axios';
@@ -13,8 +13,6 @@ import styled from '@emotion/styled';
 type State = Pick<User, 'userId' | 'password'>;
 
 const LoginForm = () => {
-  const router = useRouter();
-  const { pathname } = router;
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [errorInfo, setErrorInfo] = useState({
@@ -66,7 +64,7 @@ const LoginForm = () => {
   return (
     <Wrapper>
       <Form onSubmit={onSubmit}>
-        <CloseButton type="button" onClick={() => router.replace(window.location.pathname)}>
+        <CloseButton type="button" onClick={() => Router.replace(window.location.pathname)}>
           <IoClose />
         </CloseButton>
         <h1>로그인</h1>
