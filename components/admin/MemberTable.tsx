@@ -22,7 +22,7 @@ import axios from 'axios';
 import { BsArrowUpShort, BsArrowDownShort } from 'react-icons/bs';
 import Filter from './Filter';
 
-type State = Pick<User, 'userId' | 'name' | 'role'>;
+type State = Pick<User, 'userId' | 'firstName' | 'lastName' | 'role'>;
 
 const MemberTable = ({ initialMembers }: { initialMembers: User[] }) => {
   const [roleFilter, setRoleFilter] = useState({
@@ -44,7 +44,8 @@ const MemberTable = ({ initialMembers }: { initialMembers: User[] }) => {
     id: '',
     state: {
       userId: '',
-      name: '',
+      firstName: '',
+      lastName: '',
       role: 'ADMIN',
     },
   });
@@ -60,14 +61,14 @@ const MemberTable = ({ initialMembers }: { initialMembers: User[] }) => {
     const id = String(e.currentTarget.ariaLabel);
     const user = members.find(member => member.id === id);
     if (user === undefined) return;
-    console.log(user);
-    const { userId, name, role } = user;
+    const { userId, firstName, lastName, role } = user;
     setEditState({
       open: true,
       id,
       state: {
         userId,
-        name,
+        firstName,
+        lastName,
         role,
       },
     });
@@ -154,7 +155,9 @@ const MemberTable = ({ initialMembers }: { initialMembers: User[] }) => {
                   <StyledTableCell component="th" scope="row">
                     {member.userId}
                   </StyledTableCell>
-                  <StyledTableCell>{member.name}</StyledTableCell>
+                  <StyledTableCell>
+                    {member.firstName} {member.lastName}
+                  </StyledTableCell>
                   <StyledTableCell
                     color={member.role === 'ADMIN' ? 'warning' : member.role === 'SELLER' ? 'info' : 'success'}>
                     {member.role}

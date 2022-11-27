@@ -16,7 +16,7 @@ import {
 import { User } from '@prisma/client';
 import { useState, useEffect } from 'react';
 
-type State = Pick<User, 'userId' | 'name' | 'role'>;
+type State = Pick<User, 'userId' | 'firstName' | 'lastName' | 'role'>;
 interface Props {
   open: boolean;
   handleClose: () => void;
@@ -32,7 +32,7 @@ const EditDialog = ({ open, handleClose, initialState, editMember }: Props) => {
     setValues(values => ({ ...values, [prop]: event.target.value }));
   };
   const onConfirm = () => {
-    if (values.userId === '' || values.name === '') {
+    if (values.userId === '' || values.firstName === '' || values.lastName === '') {
       setMessage('빈 항목이 존재합니다.');
       return;
     }
@@ -65,7 +65,20 @@ const EditDialog = ({ open, handleClose, initialState, editMember }: Props) => {
             onChange={handleChange('userId')}
             value={values.userId}
           />
-          <TextField label="Name" variant="standard" name="name" onChange={handleChange('name')} value={values.name} />
+          <TextField
+            label="First Name"
+            variant="standard"
+            name="firstName"
+            onChange={handleChange('firstName')}
+            value={values.firstName}
+          />
+          <TextField
+            label="Last Name"
+            variant="standard"
+            name="lastName"
+            onChange={handleChange('lastName')}
+            value={values.lastName}
+          />
           <FormControl>
             <FormLabel id="role">Role</FormLabel>
             <RadioGroup name="role" defaultValue={initialState.role} onChange={handleChange('role')}>
