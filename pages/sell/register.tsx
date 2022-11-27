@@ -23,7 +23,6 @@ const ProductRegister = ({ data, token }: InferGetServerSidePropsType<typeof get
 };
 
 const Main = styled.main`
-  padding: 2rem;
   h2 {
     margin-bottom: 1.5rem;
   }
