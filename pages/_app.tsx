@@ -4,6 +4,7 @@ import { ThemeProvider } from '@mui/material';
 import { theme } from 'styles/theme';
 import { useEffect } from 'react';
 import { RecoilRoot } from 'recoil';
+import Footer from '@components/common/Footer';
 
 export default function App({ Component, pageProps, router }: AppProps) {
   const { query, pathname } = router;
@@ -25,6 +26,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
     <RecoilRoot>
       <ThemeProvider theme={theme}>
         <Component {...pageProps} />
+        <Footer />
       </ThemeProvider>
     </RecoilRoot>
   );
