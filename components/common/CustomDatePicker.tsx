@@ -6,8 +6,8 @@ import { DateValidationError } from '@mui/x-date-pickers/internals/hooks/validat
 import { Dayjs } from 'dayjs';
 
 interface Props {
-  date: Dayjs | null;
-  setDate: React.Dispatch<React.SetStateAction<Dayjs | null>>;
+  date: Dayjs;
+  setDate: React.Dispatch<React.SetStateAction<Dayjs>>;
   errorInfo: typeof noError;
 }
 
@@ -19,6 +19,7 @@ const CustomDatePicker = ({ date, setDate, errorInfo }: Props) => {
           label="Choose Ending Date"
           value={date}
           onChange={value => {
+            if (value === null) return;
             setDate(value);
             console.log(value);
           }}
