@@ -47,6 +47,7 @@ const ProductsSearch = ({ sellers, isLogin, token }: InferGetServerSidePropsType
         <div style={{ marginTop: '1rem' }}>
           <h2>검색 결과</h2>
           <ProductList
+            basePath="/"
             result={true}
             products={products
               .filter(product => (seller.id === '' ? true : product.sellerId === seller.id))
