@@ -10,6 +10,12 @@ body {
   padding: 0;
   margin: 0;
   font-family: Pretendard, sans-serif;
+  height: calc(100vh - var(--hh));
+}
+
+#__next {
+  min-height: 100%;
+  position: relative;
 }
 
 a {
@@ -46,7 +52,7 @@ ol {
 main {
   max-width: 1020px;
   margin: 0 auto;
-  padding: 3rem 1rem;
+  padding: 3rem 1rem 8rem;
   margin-top: var(--hh) !important;
 }
 
