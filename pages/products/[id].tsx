@@ -52,7 +52,7 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
           const { data } = await axios.post(`/api/product/wish/${id}`);
           const { success } = data;
           if (success) {
-            Router.replace(`/products/${id}?alert=❤️ 위시리스트에 추가되었습니다.`);
+            Router.replace(`/products/${id}?alert=❤️ 위시리스트에 추가되었습니다.`, `/products/${id}`);
           } else {
             alert('⚠️ 위시리스트 추가에 실패했습니다. 다시 시도해주세요.');
           }
@@ -64,7 +64,7 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
           const { data } = await axios.delete(`/api/product/wish/${id}`);
           const { success } = data;
           if (success) {
-            Router.replace(`/products/${id}?alert=🤍 위시리스트에서 삭제되었습니다.`);
+            Router.replace(`/products/${id}?alert=🤍 위시리스트에서 삭제되었습니다.`, `/products/${id}`);
           } else {
             alert('⚠️ 위시리스트 삭제에 실패했습니다. 다시 시도해주세요.');
           }
@@ -86,7 +86,10 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
       });
       const { success } = data;
       if (success) {
-        Router.replace(`/products/${id}?alert=🎉 구매 완료되었습니다! 마이페이지에서 구매 목록을 확인해보세요!`);
+        Router.replace(
+          `/products/${id}?alert=🎉 구매 완료되었습니다! 마이페이지에서 구매 목록을 확인해보세요!`,
+          `/products/${id}`,
+        );
       } else {
         alert('⚠️ 상품 구입에 실패했습니다. 다시 시도해주세요.');
       }
@@ -103,7 +106,7 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
       });
       const { success } = data;
       if (success) {
-        Router.replace(`/products/${id}?alert=🎉 입찰 완료되었습니다!`);
+        Router.replace(`/products/${id}?alert=🎉 입찰 완료되었습니다!`, `/products/${id}`);
       } else {
         alert('⚠️ 상품 구입에 실패했습니다. 다시 시도해주세요.');
       }
@@ -150,7 +153,7 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
           )}
           <div className={styles.content}>
             <BiUser />
-            <div>
+            <div className={styles.name}>
               {user.firstName} {user.lastName}
             </div>
             <Chip label={`⭐ ${user.rating}`} size="small" variant="outlined" />
@@ -178,7 +181,7 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
             {content}
           </p>
           {status === 'AUCTION' && (
-            <div className={styles.content}>
+            <div className={styles.contentStart}>
               <RiHistoryLine />
               <div className={styles.bidTable}>
                 <span>입찰목록 ({bid.length})</span>
