@@ -19,7 +19,8 @@ import { RiHistoryLine } from 'react-icons/ri';
 
 const ProductDetail = ({ product }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [open, setOpen] = useState(false);
-  const { id, name, price, tradingPlace, endingAt, status, image, content, likeCnt, phoneNumber, bid } = product;
+  const { id, name, price, tradingPlace, endingAt, status, image, content, likeCnt, phoneNumber, bid, rating } =
+    product;
   const onDelete = async () => {
     try {
       await axios.delete(`/api/product/${id}`);
@@ -41,7 +42,10 @@ const ProductDetail = ({ product }: InferGetServerSidePropsType<typeof getServer
         <section className={styles.contentBox}>
           <div className={styles.row}>
             <Chip label={status === 'AUCTION' ? '경매' : status === 'PROGRESS' ? '판매 진행중' : '판매 완료'} />
-            {endingAt && <Chip label={`D-${getDiffDay(String(endingAt))}`} />}
+            {status === 'AUCTION' && endingAt && (
+              <Chip label={`D-${getDiffDay(String(endingAt))}`} variant="outlined" />
+            )}
+            {status === 'PURCHASED' && <Chip label={`⭐ ${rating}`} variant="outlined" />}
           </div>
           {endingAt && (
             <p className={styles.content}>
@@ -62,7 +66,7 @@ const ProductDetail = ({ product }: InferGetServerSidePropsType<typeof getServer
             {content}
           </p>
           {status === 'AUCTION' && (
-            <div className={styles.content}>
+            <div className={styles.contentStart}>
               <RiHistoryLine />
               <div className={styles.bidTable}>
                 <span>입찰목록 ({bid.length})</span>
