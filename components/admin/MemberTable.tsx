@@ -21,6 +21,7 @@ import EditDialog from './EditDialog';
 import axios from 'axios';
 import { BsArrowUpShort, BsArrowDownShort } from 'react-icons/bs';
 import Filter from './Filter';
+import { changeDateFormat } from '@lib/changeDateFormat';
 
 type State = Pick<User, 'userId' | 'firstName' | 'lastName' | 'role'>;
 
@@ -162,11 +163,7 @@ const MemberTable = ({ initialMembers }: { initialMembers: User[] }) => {
                     color={member.role === 'ADMIN' ? 'warning' : member.role === 'SELLER' ? 'info' : 'success'}>
                     {member.role}
                   </StyledTableCell>
-                  <StyledTableCell>
-                    {`${String(member.createdAt).split('T')[0]}  ${
-                      String(member.createdAt).split('T')[1].split('.')[0]
-                    }`}
-                  </StyledTableCell>
+                  <StyledTableCell>{changeDateFormat(new Date(String(member.createdAt)))}</StyledTableCell>
                   <StyledTableCell align="center">
                     <Tooltip title="edit" arrow>
                       <IconButton size="small" aria-label={member.id} onClick={onClickEditButton} className="margin">

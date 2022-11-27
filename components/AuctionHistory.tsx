@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { changeDateFormat } from '@lib/changeDateFormat';
 import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
 import { Bidding, User } from '@prisma/client';
 
@@ -16,17 +17,20 @@ const AuctionHistory = ({ history }: { history: Props[] }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {history.map((row, index) => (
-            <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-              <TableCell component="th" scope="row" align="center">
-                {row.userId}
-              </TableCell>
-              <TableCell align="center" sx={{ fontWeight: index === 0 ? 'bold' : 'normal' }}>
-                {row.price.toLocaleString()}원
-              </TableCell>
-              <TableCell align="center">{String(row.createdAt).replace('T', ' ').split('.')[0]}</TableCell>
-            </TableRow>
-          ))}
+          {history.map((row, index) => {
+            const biddingDate = new Date(row.createdAt);
+            return (
+              <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <TableCell component="th" scope="row" align="center">
+                  {row.userId}
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: index === 0 ? 'bold' : 'normal' }}>
+                  {row.price.toLocaleString()}원
+                </TableCell>
+                <TableCell align="center">{changeDateFormat(biddingDate)}</TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </TableContainer>
