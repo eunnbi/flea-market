@@ -81,6 +81,7 @@ const GridSection = styled.section`
 
 const DefaultItem = ({ product }: { product: ProductItem }) => {
   const { id, name, price, status, image, createdAt, likeCnt, endingAt, wish, bid } = product;
+  const endingDate = new Date(String(endingAt));
   return (
     <article>
       <div className="imageBox">
@@ -97,9 +98,7 @@ const DefaultItem = ({ product }: { product: ProductItem }) => {
           label={status === 'AUCTION' ? '경매' : status === 'PROGRESS' ? '판매 진행중' : '판매 완료'}
           className="status"
         />
-        {status === 'AUCTION' && (
-          <Chip label={`D-${getDiffDay(String(endingAt))}`} className="dday" variant="outlined" />
-        )}
+        {status === 'AUCTION' && <Chip label={`D-${getDiffDay(endingDate)}`} className="dday" variant="outlined" />}
       </div>
       <div className="wrapper">
         <div>
