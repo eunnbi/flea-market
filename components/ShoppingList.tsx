@@ -2,7 +2,6 @@ import styled from '@emotion/styled';
 import { getImageUrl } from '@lib/getImageUrl';
 import { Shopping, User } from '@prisma/client';
 import { BiUser } from 'react-icons/bi';
-import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { IoLocationOutline } from 'react-icons/io5';
 import { ProductItem } from './common/ProductList';
 import Image from 'next/image';
@@ -61,17 +60,26 @@ const ShoppingList = ({ list, dates }: { list: ShoppingItem[]; dates: string[] }
     }
   };
 
+  const newDates = [
+    ...new Set(
+      dates.map(date => new Date(date)).map(date => `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`),
+    ),
+  ];
+  console.log(newDates);
   return dates.length === 0 ? (
     <p className="emptyText">구매 목록이 없습니다.</p>
   ) : (
     <>
       <Section>
-        {dates.map(date => (
-          <article key={date}>
-            <h3>{date.split('-').join('.')}</h3>
+        {newDates.map((date, index) => (
+          <article key={index}>
+            <h3>{date}</h3>
             <div>
               {list
-                .filter(({ item }) => String(item.createdAt).split('T')[0] === date)
+                .filter(({ item }) => {
+                  const buyingDate = new Date(item.createdAt);
+                  return `${buyingDate.getFullYear()}.${buyingDate.getMonth() + 1}.${buyingDate.getDate()}` === date;
+                })
                 .map(({ item, product }) => (
                   <Fragment key={product.id}>
                     <Item>

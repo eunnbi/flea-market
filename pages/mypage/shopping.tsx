@@ -68,7 +68,7 @@ export const getServerSideProps = async ({ req }: GetServerSidePropsContext) => 
       },
     });
     const shopping: ShoppingItem[] = await res.json();
-    const dates = shopping.map(({ item }) => String(item.createdAt).split('T')[0]);
+    const dates = shopping.map(({ item }) => String(item.createdAt));
     return { props: { isLogin: verify, shopping, dates: [...new Set(dates)], user } };
   }
   return {
