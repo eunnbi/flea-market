@@ -7,7 +7,7 @@ interface Props {
   onConfirm: () => Promise<void>;
   basicTitle: string;
   loadingTitle: string;
-  content: string;
+  content: string | React.ReactNode;
 }
 
 const SimpleDialog = ({ open, handleClose, onConfirm, basicTitle, loadingTitle, content }: Props) => {
@@ -27,7 +27,11 @@ const SimpleDialog = ({ open, handleClose, onConfirm, basicTitle, loadingTitle, 
       aria-describedby="alert-dialog-description">
       <DialogTitle id="alert-dialog-title">{loading ? loadingTitle : basicTitle}</DialogTitle>
       <DialogContent>
-        <DialogContentText id="alert-dialog-description">{content}</DialogContentText>
+        {typeof content === 'string' ? (
+          <DialogContentText id="alert-dialog-description">{content}</DialogContentText>
+        ) : (
+          content
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="error" disabled={loading}>
