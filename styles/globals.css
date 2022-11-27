@@ -47,6 +47,7 @@ main {
   max-width: 1020px;
   margin: 0 auto;
   padding: 3rem 1rem;
+  margin-top: var(--hh) !important;
 }
 
 button {
@@ -86,4 +87,31 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+@media screen and (max-width: 920px) {
+  html {
+    font-size: 13px;
+  }
+  #map {
+    height: 400px;
+  }
+}
+
+@media screen and (max-width: 620px) {
+  html {
+    font-size: 12px;
+  }
+  :root {
+    --hh: 60px;
+  }
+}
+
+@media screen and (max-width: 420px) {
+  html {
+    font-size: 11px;
+  }
+  #map {
+    height: 200px;
+  }
 }
