@@ -48,8 +48,10 @@ const ProductRegisterForm = ({ initialProduct }: { initialProduct: ProductItem |
         },
   );
   const [location, setLocation] = useState(initialProduct !== null ? initialProduct.tradingPlace : '');
-  const [endingAt, setEndingAt] = useState<Dayjs | null>(
-    initialProduct != null ? dayjs(initialProduct.endingAt) : null,
+  const endingDate = initialProduct === null ? new Date() : new Date(String(initialProduct.endingAt));
+
+  const [endingAt, setEndingAt] = useState<Dayjs>(
+    dayjs(`${endingDate.getFullYear()}-${endingDate.getMonth() + 1}-${endingDate.getDate()} 00:00:00`),
   );
   const [imageFile, setImageFile] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -84,9 +86,6 @@ const ProductRegisterForm = ({ initialProduct }: { initialProduct: ProductItem |
       }));
     }
   }, []);
-  useEffect(() => {
-    console.log(values);
-  }, [values]);
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (imageFile === null && !initialProduct?.image) {
@@ -182,23 +181,6 @@ const ProductRegisterForm = ({ initialProduct }: { initialProduct: ProductItem |
         }));
       }
     }
-    if (status === 'AUCTION') {
-      if (endingAt === null) {
-        setErrorInfo(errorInfo => ({
-          ...errorInfo,
-          endingAt: createErrorObject('경매 마감 날짜를 선택해주세요'),
-        }));
-        return;
-      } else {
-        setErrorInfo(errorInfo => ({
-          ...errorInfo,
-          endingAt: noError,
-        }));
-      }
-    }
-    console.log(values);
-    console.log(endingAt);
-    console.log(imageFile);
     try {
       setLoading(true);
       if (initialProduct) {
@@ -296,7 +278,7 @@ const ProductRegisterForm = ({ initialProduct }: { initialProduct: ProductItem |
         if (status === 'AUCTION') {
           const { data: productData } = await axios.post('/api/product', {
             name,
-            price: -1,
+            price: 0,
             endingAt,
             phoneNumber,
             tradingPlace,
