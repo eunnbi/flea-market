@@ -14,27 +14,22 @@ import React, { useState } from 'react';
 import { BiSearchAlt } from 'react-icons/bi';
 import { IoCloseCircle } from 'react-icons/io5';
 import { useRecoilState } from 'recoil';
-import { searchState } from 'store/searchState';
+import { inputState, searchState } from 'store/searchState';
 
 const SearchBar = () => {
   const [open, setOpen] = useState(false);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useRecoilState(inputState);
   const [state, setState] = useRecoilState(searchState);
   const handleClose = () => setOpen(false);
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.currentTarget.value);
   };
   const onClickSearchButton = () => {
-    setInput(input => {
-      setState(state => ({ ...state, name: input }));
-      return input;
-    });
+    setState(state => ({ ...state, name: input }));
   };
   const onClickClearButton = () => {
-    setInput(() => {
-      setState(state => ({ ...state, name: '' }));
-      return '';
-    });
+    setState(state => ({ ...state, name: '' }));
+    setInput('');
   };
   return (
     <>

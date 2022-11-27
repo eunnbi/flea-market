@@ -12,3 +12,8 @@ export const searchState = atom({
     lastPrice: 0,
   },
 });
+
+export const inputState = atom({
+  key: 'inputState',
+  default: '',
+});
