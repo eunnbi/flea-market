@@ -21,6 +21,7 @@ const ProductDetail = ({ product }: InferGetServerSidePropsType<typeof getServer
   const [open, setOpen] = useState(false);
   const { id, name, price, tradingPlace, endingAt, status, image, content, likeCnt, phoneNumber, bid, rating } =
     product;
+  const endingDate = new Date(String(endingAt));
   const onDelete = async () => {
     try {
       await axios.delete(`/api/product/${id}`);
@@ -37,20 +38,24 @@ const ProductDetail = ({ product }: InferGetServerSidePropsType<typeof getServer
         <section>
           <img src={getImageUrl(image)} alt="product" />
           <h2>{name}</h2>
-          {status != 'AUCTION' && <p className={styles.price}>{price.toLocaleString()}원</p>}
+          {status !== 'AUCTION' ? (
+            <p className={styles.price}>{price.toLocaleString()}원</p>
+          ) : (
+            <p className={styles.price}>{bid.length === 0 ? '입찰 없음' : `${bid[0].price.toLocaleString()}원`}</p>
+          )}
         </section>
         <section className={styles.contentBox}>
           <div className={styles.row}>
             <Chip label={status === 'AUCTION' ? '경매' : status === 'PROGRESS' ? '판매 진행중' : '판매 완료'} />
-            {status === 'AUCTION' && endingAt && (
-              <Chip label={`D-${getDiffDay(String(endingAt))}`} variant="outlined" />
-            )}
+            {status === 'AUCTION' && endingAt && <Chip label={`D-${getDiffDay(endingDate)}`} variant="outlined" />}
             {status === 'PURCHASED' && <Chip label={`⭐ ${rating}`} variant="outlined" />}
           </div>
-          {endingAt && (
+          {status === 'AUCTION' && (
             <p className={styles.content}>
               <BsCalendarDate />
-              <span>{String(endingAt).split('T')[0]}</span>
+              <span>
+                {endingDate.getFullYear()}-{endingDate.getMonth() + 1}-{endingDate.getDate()}
+              </span>
             </p>
           )}
           <p className={styles.content}>
@@ -65,7 +70,7 @@ const ProductDetail = ({ product }: InferGetServerSidePropsType<typeof getServer
             <FaRegComment />
             {content}
           </p>
-          {status === 'AUCTION' && (
+          {endingAt && (
             <div className={styles.contentStart}>
               <RiHistoryLine />
               <div className={styles.bidTable}>
