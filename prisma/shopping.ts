@@ -43,6 +43,13 @@ export const deleteShoppingByUser = async (buyerId: Shopping['buyerId']) => {
   return res;
 };
 
+export const deleteShoppingByProduct = async (productId: Shopping['productId']) => {
+  const res = await prisma.shopping.deleteMany({
+    where: { productId },
+  });
+  return res;
+};
+
 export const updateShopping = async (id: Shopping['id'], data: Partial<Shopping>) => {
   const res = await prisma.shopping.update({
     where: { id },
