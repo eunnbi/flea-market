@@ -36,9 +36,16 @@ export const getBidding = async (productId: Bidding['productId']) => {
   return res;
 };
 
-export const deleteBidding = async (productId: Bidding['productId']) => {
+export const deleteBiddingByProduct = async (productId: Bidding['productId']) => {
   const res = await prisma.bidding.deleteMany({
     where: { productId },
+  });
+  return res;
+};
+
+export const deleteBiddingByUser = async (bidderId: Bidding['bidderId']) => {
+  const res = await prisma.bidding.deleteMany({
+    where: { bidderId },
   });
   return res;
 };
