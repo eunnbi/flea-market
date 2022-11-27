@@ -204,6 +204,13 @@ const Item = styled.div`
     font-size: 0.9rem;
     text-transform: capitalize;
   }
+  @media screen and (max-width: 620px) {
+    flex-direction: column;
+    gap: 2rem;
+    a {
+      width: 100%;
+    }
+  }
 `;
 
 const RatingBox = styled.div`
