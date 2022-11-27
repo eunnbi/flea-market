@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import jwt from 'jsonwebtoken';
 import { User } from '@prisma/client';
-import { createBidding } from '@db/auction';
+import { createBidding } from '@db/bidding';
 
 const KEY = String(process.env.JSON_KEY);
 

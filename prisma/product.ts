@@ -1,5 +1,5 @@
 import { Product, Wish } from '@prisma/client';
-import { getBidding } from './auction';
+import { getBidding } from './bidding';
 import { getImageById } from './image';
 import prisma from './prisma';
 import { createShopping } from './shopping';
