@@ -7,29 +7,32 @@ import { noError, createErrorObject } from '@lib/formValidation';
 import Router from 'next/router';
 import axios from 'axios';
 
-type State = Pick<User, 'userId' | 'password' | 'name' | 'role'>;
+type State = Pick<User, 'userId' | 'password' | 'firstName' | 'lastName' | 'role'>;
 
 const RegisterForm = () => {
   const [loading, setLoading] = useState(false);
   const [errorInfo, setErrorInfo] = useState({
     userId: noError,
     password: noError,
-    name: noError,
+    firstName: noError,
+    lastName: noError,
   });
   const [helperText, setHelperText] = useState({
     userId: '',
     password: '영문자와 숫자 포함, 8자 이상 15자 이하',
-    name: '',
+    firstName: '',
+    lastName: '',
   });
-  const [values, setValues] = useState<Pick<User, 'userId' | 'password' | 'name' | 'role'>>({
-    name: '',
+  const [values, setValues] = useState<State>({
+    firstName: '',
+    lastName: '',
     role: 'SELLER',
     userId: '',
     password: '',
   });
   const isCheckIdDuplicate = useRef(false);
   const isIdDuplicate = useRef(false);
-  const { name, userId, password } = values;
+  const { firstName, lastName, userId, password } = values;
   const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues(values => ({ ...values, [prop]: event.target.value }));
   };
@@ -64,36 +67,41 @@ const RegisterForm = () => {
   };
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (name === '' || userId === '' || password === '') {
+    if (firstName === '' || lastName === '' || userId === '' || password === '') {
       setErrorInfo({
         userId: userId === '' ? createErrorObject('아이디를 입력하세요') : noError,
         password: password === '' ? createErrorObject('비밀번호를 입력하세요') : noError,
-        name: name === '' ? createErrorObject('이름을 입력하세요') : noError,
+        firstName: firstName === '' ? createErrorObject('이름을 입력하세요') : noError,
+        lastName: lastName === '' ? createErrorObject('이름을 입력하세요') : noError,
       });
     } else if (!isCheckIdDuplicate.current) {
       setErrorInfo({
         userId: createErrorObject('아이디 중복 확인이 필요합니다.'),
         password: noError,
-        name: noError,
+        firstName: noError,
+        lastName: noError,
       });
     } else if (isIdDuplicate.current) {
       setErrorInfo({
         userId: createErrorObject('중복된 아이디입니다'),
         password: noError,
-        name: noError,
+        firstName: noError,
+        lastName: noError,
       });
     } else if (!/(?=.*\d)(?=.*[a-zA-ZS]).{8,15}/.test(password)) {
       // password 정규식 검사
       setErrorInfo({
         userId: noError,
         password: createErrorObject('비밀번호 형식과 맞지 않습니다.'),
-        name: noError,
+        firstName: noError,
+        lastName: noError,
       });
     } else {
       setErrorInfo({
         userId: noError,
         password: noError,
-        name: noError,
+        firstName: noError,
+        lastName: noError,
       });
       // register api 호출
       setLoading(true);
@@ -112,12 +120,20 @@ const RegisterForm = () => {
   return (
     <form className={styles.form} onSubmit={onSubmit}>
       <CustomInput
-        label="Name"
-        htmlFor="name"
-        value={name}
-        onChange={handleChange('name')}
+        label="First Name"
+        htmlFor="firstName"
+        value={firstName}
+        onChange={handleChange('firstName')}
         isPassword={false}
-        errorInfo={errorInfo.name}
+        errorInfo={errorInfo.firstName}
+      />
+      <CustomInput
+        label="Last Name"
+        htmlFor="lastName"
+        value={lastName}
+        onChange={handleChange('lastName')}
+        isPassword={false}
+        errorInfo={errorInfo.lastName}
       />
       <div className={styles.row}>
         <CustomInput
