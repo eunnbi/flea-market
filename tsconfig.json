@@ -7,6 +7,7 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
+    "downlevelIteration": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "node",
@@ -20,10 +21,10 @@
       "@lib/*": ["lib/*"],
       "@api/*": ["pages/api/*"],
       "@db/*": ["prisma/*"],
-      "@types/*": ["types/*"],
       "@styles/*": ["styles/*"]
-    }
+    },
+    "typeRoots": ["node_modules/@types", "@types/*"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "lib/cloudinary.js", "lib/cloudinary.js"],
   "exclude": ["node_modules"]
 }
