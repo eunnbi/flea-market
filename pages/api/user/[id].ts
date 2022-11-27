@@ -1,9 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { createUser, deleteUser, getAllUsers, getUserById, updateUser } from '@db/user';
+import { deleteUser, updateUser } from '@db/user';
 import { deleteProductsBySeller, getProductBySeller } from '@db/product';
 import { deleteImage } from '@db/image';
-import { deleteShoppingByUser } from '@db/shopping';
-import { deleteWishByUser } from '@db/wish';
+import { deleteShoppingByProduct, deleteShoppingByUser } from '@db/shopping';
+import { deleteWishByProduct, deleteWishByUser } from '@db/wish';
+import { deleteBiddingByProduct, deleteBiddingByUser } from '@db/bidding';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -17,13 +18,17 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           // delete products of user
           const products = await getProductBySeller(id as string);
           await deleteProductsBySeller(id as string);
-          products.forEach(async ({ imageId }) => {
+          products.forEach(async ({ id, imageId }) => {
             await deleteImage(imageId);
+            await deleteWishByProduct(id);
+            await deleteShoppingByProduct(id);
+            await deleteBiddingByProduct(id);
           });
         } else if (user.role === 'BUYER') {
           // delete data at bidding, shopping, and wishlist table
           await deleteShoppingByUser(id as string);
           await deleteWishByUser(id as string);
+          await deleteBiddingByUser(id as string);
         }
         return res.json(user);
       }
