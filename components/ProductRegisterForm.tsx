@@ -271,7 +271,10 @@ const ProductRegisterForm = ({ initialProduct }: { initialProduct: ProductItem |
           }
         }
         setLoading(false);
-        Router.push('/sell?alert=🎉 상품을 성공적으로 수정했습니다.');
+        Router.push(
+          `/sell/products/${initialProduct.id}?alert=🎉 상품을 성공적으로 수정했습니다.`,
+          `/sell/products/${initialProduct.id}`,
+        );
       } else {
         const formData = new FormData();
         formData.append('file', imageFile);
@@ -301,9 +304,12 @@ const ProductRegisterForm = ({ initialProduct }: { initialProduct: ProductItem |
             status,
             content,
           });
-          const { success } = productData;
+          const { success, product } = productData;
           if (success) {
-            Router.push('/sell?alert=🎉 상품을 성공적으로 등록했습니다.');
+            Router.push(
+              `/sell/products/${product.id}?alert=🎉 상품을 성공적으로 등록했습니다.`,
+              `/sell/products/${product.id}`,
+            );
           } else {
             setLoading(false);
             alert('상품 등록에 실패하였습니다. 다시 등록해주세요.');
@@ -319,9 +325,12 @@ const ProductRegisterForm = ({ initialProduct }: { initialProduct: ProductItem |
             status,
             content,
           });
-          const { success } = productData;
+          const { success, product } = productData;
           if (success) {
-            Router.push('/sell?alert=🎉 상품을 성공적으로 등록했습니다.');
+            Router.push(
+              `/sell/products/${product.id}?alert=🎉 상품을 성공적으로 등록했습니다.`,
+              `/sell/products/${product.id}`,
+            );
           } else {
             setLoading(false);
             alert('상품 등록에 실패하였습니다. 다시 등록해주세요.');
