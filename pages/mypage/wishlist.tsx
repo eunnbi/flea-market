@@ -4,8 +4,13 @@ import WishList from '@components/WishList';
 import styled from '@emotion/styled';
 import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import { useEffect } from 'react';
 
 const MyPage = ({ wish, user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  useEffect(() => {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+  }, []);
   return (
     <>
       <CustomHead title="My Page" />
@@ -19,15 +24,16 @@ const MyPage = ({ wish, user }: InferGetServerSidePropsType<typeof getServerSide
 };
 
 const Main = styled.main`
-  margin: 3rem auto;
-  padding: 0 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-
+  min-height: calc(100vh - var(--hh));
   h2 {
     text-align: center;
     margin-bottom: 1.5rem;
+  }
+  @media screen and (max-width: 620px) {
+    min-height: calc(var(--vh, 1vh) * 100 - var(--hh));
   }
 `;
 export const getServerSideProps = async ({ req }: GetServerSidePropsContext) => {
