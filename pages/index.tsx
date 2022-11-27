@@ -119,8 +119,23 @@ export const getServerSideProps = async ({ req }: GetServerSidePropsContext) => 
         },
       };
     }
+    const response = await fetch(`${baseUrl}/api/product`, {
+      headers: {
+        Authorization: `Bearer ${cookies.access_token}`,
+      },
+    });
+    const data = await response.json();
+    return {
+      props: {
+        isLogin: verify,
+        token: cookies.access_token,
+        data,
+      },
+    };
   }
-  return { props: { isLogin: verify, token: cookies.access_token === undefined ? null : cookies.access_token } };
+  const res = await fetch(`${baseUrl}/api/product`);
+  const data = await res.json();
+  return { props: { isLogin: verify, token: null, data } };
 };
 
 export default Home;
