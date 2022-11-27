@@ -48,6 +48,7 @@ const SortFilter = ({ sort, setSort }: Props) => {
 
 const Div = styled.div`
   align-self: flex-end;
+  margin-top: 1rem;
 `;
 
 export default React.memo(SortFilter);
