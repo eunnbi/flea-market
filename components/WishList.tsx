@@ -2,7 +2,6 @@ import styled from '@emotion/styled';
 import { getDiffDay } from '@lib/getDiffDay';
 import { getImageUrl } from '@lib/getImageUrl';
 import { Chip } from '@mui/material';
-import Link from 'next/link';
 import { IoMdHeart } from 'react-icons/io';
 import ProductList, { ImageWrapper, ProductItem, StyledLink } from './common/ProductList';
 import Image from 'next/image';
@@ -20,7 +19,8 @@ const WishList = ({ products }: { products: ProductItem[] }) => {
 };
 
 const Item = ({ product }: { product: ProductItem }) => {
-  const { id, name, price, status, image, createdAt, likeCnt, endingAt, wish, bid } = product;
+  const { id, name, price, status, image, createdAt, likeCnt, endingAt, bid } = product;
+  const endingDate = new Date(String(endingAt));
   return (
     <StyledLink href={`/products/${id}`} passHref>
       <article>
@@ -38,9 +38,7 @@ const Item = ({ product }: { product: ProductItem }) => {
             label={status === 'AUCTION' ? '경매' : status === 'PROGRESS' ? '판매 진행중' : '판매 완료'}
             className="status"
           />
-          {status === 'AUCTION' && (
-            <Chip label={`D-${getDiffDay(String(endingAt))}`} className="dday" variant="outlined" />
-          )}
+          {status === 'AUCTION' && <Chip label={`D-${getDiffDay(endingDate)}`} className="dday" variant="outlined" />}
         </div>
         <div className="wrapper">
           <div>
