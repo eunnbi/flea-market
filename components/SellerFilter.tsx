@@ -14,9 +14,12 @@ import React, { useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { searchState } from 'store/searchState';
 import { BiUser } from 'react-icons/bi';
-import SellerAvatar from './common/SellerAvatar';
 
-const SellerFilter = ({ sellers }: { sellers: User[] }) => {
+type State = User & {
+  rating: string;
+};
+
+const SellerFilter = ({ sellers }: { sellers: State[] }) => {
   const [open, setOpen] = useState(false);
   const [state, setState] = useRecoilState(searchState);
   const handleClose = () => setOpen(false);
@@ -37,6 +40,7 @@ const SellerFilter = ({ sellers }: { sellers: User[] }) => {
         variant={state.seller.name === '' ? 'outlined' : 'filled'}
         onClick={() => setOpen(true)}
         onDelete={state.seller.name === '' ? undefined : onDelete}
+        sx={{ textTransform: 'capitalize' }}
       />
       <Dialog
         open={open}
@@ -51,11 +55,14 @@ const SellerFilter = ({ sellers }: { sellers: User[] }) => {
                 disablePadding
                 key={seller.id}
                 data-id={seller.userId}
-                data-name={seller.name}
+                data-name={`${seller.firstName} ${seller.lastName}`}
                 onClick={onClick}>
                 <ListItemButton sx={{ display: 'flex', gap: '1rem' }}>
-                  <SellerAvatar name={seller.name} />
-                  <ListItemText primary={seller.name} />
+                  <ListItemText
+                    primary={`${seller.firstName} ${seller.lastName}`}
+                    secondary={`⭐ ${seller.rating}`}
+                    sx={{ textTransform: 'capitalize' }}
+                  />
                 </ListItemButton>
               </ListItem>
             ))}
