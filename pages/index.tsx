@@ -40,6 +40,7 @@ const Home = ({ isLogin, token }: InferGetServerSidePropsType<typeof getServerSi
         <StatusFilter filter={filter} setFilter={setFilter} />
         <SortFilter sort={sort} setSort={setSort} />
         <ProductList
+          basePath="/"
           products={
             sort === '최신순'
               ? products
@@ -83,8 +84,6 @@ const Home = ({ isLogin, token }: InferGetServerSidePropsType<typeof getServerSi
 
 const Main = styled.main`
   max-width: 1200px;
-  margin: 3rem auto;
-  padding: 0 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;

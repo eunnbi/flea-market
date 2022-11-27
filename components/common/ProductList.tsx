@@ -5,7 +5,6 @@ import { getTimeForToday } from '@lib/getTimeForToday';
 import { Chip } from '@mui/material';
 import { Bidding, Image as ImageType, Product, Wish } from '@prisma/client';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { IoMdHeartEmpty, IoMdHeart } from 'react-icons/io';
 import { BsFillPeopleFill } from 'react-icons/bs';
 import Image from 'next/image';
@@ -21,11 +20,13 @@ const ProductList = ({
   Item,
   result,
   emptyText,
+  basePath,
 }: {
   products: ProductItem[];
   Item?: (props: { product: ProductItem }) => JSX.Element;
   result?: boolean;
   emptyText?: string;
+  basePath: string;
 }) => {
   return (
     <>
@@ -38,15 +39,19 @@ const ProductList = ({
         <>
           {products.length <= 2 ? (
             <FlexSection>
-              {products.map(product =>
-                Item === undefined ? <DefaultItem product={product} /> : <Item product={product} key={product.id} />,
-              )}
+              {products.map(product => (
+                <StyledLink href={`${basePath}/products/${product.id}`} passHref key={product.id}>
+                  {Item === undefined ? <DefaultItem product={product} /> : <Item product={product} key={product.id} />}
+                </StyledLink>
+              ))}
             </FlexSection>
           ) : (
             <GridSection>
-              {products.map(product =>
-                Item === undefined ? <DefaultItem product={product} /> : <Item product={product} key={product.id} />,
-              )}
+              {products.map(product => (
+                <StyledLink href={`${basePath}/products/${product.id}`} passHref key={product.id}>
+                  {Item === undefined ? <DefaultItem product={product} /> : <Item product={product} key={product.id} />}
+                </StyledLink>
+              ))}
             </GridSection>
           )}
         </>
@@ -75,58 +80,53 @@ const GridSection = styled.section`
 `;
 
 const DefaultItem = ({ product }: { product: ProductItem }) => {
-  const { pathname } = useRouter();
   const { id, name, price, status, image, createdAt, likeCnt, endingAt, wish, bid } = product;
   return (
-    <StyledLink
-      href={`${pathname.split('/')[1] === 'products' ? '/' : `/${pathname.split('/')[1]}/`}products/${id}`}
-      passHref>
-      <article>
-        <div className="imageBox">
-          <ImageWrapper>
-            <Image
-              src={getImageUrl(image)}
-              alt="product thumbnail"
-              layout="fill"
-              placeholder="blur"
-              blurDataURL="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg=="
-            />
-          </ImageWrapper>
-          <Chip
-            label={status === 'AUCTION' ? '경매' : status === 'PROGRESS' ? '판매 진행중' : '판매 완료'}
-            className="status"
+    <article>
+      <div className="imageBox">
+        <ImageWrapper>
+          <Image
+            src={getImageUrl(image)}
+            alt="product thumbnail"
+            layout="fill"
+            placeholder="blur"
+            blurDataURL="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg=="
           />
-          {status === 'AUCTION' && (
-            <Chip label={`D-${getDiffDay(String(endingAt))}`} className="dday" variant="outlined" />
+        </ImageWrapper>
+        <Chip
+          label={status === 'AUCTION' ? '경매' : status === 'PROGRESS' ? '판매 진행중' : '판매 완료'}
+          className="status"
+        />
+        {status === 'AUCTION' && (
+          <Chip label={`D-${getDiffDay(String(endingAt))}`} className="dday" variant="outlined" />
+        )}
+      </div>
+      <div className="wrapper">
+        <div>
+          <h3>{name}</h3>
+          {status != 'AUCTION' ? (
+            <p className="price">{price.toLocaleString()}원</p>
+          ) : (
+            <div className="row">
+              <p className="price">
+                {bid.length === 0 ? '입찰 없음' : `${Math.max(...bid.map(elem => elem.price)).toLocaleString()}원`}
+              </p>
+              <p className="cnt">
+                <BsFillPeopleFill />
+                <span>{bid.length}</span>
+              </p>
+            </div>
           )}
         </div>
-        <div className="wrapper">
-          <div>
-            <h3>{name}</h3>
-            {status != 'AUCTION' ? (
-              <p className="price">{price.toLocaleString()}원</p>
-            ) : (
-              <div className="row">
-                <p className="price">
-                  {bid.length === 0 ? '입찰 없음' : `${Math.max(...bid.map(elem => elem.price)).toLocaleString()}원`}
-                </p>
-                <p className="cnt">
-                  <BsFillPeopleFill />
-                  <span>{bid.length}</span>
-                </p>
-              </div>
-            )}
-          </div>
-          <div className="row">
-            <p className="date">{getTimeForToday(String(createdAt))}</p>
-            <div className="cnt">
-              {wish ? <IoMdHeart className="heart_icon" /> : <IoMdHeartEmpty className="heart_icon" />}
-              <span>{likeCnt}</span>
-            </div>
+        <div className="row">
+          <p className="date">{getTimeForToday(String(createdAt))}</p>
+          <div className="cnt">
+            {wish ? <IoMdHeart className="heart_icon" /> : <IoMdHeartEmpty className="heart_icon" />}
+            <span>{likeCnt}</span>
           </div>
         </div>
-      </article>
-    </StyledLink>
+      </div>
+    </article>
   );
 };
 

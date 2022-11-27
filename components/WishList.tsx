@@ -9,7 +9,14 @@ import Image from 'next/image';
 import { BsFillPeopleFill } from 'react-icons/bs';
 
 const WishList = ({ products }: { products: ProductItem[] }) => {
-  return <ProductList products={products} Item={Item} emptyText="좋아하는 상품이 없습니다. 상품을 추가해보세요." />;
+  return (
+    <ProductList
+      products={products}
+      Item={Item}
+      emptyText="좋아하는 상품이 없습니다. 상품을 추가해보세요."
+      basePath="/"
+    />
+  );
 };
 
 const Item = ({ product }: { product: ProductItem }) => {
