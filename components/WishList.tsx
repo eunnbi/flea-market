@@ -43,7 +43,7 @@ const Item = ({ product }: { product: ProductItem }) => {
                 <p className="price">{price.toLocaleString()}원</p>
               ) : (
                 <p className="price">
-                  {bid.length === 0 ? '입찰 없음' : `${Math.max(bid.map(elem => elem.price)).toLocaleString()}원`}
+                  {bid.length === 0 ? '입찰 없음' : `${Math.max(...bid.map(elem => elem.price)).toLocaleString()}원`}
                 </p>
               )}
               <div className="row">
