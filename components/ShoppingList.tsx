@@ -204,7 +204,7 @@ const Item = styled.div`
     font-size: 0.9rem;
     text-transform: capitalize;
   }
-  @media screen and (max-width: 620px) {
+  @media screen and (max-width: 420px) {
     flex-direction: column;
     gap: 2rem;
     a {
