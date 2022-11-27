@@ -77,85 +77,44 @@ export const getProductById = async (id: Product['id'], buyerId?: Wish['buyerId'
   const rating = ratings.length === 0 ? 0 : ratings.reduce((acc, cur) => acc + cur.rating, 0) / ratings.length;
   //@ts-ignore
   product['rating'] = rating.toFixed(1);
-  if (product?.status === 'AUCTION') {
-    const bid = await getBiddingByProductId(product.id);
-    if (withSeller) {
-      const user = await prisma.user.findUnique({
-        where: { userId: product?.sellerId },
-      });
-      const data = await prisma.shopping.findMany({
-        where: { sellerId: user?.userId },
-        select: { rating: true },
-      });
-      if (user != null) {
-        if (data.length === 0) {
+  const bid = await getBiddingByProductId(product!.id);
+  if (withSeller) {
+    const user = await prisma.user.findUnique({
+      where: { userId: product?.sellerId },
+    });
+    const data = await prisma.shopping.findMany({
+      where: { sellerId: user?.userId },
+      select: { rating: true },
+    });
+    if (user != null) {
+      if (data.length === 0) {
+        // @ts-ignore
+        user['rating'] = 0;
+      } else {
+        const totalRating = data.reduce((acc, cur) => acc + cur.rating, 0) / data.length;
+        if (user !== null) {
           // @ts-ignore
-          user['rating'] = 0;
-        } else {
-          const totalRating = data.reduce((acc, cur) => acc + cur.rating, 0) / data.length;
-          if (user !== null) {
-            // @ts-ignore
-            user['rating'] = totalRating.toFixed(1);
-          }
+          user['rating'] = totalRating.toFixed(1);
         }
-      }
-
-      if (buyerId) {
-        const wish = await prisma.wish.findFirst({
-          where: { productId: product?.id, buyerId },
-        });
-        return { ...product, image, user, wish, bid };
-      } else {
-        return { ...product, image, user, bid };
-      }
-    } else {
-      if (buyerId) {
-        const wish = await prisma.wish.findFirst({
-          where: { productId: product?.id, buyerId },
-        });
-        return { ...product, image, wish, bid };
-      } else {
-        return { ...product, image, bid };
       }
     }
-  } else {
-    if (withSeller) {
-      const user = await prisma.user.findUnique({
-        where: { userId: product?.sellerId },
+
+    if (buyerId) {
+      const wish = await prisma.wish.findFirst({
+        where: { productId: product?.id, buyerId },
       });
-      const data = await prisma.shopping.findMany({
-        where: { sellerId: user?.userId },
-        select: { rating: true },
-      });
-      if (user != null) {
-        if (data.length === 0) {
-          // @ts-ignore
-          user['rating'] = 0;
-        } else {
-          const totalRating = data.reduce((acc, cur) => acc + cur.rating, 0) / data.length;
-          if (user !== null) {
-            // @ts-ignore
-            user['rating'] = totalRating.toFixed(1);
-          }
-        }
-      }
-      if (buyerId) {
-        const wish = await prisma.wish.findFirst({
-          where: { productId: product?.id, buyerId },
-        });
-        return { ...product, image, user, wish };
-      } else {
-        return { ...product, image, user };
-      }
+      return { ...product, image, user, wish, bid };
     } else {
-      if (buyerId) {
-        const wish = await prisma.wish.findFirst({
-          where: { productId: product?.id, buyerId },
-        });
-        return { ...product, image, wish };
-      } else {
-        return { ...product, image };
-      }
+      return { ...product, image, user, bid };
+    }
+  } else {
+    if (buyerId) {
+      const wish = await prisma.wish.findFirst({
+        where: { productId: product?.id, buyerId },
+      });
+      return { ...product, image, wish, bid };
+    } else {
+      return { ...product, image, bid };
     }
   }
 };
@@ -223,10 +182,11 @@ export const updateProduct = async (id: Product['id'], updateData: Partial<Produ
 };
 
 export const updateAuctionProduct = async () => {
+  const today = new Date();
   const products = await prisma.product.findMany({
     where: {
       endingAt: {
-        lte: new Date(),
+        lte: today.toISOString(),
       },
       status: 'AUCTION',
     },
