@@ -20,12 +20,10 @@ const Admin = ({ members, isLogin }: InferGetServerSidePropsType<typeof getServe
 };
 
 const Main = styled.main`
-  padding: 0 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: 2.5rem;
 `;
 
 export default Admin;
