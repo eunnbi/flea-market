@@ -16,34 +16,40 @@ export interface ProductItem extends Product {
   bid: Bidding[];
 }
 
-interface ItemProps {
-  product: ProductItem;
-}
-
 const ProductList = ({
   products,
   Item,
   result,
+  emptyText,
 }: {
   products: ProductItem[];
-  Item?: (props: ItemProps) => JSX.Element;
+  Item?: (props: { product: ProductItem }) => JSX.Element;
   result?: boolean;
+  emptyText?: string;
 }) => {
   return (
     <>
       {result && <p className="result">{products.length}개의 상품</p>}
-      {products.length <= 2 ? (
-        <FlexSection>
-          {products.map(product =>
-            Item === undefined ? <DefaultItem product={product} /> : <Item product={product} key={product.id} />,
-          )}
-        </FlexSection>
+      {products.length === 0 ? (
+        emptyText ? (
+          <p className="emptyText">{emptyText}</p>
+        ) : null
       ) : (
-        <GridSection>
-          {products.map(product =>
-            Item === undefined ? <DefaultItem product={product} /> : <Item product={product} key={product.id} />,
+        <>
+          {products.length <= 2 ? (
+            <FlexSection>
+              {products.map(product =>
+                Item === undefined ? <DefaultItem product={product} /> : <Item product={product} key={product.id} />,
+              )}
+            </FlexSection>
+          ) : (
+            <GridSection>
+              {products.map(product =>
+                Item === undefined ? <DefaultItem product={product} /> : <Item product={product} key={product.id} />,
+              )}
+            </GridSection>
           )}
-        </GridSection>
+        </>
       )}
     </>
   );
@@ -53,6 +59,7 @@ const FlexSection = styled.section`
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
+  gap: 2rem;
 `;
 
 const GridSection = styled.section`
@@ -67,7 +74,7 @@ const GridSection = styled.section`
   }
 `;
 
-const DefaultItem = ({ product }: ItemProps) => {
+const DefaultItem = ({ product }: { product: ProductItem }) => {
   const { pathname } = useRouter();
   const { id, name, price, status, image, createdAt, likeCnt, endingAt, wish, bid } = product;
   return (
@@ -101,7 +108,7 @@ const DefaultItem = ({ product }: ItemProps) => {
             ) : (
               <div className="row">
                 <p className="price">
-                  {bid.length === 0 ? '입찰 없음' : `${Math.max(bid.map(elem => elem.price)).toLocaleString()}원`}
+                  {bid.length === 0 ? '입찰 없음' : `${Math.max([...bid.map(elem => elem.price)]).toLocaleString()}원`}
                 </p>
                 <p className="cnt">
                   <BsFillPeopleFill />
@@ -129,6 +136,7 @@ export const StyledLink = styled(Link)`
     font-weight: normal;
     margin: 3px 0;
     font-size: 1.3rem;
+    text-transform: capitalize;
   }
   .price {
     font-weight: bold;
