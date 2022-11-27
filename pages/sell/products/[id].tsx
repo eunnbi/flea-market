@@ -79,26 +79,28 @@ const ProductDetail = ({ product }: InferGetServerSidePropsType<typeof getServer
           <IoMdHeartEmpty className="heart_icon" />
           {likeCnt}
         </p>
-        <div>
-          <Button
-            variant="outlined"
-            onClick={() =>
-              Router.push(
-                {
-                  pathname: '/sell/register',
-                  query: {
-                    id,
+        {status !== 'PURCHASED' && (
+          <div>
+            <Button
+              variant="outlined"
+              onClick={() =>
+                Router.push(
+                  {
+                    pathname: '/sell/register',
+                    query: {
+                      id,
+                    },
                   },
-                },
-                '/sell/register',
-              )
-            }>
-            수정
-          </Button>
-          <Button variant="outlined" onClick={() => setOpen(true)}>
-            삭제
-          </Button>
-        </div>
+                  '/sell/register',
+                )
+              }>
+              수정
+            </Button>
+            <Button variant="outlined" onClick={() => setOpen(true)}>
+              삭제
+            </Button>
+          </div>
+        )}
       </main>
       <SimpleDialog
         open={open}
