@@ -6,12 +6,14 @@ export const createShopping = async ({
   price,
   buyerId,
   productId,
-}: Pick<Shopping, 'buyerId' | 'price' | 'productId'>) => {
+  sellerId,
+}: Pick<Shopping, 'buyerId' | 'price' | 'productId' | 'sellerId'>) => {
   const res = await prisma.shopping.create({
     data: {
       price,
       buyerId,
       productId,
+      sellerId,
     },
   });
   return res;
@@ -37,6 +39,16 @@ export const getShoppingList = async (buyerId: Shopping['buyerId']) => {
 export const deleteShoppingByUser = async (buyerId: Shopping['buyerId']) => {
   const res = await prisma.shopping.deleteMany({
     where: { buyerId },
+  });
+  return res;
+};
+
+export const updateShopping = async (id: Shopping['id'], data: Partial<Shopping>) => {
+  const res = await prisma.shopping.update({
+    where: { id },
+    data: {
+      ...data,
+    },
   });
   return res;
 };
