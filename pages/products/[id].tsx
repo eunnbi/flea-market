@@ -130,6 +130,7 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
     bid,
     sellerId,
   } = product;
+  const endingDate = new Date(String(endingAt));
   return (
     <>
       <CustomHead title={product.name} />
@@ -138,17 +139,23 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
         <section>
           <img src={getImageUrl(image)} alt="product" />
           <h2>{name}</h2>
-          {status != 'AUCTION' && <p className={styles.price}>{price.toLocaleString()}원</p>}
+          {status !== 'AUCTION' ? (
+            <p className={styles.price}>{price.toLocaleString()}원</p>
+          ) : (
+            <p className={styles.price}>{bid.length === 0 ? '입찰 없음' : `${bid[0].price.toLocaleString()}원`}</p>
+          )}
         </section>
         <section className={styles.contentBox}>
           <div className={styles.row}>
             <Chip label={status === 'AUCTION' ? '경매' : status === 'PROGRESS' ? '판매 진행중' : '판매 완료'} />
-            {endingAt && <Chip label={`D-${getDiffDay(String(endingAt))}`} />}
+            {status === 'AUCTION' && <Chip label={`D-${getDiffDay(endingDate)}`} />}
           </div>
-          {endingAt && (
+          {status === 'AUCTION' && (
             <p className={styles.content}>
               <BsCalendarDate />
-              <span>{String(endingAt).split('T')[0]}</span>
+              <span>
+                {endingDate.getFullYear()}-{endingDate.getMonth() + 1}-{endingDate.getDate()}
+              </span>
             </p>
           )}
           <div className={styles.content}>
@@ -180,17 +187,7 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
             <FaRegComment />
             {content}
           </p>
-          {status === 'AUCTION' && (
-            <div className={styles.contentStart}>
-              <RiHistoryLine />
-              <div className={styles.bidTable}>
-                <span>입찰목록 ({bid.length})</span>
-                <AuctionHistory history={bid} />
-              </div>
-            </div>
-          )}
         </section>
-
         <p className={styles.likeCnt}>
           <Tooltip title="위시리스트" arrow>
             <button onClick={() => onClickLikeButton(wish)}>
@@ -223,7 +220,7 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
           open={openBid}
           handleClose={handleCloseBid}
           onConfirm={onConfirmBidding}
-          maxPrice={bid.length === 0 ? 0 : Math.max(bid.map((elem: Bidding) => elem.price))}
+          maxPrice={bid.length === 0 ? 0 : Math.max(...bid.map((elem: Bidding) => elem.price))}
         />
       )}
     </>
