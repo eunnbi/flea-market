@@ -44,6 +44,15 @@ export const deleteWishByUser = async (buyerId: Wish['buyerId']) => {
   return res;
 };
 
+export const deleteWishByProduct = async (productId: Wish['productId']) => {
+  const res = await prisma.wish.deleteMany({
+    where: {
+      productId,
+    },
+  });
+  return res;
+};
+
 export const getWish = async ({ buyerId, productId }: Pick<Wish, 'buyerId' | 'productId'>) => {
   const res = await prisma.wish.findFirst({
     where: { buyerId, productId },
