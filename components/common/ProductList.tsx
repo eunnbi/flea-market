@@ -20,13 +20,13 @@ const ProductList = ({
   Item,
   result,
   emptyText,
-  basePath,
+  seller,
 }: {
   products: ProductItem[];
   Item?: (props: { product: ProductItem }) => JSX.Element;
   result?: boolean;
   emptyText?: string;
-  basePath: string;
+  seller?: boolean;
 }) => {
   return (
     <>
@@ -40,7 +40,10 @@ const ProductList = ({
           {products.length <= 2 ? (
             <FlexSection>
               {products.map(product => (
-                <StyledLink href={`${basePath}/products/${product.id}`} passHref key={product.id}>
+                <StyledLink
+                  href={seller ? `/sell/products/${product.id}` : `/products/${product.id}`}
+                  passHref
+                  key={product.id}>
                   {Item === undefined ? <DefaultItem product={product} /> : <Item product={product} key={product.id} />}
                 </StyledLink>
               ))}
@@ -48,7 +51,10 @@ const ProductList = ({
           ) : (
             <GridSection>
               {products.map(product => (
-                <StyledLink href={`${basePath}/products/${product.id}`} passHref key={product.id}>
+                <StyledLink
+                  href={seller ? `/sell/products/${product.id}` : `/products/${product.id}`}
+                  passHref
+                  key={product.id}>
                   {Item === undefined ? <DefaultItem product={product} /> : <Item product={product} key={product.id} />}
                 </StyledLink>
               ))}
