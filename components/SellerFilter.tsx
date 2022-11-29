@@ -41,6 +41,7 @@ const SellerFilter = ({ sellers }: { sellers: State[] }) => {
         onClick={() => setOpen(true)}
         onDelete={state.seller.name === '' ? undefined : onDelete}
         sx={{ textTransform: 'capitalize' }}
+        className="filterChip"
       />
       <Dialog
         open={open}

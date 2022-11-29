@@ -69,6 +69,7 @@ const PriceFilter = () => {
         variant={startPrice === 0 && lastPrice === 0 ? 'outlined' : 'filled'}
         onClick={() => setOpen(true)}
         onDelete={startPrice === 0 && lastPrice === 0 ? undefined : onDelete}
+        className="filterChip"
       />
       <Dialog
         open={open}

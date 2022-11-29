@@ -169,7 +169,6 @@ export const StyledLink = styled(Link)`
       z-index: 2;
       background-color: #222222;
       color: white;
-      font-size: 0.7rem;
       height: 30px;
     }
     .dday {

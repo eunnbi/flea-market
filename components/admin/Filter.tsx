@@ -14,9 +14,9 @@ const Filter = ({ roleFilter, onChangeFilter }: Props) => {
   const { admin, seller, buyer } = roleFilter;
   return (
     <Box>
-      <Chip label="admin" variant={admin ? 'filled' : 'outlined'} onClick={onChangeFilter} />
-      <Chip label="seller" variant={seller ? 'filled' : 'outlined'} onClick={onChangeFilter} />
-      <Chip label="buyer" variant={buyer ? 'filled' : 'outlined'} onClick={onChangeFilter} />
+      <Chip label="admin" variant={admin ? 'filled' : 'outlined'} onClick={onChangeFilter} className="filterChip" />
+      <Chip label="seller" variant={seller ? 'filled' : 'outlined'} onClick={onChangeFilter} className="filterChip" />
+      <Chip label="buyer" variant={buyer ? 'filled' : 'outlined'} onClick={onChangeFilter} className="filterChip" />
     </Box>
   );
 };
