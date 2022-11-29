@@ -1,9 +1,8 @@
 import CustomHead from '@components/common/CustomHead';
 import { getImageUrl } from '@lib/getImageUrl';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import styles from '@styles/ProductDetail.module.css';
-import { IoLocationOutline, IoCallOutline } from 'react-icons/io5';
-import { AiFillStar } from 'react-icons/ai';
+import { IoCallOutline } from 'react-icons/io5';
 import { FaRegComment } from 'react-icons/fa';
 import { IoMdHeartEmpty, IoMdHeart } from 'react-icons/io';
 import { BsCalendarDate } from 'react-icons/bs';
@@ -11,7 +10,7 @@ import { BiUser } from 'react-icons/bi';
 import { FiMapPin } from 'react-icons/fi';
 import { RiHistoryLine } from 'react-icons/ri';
 import { TbChevronDown, TbChevronUp } from 'react-icons/tb';
-import { Badge, Button, Chip, Dialog, Tooltip } from '@mui/material';
+import { Button, Chip, Tooltip } from '@mui/material';
 import Router from 'next/router';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
@@ -187,6 +186,15 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
             <FaRegComment />
             {content}
           </p>
+          {status === 'AUCTION' && (
+            <div className={styles.contentStart}>
+              <RiHistoryLine />
+              <div className={styles.bidTable}>
+                <span>입찰목록 ({bid.length})</span>
+                <AuctionHistory history={bid} />
+              </div>
+            </div>
+          )}
         </section>
         <p className={styles.likeCnt}>
           <Tooltip title="위시리스트" arrow>
