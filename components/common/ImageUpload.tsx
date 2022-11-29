@@ -1,7 +1,7 @@
 import { MdOutlineAddPhotoAlternate } from 'react-icons/md';
 import React, { useRef } from 'react';
 import styled from '@emotion/styled';
-import { noError } from '@lib/formValidation';
+import { noError } from '@lib/createErrorObject';
 
 interface Props {
   imageUrl?: string;
@@ -14,17 +14,7 @@ const ImageUpload = ({ imageUrl, imageFile, changeImageFile, errorInfo }: Props)
   const ref = useRef<HTMLInputElement | null>(null);
   return (
     <Wrapper>
-      {imageFile ? (
-        <div>
-          <img src={URL.createObjectURL(imageFile)} />
-        </div>
-      ) : (
-        imageUrl && (
-          <div>
-            <img src={imageUrl} />
-          </div>
-        )
-      )}
+      {imageFile ? <img src={URL.createObjectURL(imageFile)} /> : imageUrl && <img src={imageUrl} />}
       <div>
         <button onClick={() => ref.current?.click()} type="button">
           <MdOutlineAddPhotoAlternate />
