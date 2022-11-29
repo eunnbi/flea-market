@@ -1,5 +1,5 @@
 import CustomHead from '@components/common/CustomHead';
-import styles from '@styles/Auth.module.css';
+import styles from '@styles/Register.module.css';
 import RegisterForm from '@components/RegisterForm';
 import { useEffect } from 'react';
 import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';

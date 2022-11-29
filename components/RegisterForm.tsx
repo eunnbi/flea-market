@@ -1,6 +1,6 @@
 import { FormControl, Button, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material';
 import { useRef, useState } from 'react';
-import styles from '@styles/RegisterForm.module.css';
+import styles from '@styles/Register.module.css';
 import type { User } from '@prisma/client';
 import CustomInput from './common/CustomInput';
 import { noError, createErrorObject } from '@lib/formValidation';
