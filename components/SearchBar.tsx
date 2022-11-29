@@ -14,11 +14,11 @@ import React, { useState } from 'react';
 import { BiSearchAlt } from 'react-icons/bi';
 import { IoCloseCircle } from 'react-icons/io5';
 import { useRecoilState } from 'recoil';
-import { inputState, searchState } from 'store/searchState';
+import { searchInputState, searchState } from 'store/searchState';
 
 const SearchBar = () => {
   const [open, setOpen] = useState(false);
-  const [input, setInput] = useRecoilState(inputState);
+  const [input, setInput] = useRecoilState(searchInputState);
   const [state, setState] = useRecoilState(searchState);
   const handleClose = () => setOpen(false);
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {

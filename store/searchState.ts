@@ -13,7 +13,7 @@ export const searchState = atom({
   },
 });
 
-export const inputState = atom({
-  key: 'inputState',
+export const searchInputState = atom({
+  key: 'searchInputState',
   default: '',
 });
