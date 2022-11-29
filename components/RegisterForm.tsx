@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import styles from '@styles/Register.module.css';
 import type { User } from '@prisma/client';
 import CustomInput from './common/CustomInput';
-import { noError, createErrorObject } from '@lib/formValidation';
+import { noError, createErrorObject } from '@lib/createErrorObject';
 import Router from 'next/router';
 import axios from 'axios';
 

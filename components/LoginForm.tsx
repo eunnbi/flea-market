@@ -4,7 +4,7 @@ import { IoClose } from 'react-icons/io5';
 import { User } from '@prisma/client';
 import Router from 'next/router';
 import CustomInput from './common/CustomInput';
-import { noError, createErrorObject } from '@lib/formValidation';
+import { noError, createErrorObject } from '@lib/createErrorObject';
 import axios from 'axios';
 import { getRedirectInfo } from '@lib/getRedirectInfo';
 import Link from 'next/link';
