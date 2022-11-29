@@ -98,7 +98,7 @@ const DefaultItem = ({ product }: { product: ProductItem }) => {
           label={status === 'AUCTION' ? '경매' : status === 'PROGRESS' ? '판매 진행중' : '판매 완료'}
           className="status"
         />
-        {status === 'AUCTION' && <Chip label={`D-${getDiffDay(endingDate)}`} className="dday" variant="outlined" />}
+        {status === 'AUCTION' && <Chip label={`D-${getDiffDay(endingDate)}`} className="dday" />}
       </div>
       <div className="wrapper">
         <div>
@@ -171,8 +171,9 @@ export const StyledLink = styled(Link)`
       top: 10px;
       right: 10px;
       z-index: 2;
-      border-color: gray;
+      background-color: #fff;
       color: gray;
+      border: 1px solid gray;
     }
   }
 `;
