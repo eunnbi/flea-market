@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
 import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
 import Header from '@components/common/Header';
 
-const Sell = ({ token, data }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const Sell = ({ token, data, user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [filter, setFilter] = useState({
     AUCTION: true,
     PURCHASED: true,
@@ -30,7 +30,7 @@ const Sell = ({ token, data }: InferGetServerSidePropsType<typeof getServerSideP
       <CustomHead title="Home" />
       <Header isLogin={true} />
       <Main>
-        <h2>Your Products</h2>
+        <h2>{user.userId}님의 상품들</h2>
         <StatusFilter filter={filter} setFilter={setFilter} />
         <SortFilter sort={sort} setSort={setSort} />
         <ProductList
@@ -85,6 +85,7 @@ const Main = styled.main`
   min-height: calc(100vh - var(--hh));
   h2 {
     margin-bottom: 2rem;
+    text-transform: capitalize;
   }
   @media screen and (max-width: 620px) {
     min-height: calc(var(--vh, 1vh) * 100 - var(--hh));
@@ -117,7 +118,7 @@ export const getServerSideProps = async ({ req }: GetServerSidePropsContext) => 
       });
       const data = await response.json();
       return {
-        props: { token: cookies.access_token, data },
+        props: { token: cookies.access_token, data, user },
       };
     }
   }

@@ -30,6 +30,7 @@ const Main = styled.main`
   h2 {
     text-align: center;
     margin-bottom: 1.5rem;
+    text-transform: capitalize;
   }
   @media screen and (max-width: 620px) {
     min-height: calc(var(--vh, 1vh) * 100 - var(--hh));
