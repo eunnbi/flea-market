@@ -34,7 +34,7 @@ const Sell = ({ token, data, user }: InferGetServerSidePropsType<typeof getServe
         <StatusFilter filter={filter} setFilter={setFilter} />
         <SortFilter sort={sort} setSort={setSort} />
         <ProductList
-          basePath="/sell"
+          seller={true}
           emptyText="등록한 상품이 없습니다. 상품을 등록해주세요!"
           products={
             sort === '최신순'

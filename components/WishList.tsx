@@ -8,18 +8,11 @@ import Image from 'next/image';
 import { BsFillPeopleFill } from 'react-icons/bs';
 
 const WishList = ({ products }: { products: ProductItem[] }) => {
-  return (
-    <ProductList
-      products={products}
-      Item={Item}
-      emptyText="좋아하는 상품이 없습니다. 상품을 추가해보세요."
-      basePath="/"
-    />
-  );
+  return <ProductList products={products} Item={Item} emptyText="좋아하는 상품이 없습니다. 상품을 추가해보세요." />;
 };
 
 const Item = ({ product }: { product: ProductItem }) => {
-  const { id, name, price, status, image, createdAt, likeCnt, endingAt, bid } = product;
+  const { id, name, price, status, image, likeCnt, endingAt, bid } = product;
   const endingDate = new Date(String(endingAt));
   return (
     <StyledLink href={`/products/${id}`} passHref>
