@@ -30,7 +30,7 @@ const Sell = ({ token, data, user }: InferGetServerSidePropsType<typeof getServe
       <CustomHead title="Home" />
       <Header isLogin={true} />
       <Main>
-        <h2>{user.userId}님의 상품들</h2>
+        <h1>{user.userId}님의 상품들</h1>
         <StatusFilter filter={filter} setFilter={setFilter} />
         <SortFilter sort={sort} setSort={setSort} />
         <ProductList
@@ -83,9 +83,8 @@ const Main = styled.main`
   flex-direction: column;
   align-items: center;
   min-height: calc(100vh - var(--hh));
-  h2 {
+  h1 {
     margin-bottom: 2rem;
-    text-transform: capitalize;
   }
   @media screen and (max-width: 620px) {
     min-height: calc(var(--vh, 1vh) * 100 - var(--hh));

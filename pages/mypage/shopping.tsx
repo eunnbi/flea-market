@@ -16,7 +16,7 @@ const MyShopping = ({ shopping, dates, user }: InferGetServerSidePropsType<typeo
       <CustomHead title="My Page" />
       <Header isLogin={true} />
       <Main>
-        <h2>{user.userId}님의 구매 목록</h2>
+        <h1>{user.userId}님의 구매 목록</h1>
         <ShoppingList list={shopping} dates={dates} />
       </Main>
     </>
@@ -27,10 +27,9 @@ const Main = styled.main`
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - var(--hh));
-  h2 {
+  h1 {
     text-align: center;
     margin-bottom: 1.5rem;
-    text-transform: capitalize;
   }
   @media screen and (max-width: 620px) {
     min-height: calc(var(--vh, 1vh) * 100 - var(--hh));
