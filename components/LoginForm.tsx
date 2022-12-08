@@ -100,7 +100,7 @@ const Wrapper = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.3);
   z-index: 10;
   display: flex;
   justify-content: center;
@@ -115,6 +115,7 @@ const Form = styled.form`
   background-color: white;
   padding: 2rem;
   border-radius: 5px;
+  box-shadow: 1px 5px 10px 0px rgba(0, 0, 0, 0.3);
   h1 {
     text-align: center;
   }
