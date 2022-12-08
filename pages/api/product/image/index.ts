@@ -1,5 +1,4 @@
 import { createImage } from '@db/image';
-import prisma from '@db/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 //@ts-ignore

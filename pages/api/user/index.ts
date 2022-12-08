@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getAllUsers, getUserById, getUsersByRole, updateUser } from '@db/user';
+import { getAllUsers, getUserById, getUsersByRole } from '@db/user';
 import { Role } from '@prisma/client';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
