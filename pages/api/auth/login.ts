@@ -12,10 +12,11 @@ export default async function login(req: NextApiRequest, res: NextApiResponse) {
         if (user === null) {
           res.status(200).json({ message: 'Wrong ID or password' });
         } else {
-          const { name, userId, role, createdAt } = user;
+          const { firstName, lastName, userId, role, createdAt } = user;
           const payload = {
             userId,
-            name,
+            firstName,
+            lastName,
             role,
             createdAt,
           };
