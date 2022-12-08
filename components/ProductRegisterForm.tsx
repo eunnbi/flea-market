@@ -344,7 +344,7 @@ const ProductRegisterForm = ({ initialProduct }: { initialProduct: ProductItem |
         imageFile={imageFile}
         changeImageFile={changeImageFile}
         errorInfo={errorInfo.imageFile}
-        imageUrl={initialProduct?.image ? getImageUrl(initialProduct.image) : undefined}
+        imageUrl={initialProduct ? getImageUrl(initialProduct.image) : undefined}
       />
       <CustomInput
         label="🛍️ Product's Name"
@@ -404,7 +404,7 @@ const ProductRegisterForm = ({ initialProduct }: { initialProduct: ProductItem |
         <Map location={location} setLocationErrorInfo={setLocationErrorInfo} />
       </div>
       <Button variant="contained" type="submit" disabled={loading}>
-        {loading ? (initialProduct?.id ? '수정 중...' : '등록 중...') : initialProduct?.id ? '수정하기' : '등록하기'}
+        {loading ? (initialProduct ? '수정 중...' : '등록 중...') : initialProduct ? '수정하기' : '등록하기'}
       </Button>
     </Form>
   );
