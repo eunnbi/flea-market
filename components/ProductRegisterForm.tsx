@@ -48,7 +48,10 @@ const ProductRegisterForm = ({ initialProduct }: { initialProduct: ProductItem |
         },
   );
   const [location, setLocation] = useState(initialProduct !== null ? initialProduct.tradingPlace : '');
-  const endingDate = initialProduct === null ? new Date() : new Date(String(initialProduct.endingAt));
+  const endingDate =
+    initialProduct === null || initialProduct?.endingAt === null
+      ? new Date()
+      : new Date(String(initialProduct.endingAt));
 
   const [endingAt, setEndingAt] = useState<Dayjs>(
     dayjs(`${endingDate.getFullYear()}-${endingDate.getMonth() + 1}-${endingDate.getDate()} 00:00:00`),
