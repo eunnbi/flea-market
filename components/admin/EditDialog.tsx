@@ -31,6 +31,11 @@ const EditDialog = ({ open, handleClose, initialState, editMember }: Props) => {
   const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues(values => ({ ...values, [prop]: event.target.value }));
   };
+  const onClose = () => {
+    setMessage('');
+    handleClose();
+    setLoading(false);
+  };
   const onConfirm = () => {
     if (values.userId === '' || values.firstName === '' || values.lastName === '') {
       setMessage('빈 항목이 존재합니다.');
@@ -38,10 +43,15 @@ const EditDialog = ({ open, handleClose, initialState, editMember }: Props) => {
     }
     setMessage('');
     setLoading(true);
-    editMember(values).then(() => {
-      setLoading(false);
-      handleClose();
-    });
+    editMember(values)
+      .then(() => {
+        setLoading(false);
+        handleClose();
+      })
+      .catch(e => {
+        setLoading(false);
+        setMessage('중복된 아이디입니다.');
+      });
   };
   useEffect(() => {
     setValues(initialState);
@@ -49,7 +59,7 @@ const EditDialog = ({ open, handleClose, initialState, editMember }: Props) => {
   return (
     <Dialog
       open={open}
-      onClose={handleClose}
+      onClose={onClose}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description">
       <DialogTitle id="alert-dialog-title" sx={{ fontFamily: 'Pretendard' }}>
@@ -90,7 +100,7 @@ const EditDialog = ({ open, handleClose, initialState, editMember }: Props) => {
         </Form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="error" type="button" disabled={loading}>
+        <Button onClick={onClose} color="error" type="button" disabled={loading}>
           취소
         </Button>
         <Button onClick={onConfirm} autoFocus color="secondary" type="button" disabled={loading}>
@@ -105,5 +115,6 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  margin-top: 1rem;
 `;
 export default EditDialog;
