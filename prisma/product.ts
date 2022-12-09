@@ -74,7 +74,9 @@ export const getProductById = async (id: Product['id'], buyerId?: Wish['buyerId'
       rating: true,
     },
   });
-  const rating = ratings.length === 0 ? 0 : ratings.reduce((acc, cur) => acc + cur.rating, 0) / ratings.length;
+  const ratingsExZero = ratings.filter(({ rating }) => (rating === 0 ? false : true));
+  const rating =
+    ratingsExZero.length === 0 ? 0 : ratingsExZero.reduce((acc, cur) => acc + cur.rating, 0) / ratingsExZero.length;
   //@ts-ignore
   product['rating'] = rating.toFixed(1);
   const bid = await getBidding(product!.id);
