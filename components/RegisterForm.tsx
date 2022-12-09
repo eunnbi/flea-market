@@ -88,7 +88,7 @@ const RegisterForm = () => {
         firstName: noError,
         lastName: noError,
       });
-    } else if (!/(?=.*\d)(?=.*[a-zA-ZS]).{8,15}/.test(password)) {
+    } else if (!/(?=.*\d)(?=.*[a-zA-Z]).{8,15}/.test(password)) {
       // password 정규식 검사
       setErrorInfo({
         userId: noError,
