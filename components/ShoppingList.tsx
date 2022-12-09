@@ -5,7 +5,7 @@ import { BiUser } from 'react-icons/bi';
 import { IoLocationOutline } from 'react-icons/io5';
 import { ProductItem } from './common/ProductList';
 import Image from 'next/image';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormHelperText, Rating } from '@mui/material';
 import axios from 'axios';
@@ -25,6 +25,7 @@ const ShoppingList = ({ list, dates }: { list: ShoppingItem[]; dates: string[] }
     rating: 0,
     id: '',
   });
+  const [rating, setRating] = useState(0);
   const [errorText, setErrorText] = useState('');
   const handleOpen = (id: string, rating: number) => {
     setDialogState({
@@ -39,9 +40,10 @@ const ShoppingList = ({ list, dates }: { list: ShoppingItem[]; dates: string[] }
       rating: 0,
       id: '',
     });
+    setErrorText('');
   };
   const onConfirm = async () => {
-    if (dialogState.rating === 0) {
+    if (rating === 0) {
       setErrorText('0점 평가는 불가합니다.');
       return;
     }
@@ -49,7 +51,7 @@ const ShoppingList = ({ list, dates }: { list: ShoppingItem[]; dates: string[] }
     try {
       setLoading(true);
       const { data } = await axios.patch(`/api/product/buy/${dialogState.id}`, {
-        rating: dialogState.rating,
+        rating,
       });
       setLoading(false);
       handleClose();
@@ -65,7 +67,9 @@ const ShoppingList = ({ list, dates }: { list: ShoppingItem[]; dates: string[] }
       dates.map(date => new Date(date)).map(date => `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`),
     ),
   ];
-  console.log(newDates);
+  useEffect(() => {
+    setRating(dialogState.rating);
+  }, [dialogState]);
   return dates.length === 0 ? (
     <p className="emptyText">구매 목록이 없습니다.</p>
   ) : (
@@ -115,7 +119,7 @@ const ShoppingList = ({ list, dates }: { list: ShoppingItem[]; dates: string[] }
           <Rating
             defaultValue={dialogState.rating}
             precision={0.5}
-            onChange={(_, value) => setDialogState(state => ({ ...state, rating: value === null ? 0 : value }))}
+            onChange={(_, value) => setRating(value === null ? 0 : value)}
           />
           {errorText && <FormHelperText error>{errorText}</FormHelperText>}
         </DialogContent>
