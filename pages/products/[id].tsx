@@ -85,10 +85,7 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
       });
       const { success } = data;
       if (success) {
-        Router.replace(
-          `/products/${id}?alert=🎉 구매 완료되었습니다! 마이페이지에서 구매 목록을 확인해보세요!`,
-          `/products/${id}`,
-        );
+        Router.replace(`/products/${id}?alert=🎉 구매 완료되었습니다! 쇼핑 리스트를 확인해보세요!`, `/products/${id}`);
       } else {
         alert('⚠️ 상품 구입에 실패했습니다. 다시 시도해주세요.');
       }
