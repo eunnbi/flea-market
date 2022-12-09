@@ -2,7 +2,6 @@ import { noError } from '@lib/createErrorObject';
 import { TextField } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DateValidationError } from '@mui/x-date-pickers/internals/hooks/validation/useDateValidation';
 import { Dayjs } from 'dayjs';
 
 interface Props {
@@ -21,7 +20,6 @@ const CustomDatePicker = ({ date, setDate, errorInfo }: Props) => {
           onChange={value => {
             if (value === null) return;
             setDate(value);
-            console.log(value);
           }}
           disablePast
           renderInput={params => (
