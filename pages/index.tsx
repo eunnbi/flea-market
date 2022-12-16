@@ -1,34 +1,36 @@
-import CustomHead from '@components/common/CustomHead';
-import ProductList, { ProductItem } from '@components/common/ProductList';
-import { useState, useEffect } from 'react';
-import StatusFilter from '@components/StatusFilter';
-import SortFilter from '@components/SortFilter';
-import styled from '@emotion/styled';
-import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
-import Header from '@components/common/Header';
+import CustomHead from "@components/common/CustomHead";
+import ProductList from "@components/common/ProductList";
+import { useState, useEffect } from "react";
+import StatusFilter from "@components/common/StatusFilter";
+import SortFilter from "@components/common/SortFilter";
+import styled from "@emotion/styled";
+import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import Header from "@components/common/Header";
+import { useRecoilValue } from "recoil";
+import { statusFilterState } from "@store/statusFilterState";
+import { sortFilterState } from "@store/sortFilterState";
 
-const Home = ({ isLogin, token }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const [filter, setFilter] = useState({
-    AUCTION: true,
-    PURCHASED: true,
-    PROGRESS: true,
-  });
+const Home = ({
+  isLogin,
+  token,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const filter = useRecoilValue(statusFilterState);
+  const sort = useRecoilValue(sortFilterState);
   const [products, setProducts] = useState<ProductItem[] | []>([]);
-  const [sort, setSort] = useState('최신순');
   useEffect(() => {
     if (!isLogin) {
       fetch(`/api/product`)
-        .then(res => res.json())
-        .then(data => setProducts(data));
+        .then((res) => res.json())
+        .then((data) => setProducts(data));
     } else {
       fetch(`/api/product`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
-        .then(res => res.json())
-        .then(data => setProducts(data));
+        .then((res) => res.json())
+        .then((data) => setProducts(data));
     }
   }, [isLogin, token]);
   return (
@@ -37,16 +39,19 @@ const Home = ({ isLogin, token }: InferGetServerSidePropsType<typeof getServerSi
       <Header isLogin={isLogin} />
       <Main>
         <h1>Products</h1>
-        <StatusFilter filter={filter} setFilter={setFilter} />
-        <SortFilter sort={sort} setSort={setSort} />
+        <StatusFilter />
+        <SortFilter />
         <ProductList
           products={
-            sort === '최신순'
+            sort === "최신순"
               ? products
-                  .filter(product => {
-                    if (product.status === 'AUCTION' && filter.AUCTION) return true;
-                    if (product.status === 'PROGRESS' && filter.PROGRESS) return true;
-                    if (product.status === 'PURCHASED' && filter.PURCHASED) return true;
+                  .filter((product) => {
+                    if (product.status === "AUCTION" && filter.AUCTION)
+                      return true;
+                    if (product.status === "PROGRESS" && filter.PROGRESS)
+                      return true;
+                    if (product.status === "PURCHASED" && filter.PURCHASED)
+                      return true;
                     return false;
                   })
                   .sort(({ createdAt: a }, { createdAt: b }) => {
@@ -59,10 +64,13 @@ const Home = ({ isLogin, token }: InferGetServerSidePropsType<typeof getServerSi
                     }
                   })
               : products
-                  .filter(product => {
-                    if (product.status === 'AUCTION' && filter.AUCTION) return true;
-                    if (product.status === 'PROGRESS' && filter.PROGRESS) return true;
-                    if (product.status === 'PURCHASED' && filter.PURCHASED) return true;
+                  .filter((product) => {
+                    if (product.status === "AUCTION" && filter.AUCTION)
+                      return true;
+                    if (product.status === "PROGRESS" && filter.PROGRESS)
+                      return true;
+                    if (product.status === "PURCHASED" && filter.PURCHASED)
+                      return true;
                     return false;
                   })
                   .sort(({ likeCnt: a }, { likeCnt: b }) => {
@@ -91,28 +99,32 @@ const Main = styled.main`
   }
 `;
 
-export const getServerSideProps = async ({ req }: GetServerSidePropsContext) => {
+export const getServerSideProps = async ({
+  req,
+}: GetServerSidePropsContext) => {
   const { cookies } = req;
   const baseUrl = getAbsoluteUrl(req);
   const response = await fetch(`${baseUrl}/api/user/verify`, {
     headers: {
-      Authorization: cookies.access_token ? `Bearer ${cookies.access_token}` : 'Bearer',
+      Authorization: cookies.access_token
+        ? `Bearer ${cookies.access_token}`
+        : "Bearer",
     },
   });
   const { verify, user } = await response.json();
   if (verify) {
-    if (user.role === 'SELLER') {
+    if (user.role === "SELLER") {
       return {
         redirect: {
-          destination: '/sell',
+          destination: "/sell",
           permanent: false,
         },
       };
     }
-    if (user.role === 'ADMIN') {
+    if (user.role === "ADMIN") {
       return {
         redirect: {
-          destination: '/admin',
+          destination: "/admin",
           permanent: false,
         },
       };
