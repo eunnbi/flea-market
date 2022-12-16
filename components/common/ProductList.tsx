@@ -8,6 +8,8 @@ import Link from 'next/link';
 import { IoMdHeartEmpty, IoMdHeart } from 'react-icons/io';
 import { BsFillPeopleFill } from 'react-icons/bs';
 import Image from 'next/image';
+import { useRecoilValue } from 'recoil';
+import { productsState } from '@store/productsState';
 
 export interface ProductItem extends Product {
   image: ImageType;
@@ -16,18 +18,17 @@ export interface ProductItem extends Product {
 }
 
 const ProductList = ({
-  products,
   Item,
   result,
   emptyText,
   seller,
 }: {
-  products: ProductItem[];
   Item?: (props: { product: ProductItem }) => JSX.Element;
   result?: boolean;
   emptyText?: string;
   seller?: boolean;
 }) => {
+  const { products } = useRecoilValue(productsState);
   return (
     <>
       {result && <p className="result">{products.length}개의 상품</p>}
