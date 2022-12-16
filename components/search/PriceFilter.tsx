@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import styled from "@emotion/styled";
 import {
   Button,
   Dialog,
@@ -10,15 +10,13 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-  Input,
-  TextField,
   OutlinedInput,
   FormHelperText,
-} from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import { searchState } from 'store/searchState';
-import { MdOutlineAttachMoney } from 'react-icons/md';
+} from "@mui/material";
+import React, { useState } from "react";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { MdOutlineAttachMoney } from "react-icons/md";
+import { priceState } from "@store/search/priceState";
 
 const PRICE_FILTER: { startPrice: number; lastPrice: number }[] = [
   {
@@ -45,28 +43,30 @@ const PRICE_FILTER: { startPrice: number; lastPrice: number }[] = [
 
 const PriceFilter = () => {
   const [open, setOpen] = useState(false);
-  const [state, setState] = useRecoilState(searchState);
+  const [price, setPrice] = useRecoilState(priceState);
   const handleClose = () => setOpen(false);
   const onClick = (e: React.MouseEvent<HTMLLIElement>) => {
     const { min, max } = e.currentTarget.dataset;
     if (min == undefined || max == undefined) return;
-    setState(state => ({ ...state, startPrice: Number(min), lastPrice: Number(max) }));
+    setPrice({ startPrice: Number(min), lastPrice: Number(max) });
     handleClose();
   };
   const onDelete = () => {
-    setState(state => ({ ...state, startPrice: 0, lastPrice: 0 }));
+    setPrice({ startPrice: 0, lastPrice: 0 });
   };
-  const { startPrice, lastPrice } = state;
+  const { startPrice, lastPrice } = price;
   return (
     <>
       <Chip
         icon={<MdOutlineAttachMoney />}
         label={`가격: ${
           startPrice === 0 && lastPrice === 0
-            ? ''
-            : `${startPrice.toLocaleString()} ~ ${lastPrice === 0 ? '' : lastPrice.toLocaleString()}`
+            ? ""
+            : `${startPrice.toLocaleString()} ~ ${
+                lastPrice === 0 ? "" : lastPrice.toLocaleString()
+              }`
         }`}
-        variant={startPrice === 0 && lastPrice === 0 ? 'outlined' : 'filled'}
+        variant={startPrice === 0 && lastPrice === 0 ? "outlined" : "filled"}
         onClick={() => setOpen(true)}
         onDelete={startPrice === 0 && lastPrice === 0 ? undefined : onDelete}
         className="filterChip"
@@ -75,21 +75,29 @@ const PriceFilter = () => {
         open={open}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description">
+        aria-describedby="alert-dialog-description"
+      >
         <DialogTitle id="alert-dialog-title">가격</DialogTitle>
         <DialogContent>
           <List>
-            {PRICE_FILTER.map(filter => (
+            {PRICE_FILTER.map((filter) => (
               <ListItem
                 disablePadding
                 key={filter.startPrice}
                 onClick={onClick}
                 data-min={filter.startPrice}
-                data-max={filter.lastPrice}>
+                data-max={filter.lastPrice}
+              >
                 <ListItemButton>
                   <ListItemText
-                    primary={`${filter.startPrice === 0 ? '' : `${filter.startPrice.toLocaleString()}원`} ~ ${
-                      filter.lastPrice === 0 ? '' : `${filter.lastPrice.toLocaleString()}원`
+                    primary={`${
+                      filter.startPrice === 0
+                        ? ""
+                        : `${filter.startPrice.toLocaleString()}원`
+                    } ~ ${
+                      filter.lastPrice === 0
+                        ? ""
+                        : `${filter.lastPrice.toLocaleString()}원`
                     }`}
                   />
                 </ListItemButton>
@@ -104,41 +112,52 @@ const PriceFilter = () => {
 };
 
 const Inputs = ({ handleClose }: { handleClose: () => void }) => {
-  const setState = useSetRecoilState(searchState);
+  const setPrice = useSetRecoilState(priceState);
   const [inputs, setInputs] = useState({
-    min: '',
-    max: '',
+    min: "",
+    max: "",
   });
-  const [errorText, setErrorText] = useState('');
-  const handleChange = (type: 'min' | 'max') => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputs(inputs => ({
-      ...inputs,
-      [type]: e.target.value,
-    }));
-  };
+  const [errorText, setErrorText] = useState("");
+  const handleChange =
+    (type: "min" | "max") => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setInputs((inputs) => ({
+        ...inputs,
+        [type]: e.target.value,
+      }));
+    };
   const onClick = () => {
     const { min, max } = inputs;
-    if (min === '' || max === '') {
-      setErrorText('숫자를 입력해주세요');
+    if (min === "" || max === "") {
+      setErrorText("숫자를 입력해주세요");
       return;
     } else if (Number(min) > Number(max)) {
-      setErrorText('오른쪽 필드값이 왼쪽 필드값보다 같거나 커야 합니다.');
+      setErrorText("오른쪽 필드값이 왼쪽 필드값보다 같거나 커야 합니다.");
       return;
     }
-    setErrorText('');
-    setState(state => ({ ...state, startPrice: Number(min), lastPrice: Number(max) }));
+    setErrorText("");
+    setPrice({
+      startPrice: Number(min),
+      lastPrice: Number(max),
+    });
     handleClose();
-    console.log(inputs);
   };
   return (
     <>
       <Div>
-        <OutlinedInput sx={{ width: '150px' }} type="number" onChange={handleChange('min')} />
+        <OutlinedInput
+          sx={{ width: "150px" }}
+          type="number"
+          onChange={handleChange("min")}
+        />
         <span>~</span>
-        <OutlinedInput sx={{ width: '150px' }} type="number" onChange={handleChange('max')} />
+        <OutlinedInput
+          sx={{ width: "150px" }}
+          type="number"
+          onChange={handleChange("max")}
+        />
       </Div>
       {errorText && (
-        <FormHelperText sx={{ padding: '0 20px' }} error>
+        <FormHelperText sx={{ padding: "0 20px" }} error>
           {errorText}
         </FormHelperText>
       )}
@@ -156,4 +175,4 @@ const Div = styled.div`
   padding: 0 20px;
 `;
 
-export default PriceFilter;
+export default React.memo(PriceFilter);

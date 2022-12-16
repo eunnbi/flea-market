@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -8,12 +7,12 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-} from '@mui/material';
-import { User } from '@prisma/client';
-import React, { useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { searchState } from 'store/searchState';
-import { BiUser } from 'react-icons/bi';
+} from "@mui/material";
+import { User } from "@prisma/client";
+import React, { useState } from "react";
+import { useRecoilState } from "recoil";
+import { BiUser } from "react-icons/bi";
+import { sellerState } from "@store/search/sellerState";
 
 type State = User & {
   rating: string;
@@ -21,48 +20,50 @@ type State = User & {
 
 const SellerFilter = ({ sellers }: { sellers: State[] }) => {
   const [open, setOpen] = useState(false);
-  const [state, setState] = useRecoilState(searchState);
+  const [seller, setSeller] = useRecoilState(sellerState);
   const handleClose = () => setOpen(false);
   const onClick = (e: React.MouseEvent<HTMLLIElement>) => {
     const { id, name } = e.currentTarget.dataset;
     if (id === undefined || name === undefined) return;
-    setState(state => ({ ...state, seller: { id, name } }));
+    setSeller({ id, name });
     handleClose();
   };
   const onDelete = () => {
-    setState(state => ({ ...state, seller: { id: '', name: '' } }));
+    setSeller({ id: "", name: "" });
   };
   return (
     <>
       <Chip
         icon={<BiUser />}
-        label={`판매자 : ${state.seller.name}`}
-        variant={state.seller.name === '' ? 'outlined' : 'filled'}
+        label={`판매자 : ${seller.name}`}
+        variant={seller.name === "" ? "outlined" : "filled"}
         onClick={() => setOpen(true)}
-        onDelete={state.seller.name === '' ? undefined : onDelete}
-        sx={{ textTransform: 'capitalize' }}
+        onDelete={seller.name === "" ? undefined : onDelete}
+        sx={{ textTransform: "capitalize" }}
         className="filterChip"
       />
       <Dialog
         open={open}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description">
+        aria-describedby="alert-dialog-description"
+      >
         <DialogTitle id="alert-dialog-title">판매자</DialogTitle>
         <DialogContent>
           <List>
-            {sellers.map(seller => (
+            {sellers.map((seller) => (
               <ListItem
                 disablePadding
                 key={seller.id}
                 data-id={seller.userId}
                 data-name={`${seller.firstName} ${seller.lastName}`}
-                onClick={onClick}>
-                <ListItemButton sx={{ display: 'flex', gap: '1rem' }}>
+                onClick={onClick}
+              >
+                <ListItemButton sx={{ display: "flex", gap: "1rem" }}>
                   <ListItemText
                     primary={`${seller.firstName} ${seller.lastName}`}
                     secondary={`⭐ ${seller.rating}`}
-                    sx={{ textTransform: 'capitalize' }}
+                    sx={{ textTransform: "capitalize" }}
                   />
                 </ListItemButton>
               </ListItem>
@@ -74,4 +75,4 @@ const SellerFilter = ({ sellers }: { sellers: State[] }) => {
   );
 };
 
-export default SellerFilter;
+export default React.memo(SellerFilter);
