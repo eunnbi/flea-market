@@ -1,17 +1,15 @@
 import styled from '@emotion/styled';
 import { Chip } from '@mui/material';
+import { roleFilterState, Key } from '@store/admin/roleFilterState';
+import { useRecoilState } from 'recoil';
 
-interface Props {
-  roleFilter: {
-    admin: boolean;
-    seller: boolean;
-    buyer: boolean;
+
+const RoleFilter = () => {
+  const [{ admin, seller, buyer}, setRoleFilterState] = useRecoilState(roleFilterState);
+  const onChangeFilter = (e: any) => {
+    const textContent: Key = e.target.textContent;
+    setRoleFilterState(state => ({ ...state, [textContent]: !state[textContent] }));
   };
-  onChangeFilter: (e: any) => void;
-}
-
-const Filter = ({ roleFilter, onChangeFilter }: Props) => {
-  const { admin, seller, buyer } = roleFilter;
   return (
     <Box>
       <Chip label="admin" variant={admin ? 'filled' : 'outlined'} onClick={onChangeFilter} className="filterChip" />
@@ -30,4 +28,4 @@ const Box = styled.div`
   }
 `;
 
-export default Filter;
+export default RoleFilter;
