@@ -54,4 +54,4 @@ const Div = styled.div`
   }
 `;
 
-export default SearchBar;
+export default React.memo(SearchBar);
