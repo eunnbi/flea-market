@@ -1,4 +1,8 @@
+import AlertMessage from '@components/admin/AlertMessage';
+import MemberDeleteDialog from '@components/admin/MemberDeleteDialog';
+import MemberEditDialog from '@components/admin/MemberEditDialog';
 import MemberTable from '@components/admin/MemberTable';
+import RoleFilter from '@components/admin/RoleFilter';
 import CustomHead from '@components/common/CustomHead';
 import Header from '@components/common/Header';
 import styled from '@emotion/styled';
@@ -13,7 +17,11 @@ const Admin = ({ members, isLogin }: InferGetServerSidePropsType<typeof getServe
       <Header isLogin={isLogin} />
       <Main>
         <h1>Member Management</h1>
+        <AlertMessage />
+        <RoleFilter />
         <MemberTable initialMembers={members} />
+        <MemberDeleteDialog />
+        <MemberEditDialog />
       </Main>
     </>
   );
