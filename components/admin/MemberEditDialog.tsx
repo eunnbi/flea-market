@@ -13,45 +13,48 @@ import {
   RadioGroup,
   Alert,
 } from '@mui/material';
-import { User } from '@prisma/client';
 import { useState, useEffect } from 'react';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { memberEditState } from '@store/admin/memberEditState';
+import { membersState } from '@store/admin/membersState';
+import { alertMessageState } from '@store/admin/alertMessageState';
+import axios from 'axios';
 
-type State = Pick<User, 'userId' | 'firstName' | 'lastName' | 'role'>;
-interface Props {
-  open: boolean;
-  handleClose: () => void;
-  initialState: State;
-  editMember: (state: State) => Promise<void>;
-}
-
-const EditDialog = ({ open, handleClose, initialState, editMember }: Props) => {
-  const [message, setMessage] = useState('');
+const MemberEditDialog = () => {
+  const [{ open, id, initialState }, setMemberEditState] = useRecoilState(memberEditState);
+  const setMembers = useSetRecoilState(membersState);
+  const setAlertMessage = useSetRecoilState(alertMessageState);
+  const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [values, setValues] = useState(initialState);
-  const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (prop: keyof MemberTableState) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues(values => ({ ...values, [prop]: event.target.value }));
   };
+  const handleClose = () => setMemberEditState(state => ({ ...state, open: false }));
   const onClose = () => {
-    setMessage('');
+    setErrorMessage('');
     handleClose();
     setLoading(false);
   };
-  const onConfirm = () => {
+  const onConfirm = async () => {
     if (values.userId === '' || values.firstName === '' || values.lastName === '') {
-      setMessage('빈 항목이 존재합니다.');
+      setErrorMessage('빈 항목이 존재합니다.');
       return;
     }
-    setMessage('');
+    setErrorMessage('');
     setLoading(true);
-    editMember(values)
-      .then(() => {
-        setLoading(false);
-        handleClose();
-      })
-      .catch(e => {
-        setLoading(false);
-        setMessage('중복된 아이디입니다.');
-      });
+    try {
+      await axios.patch(`/api/user/${id}`, values);
+      const { data } = await axios.get(`/api/user`);
+      setMembers(data);
+      setAlertMessage('수정이 완료되었습니다.');
+      setLoading(false);
+      handleClose();
+    }
+    catch(e) {
+      setLoading(false);
+      setErrorMessage('중복된 아이디입니다.');
+    }
   };
   useEffect(() => {
     setValues(initialState);
@@ -66,7 +69,7 @@ const EditDialog = ({ open, handleClose, initialState, editMember }: Props) => {
         {loading ? '정보 수정 중...' : '멤버 정보 수정'}
       </DialogTitle>
       <DialogContent>
-        {message && <Alert severity="error">{message}</Alert>}
+        {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
         <Form>
           <TextField
             label="ID"
@@ -117,4 +120,4 @@ const Form = styled.form`
   gap: 2rem;
   margin-top: 1rem;
 `;
-export default EditDialog;
+export default MemberEditDialog;
