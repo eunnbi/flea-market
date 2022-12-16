@@ -1,23 +1,21 @@
 import styled from '@emotion/styled';
 import { Chip } from '@mui/material';
-import React, { Dispatch, SetStateAction } from 'react';
+import { productsState } from '@store/productsState';
+import { statusFilterState } from '@store/statusFilterState';
+import React, { useEffect } from 'react';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 
-interface Props {
-  filter: {
-    AUCTION: boolean;
-    PURCHASED: boolean;
-    PROGRESS: boolean;
-  };
-  setFilter: Dispatch<
-    SetStateAction<{
-      AUCTION: boolean;
-      PURCHASED: boolean;
-      PROGRESS: boolean;
-    }>
-  >;
-}
-
-const StatusFilter = ({ filter, setFilter }: Props) => {
+const StatusFilter = () => {
+  const setProducts = useSetRecoilState(productsState);
+  const [filter, setFilter] = useRecoilState(statusFilterState);
+  useEffect(() => {
+    setProducts(state => ({ ...state, products: state.initialProducts.filter(product => {
+      if (product.status === 'AUCTION' && filter.AUCTION) return true;
+      if (product.status === 'PROGRESS' && filter.PROGRESS) return true;
+      if (product.status === 'PURCHASED' && filter.PURCHASED) return true;
+      return false;
+    })}));
+  }, [filter]);
   return (
     <Div>
       <Chip
