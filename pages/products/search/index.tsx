@@ -1,25 +1,32 @@
-import CustomHead from '@components/common/CustomHead';
-import ProductList from '@components/common/ProductList';
-import SearchBar from '@components/SearchBar';
-import SellerFilter from '@components/SellerFilter';
-import styled from '@emotion/styled';
-import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
-import { ProductItem } from '@components/common/ProductList';
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
-import { useEffect, useState } from 'react';
-import { searchState } from 'store/searchState';
-import { useRecoilValue } from 'recoil';
-import PriceFilter from '@components/PriceFilter';
-import Header from '@components/common/Header';
+import CustomHead from "@components/common/CustomHead";
+import ProductList from "@components/common/ProductList";
+import SearchBar from "@components/search/SearchBar";
+import SellerFilter from "@components/search/SellerFilter";
+import PriceFilter from "@components/search/PriceFilter";
+import styled from "@emotion/styled";
+import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
+import Header from "@components/common/Header";
+import { priceState } from "@store/search/priceState";
+import { nameState } from "@store/search/nameState";
+import { sellerState } from "@store/search/sellerState";
 
-const ProductsSearch = ({ sellers, isLogin, token }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const { name, seller, startPrice, lastPrice } = useRecoilValue(searchState);
+const ProductsSearch = ({
+  sellers,
+  isLogin,
+  token,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const { startPrice, lastPrice } = useRecoilValue(priceState);
+  const name = useRecoilValue(nameState);
+  const seller = useRecoilValue(sellerState);
   const [products, setProducts] = useState<ProductItem[] | []>([]);
   useEffect(() => {
     if (!isLogin) {
       fetch(`/api/product?name=${name}`)
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
           setProducts(data);
         });
     } else {
@@ -28,8 +35,8 @@ const ProductsSearch = ({ sellers, isLogin, token }: InferGetServerSidePropsType
           Authorization: `Bearer ${token}`,
         },
       })
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
           setProducts(data);
         });
     }
@@ -44,16 +51,19 @@ const ProductsSearch = ({ sellers, isLogin, token }: InferGetServerSidePropsType
           <SellerFilter sellers={sellers} />
           <PriceFilter />
         </div>
-        <div style={{ marginTop: '1rem' }}>
+        <div style={{ marginTop: "1rem" }}>
           <h2>검색 결과</h2>
           <ProductList
             result={true}
             products={products
-              .filter(product => (seller.id === '' ? true : product.sellerId === seller.id))
-              .filter(product =>
+              .filter((product) =>
+                seller.id === "" ? true : product.sellerId === seller.id
+              )
+              .filter((product) =>
                 startPrice === 0 && lastPrice === 0
                   ? true
-                  : product.price >= startPrice && (lastPrice === 0 ? true : product.price <= lastPrice),
+                  : product.price >= startPrice &&
+                    (lastPrice === 0 ? true : product.price <= lastPrice)
               )}
           />
         </div>
@@ -86,28 +96,32 @@ const Main = styled.main`
   }
 `;
 
-export const getServerSideProps = async ({ req }: GetServerSidePropsContext) => {
+export const getServerSideProps = async ({
+  req,
+}: GetServerSidePropsContext) => {
   const { cookies } = req;
   const baseUrl = getAbsoluteUrl(req);
   const response = await fetch(`${baseUrl}/api/user/verify`, {
     headers: {
-      Authorization: cookies.access_token ? `Bearer ${cookies.access_token}` : 'Bearer',
+      Authorization: cookies.access_token
+        ? `Bearer ${cookies.access_token}`
+        : "Bearer",
     },
   });
   const { verify, user } = await response.json();
   if (verify) {
-    if (user.role === 'ADMIN') {
+    if (user.role === "ADMIN") {
       return {
         redirect: {
-          destination: '/admin',
+          destination: "/admin",
           permanent: false,
         },
       };
     }
-    if (user.role === 'SELLER') {
+    if (user.role === "SELLER") {
       return {
         redirect: {
-          destination: '/sell',
+          destination: "/sell",
           permanent: false,
         },
       };
