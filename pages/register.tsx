@@ -1,15 +1,21 @@
-import CustomHead from '@components/common/CustomHead';
-import styles from '@styles/Register.module.css';
-import RegisterForm from '@components/RegisterForm';
-import { useEffect } from 'react';
-import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
-import Header from '@components/common/Header';
+import CustomHead from "@components/common/CustomHead";
+import styles from "@styles/Register.module.css";
+import RegisterForm from "@components/auth/RegisterForm";
+import { useEffect } from "react";
+import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import Header from "@components/common/Header";
+import { useResetRecoilState } from "recoil";
+import { registerFormState } from "@store/auth/registerFormState";
 
-const Register = ({ isLogin }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const Register = ({
+  isLogin,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const resetRegisterFormState = useResetRecoilState(registerFormState);
   useEffect(() => {
+    resetRegisterFormState();
     const vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
+    document.documentElement.style.setProperty("--vh", `${vh}px`);
   }, []);
   return (
     <>
@@ -23,28 +29,32 @@ const Register = ({ isLogin }: InferGetServerSidePropsType<typeof getServerSideP
   );
 };
 
-export const getServerSideProps = async ({ req }: GetServerSidePropsContext) => {
+export const getServerSideProps = async ({
+  req,
+}: GetServerSidePropsContext) => {
   const { cookies } = req;
   const baseUrl = getAbsoluteUrl(req);
   const response = await fetch(`${baseUrl}/api/user/verify`, {
     headers: {
-      Authorization: cookies.access_token ? `Bearer ${cookies.access_token}` : 'Bearer',
+      Authorization: cookies.access_token
+        ? `Bearer ${cookies.access_token}`
+        : "Bearer",
     },
   });
   const { verify, user } = await response.json();
   if (verify) {
-    if (user.role === 'SELLER') {
+    if (user.role === "SELLER") {
       return {
         redirect: {
-          destination: '/sell',
+          destination: "/sell",
           permanent: false,
         },
       };
     }
-    if (user.role === 'ADMIN') {
+    if (user.role === "ADMIN") {
       return {
         redirect: {
-          destination: '/admin',
+          destination: "/admin",
           permanent: false,
         },
       };
