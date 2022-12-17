@@ -1,24 +1,30 @@
-import React, { useEffect } from 'react';
-import Script from 'next/script';
+import React, { useEffect } from "react";
+import Script from "next/script";
+import { useRecoilValue, useResetRecoilState } from "recoil";
+import { locationState } from "@store/locationState";
 
 interface Props {
-  location: string;
   setLocationErrorInfo?: (isError: boolean) => void;
 }
 
-function Map({ location, setLocationErrorInfo }: Props) {
+function Map({ setLocationErrorInfo }: Props) {
+  const location = useRecoilValue(locationState);
   const onLoadKakaoMap = () => {
-    if (!window.kakao || !window.kakao.maps || !window.kakao.maps.services) return;
-    if (location === '') {
+    if (!window.kakao || !window.kakao.maps || !window.kakao.maps.services)
+      return;
+    if (location === "") {
       navigator.geolocation.getCurrentPosition(({ coords }) => {
         const { latitude, longitude } = coords;
-        const container = document.getElementById('map');
+        const container = document.getElementById("map");
         const options = {
           center: new window.kakao.maps.LatLng(latitude, longitude),
           level: 3,
         };
         const map = new window.kakao.maps.Map(container, options);
-        const markerPosition = new window.kakao.maps.LatLng(latitude, longitude);
+        const markerPosition = new window.kakao.maps.LatLng(
+          latitude,
+          longitude
+        );
         const marker = new window.kakao.maps.Marker({
           position: markerPosition,
         });
@@ -29,13 +35,16 @@ function Map({ location, setLocationErrorInfo }: Props) {
       geocoder.addressSearch(location, function (result: any, status: any) {
         // 정상적으로 검색이 완료됐으면
         if (status === window.kakao.maps.services.Status.OK) {
-          const container = document.getElementById('map');
+          const container = document.getElementById("map");
           const options = {
             center: new window.kakao.maps.LatLng(result[0].y, result[0].x),
             level: 3,
           };
           const map = new window.kakao.maps.Map(container, options);
-          const markerPosition = new window.kakao.maps.LatLng(result[0].y, result[0].x);
+          const markerPosition = new window.kakao.maps.LatLng(
+            result[0].y,
+            result[0].x
+          );
           const marker = new window.kakao.maps.Marker({
             position: markerPosition,
           });
