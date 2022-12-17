@@ -1,10 +1,10 @@
 import styled from "@emotion/styled";
 import { Chip } from "@mui/material";
-import { statusState } from "@store/product/statusState";
+import { productStatusState } from "@store/product/statusState";
 import { useRecoilState } from "recoil";
 
 const StatusSelection = () => {
-  const [status, setStatus] = useRecoilState(statusState);
+  const [status, setStatus] = useRecoilState(productStatusState);
   const toggleStatus = () => {
     setStatus((value) => (value === "AUCTION" ? "PROGRESS" : "AUCTION"));
   };

@@ -1,6 +1,6 @@
 import { atom } from "recoil";
 
-export const statusState = atom<ProductItem["status"]>({
+export const productStatusState = atom<ProductItem["status"]>({
   key: "statusState",
   default: "PROGRESS",
 });

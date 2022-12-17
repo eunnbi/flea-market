@@ -21,7 +21,7 @@ import {
 import { productInputState } from "@store/product/inputState";
 import { errorInfoState } from "@store/product/errorInfoState";
 import { locationState } from "@store/locationState";
-import { statusState } from "@store/product/statusState";
+import { productStatusState } from "@store/product/statusState";
 import StatusSelection from "./StatusSelection";
 import { endingAtState } from "@store/product/endingAtState";
 import { imageFileState } from "@store/product/imageFileState";
@@ -41,11 +41,11 @@ const ProductRegisterForm = ({ initialProduct }: Props) => {
   const [errorInfo, setErrorInfo] = useRecoilState(errorInfoState);
   const setProductInputState = useSetRecoilState(productInputState);
   const setLocationState = useSetRecoilState(locationState);
-  const setStatusState = useSetRecoilState(statusState);
+  const setStatusState = useSetRecoilState(productStatusState);
   const setEndingAtState = useSetRecoilState(endingAtState);
   const resetProductInputState = useResetRecoilState(productInputState);
   const resetLocationState = useResetRecoilState(locationState);
-  const resetStatusState = useResetRecoilState(statusState);
+  const resetStatusState = useResetRecoilState(productStatusState);
   const resetEndingAtState = useResetRecoilState(endingAtState);
   const resetImageFileState = useResetRecoilState(imageFileState);
   const handleChange = useCallback(
@@ -190,7 +190,7 @@ interface PriceInputProps {
 }
 
 const PriceInput = ({ onChange, errorInfo, defaultValue }: PriceInputProps) => {
-  const status = useRecoilValue(statusState);
+  const status = useRecoilValue(productStatusState);
   return status === "PROGRESS" ? (
     <CustomInput
       label="💲Price"
@@ -211,7 +211,7 @@ const SubmitButton = ({ initialProduct }: Props) => {
   const { name, content, tradingPlace, price, phoneNumber } =
     useRecoilValue(productInputState);
   const location = useRecoilValue(locationState);
-  const status = useRecoilValue(statusState);
+  const status = useRecoilValue(productStatusState);
   const endingAt = useRecoilValue(endingAtState);
   const imageFile = useRecoilValue(imageFileState);
   const onSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
