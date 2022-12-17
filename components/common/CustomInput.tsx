@@ -1,6 +1,13 @@
-import { FormControl, InputLabel, Input, IconButton, InputAdornment, FormHelperText } from '@mui/material';
-import { ChangeEventHandler, useState } from 'react';
-import { BsEyeSlashFill, BsEyeFill } from 'react-icons/bs';
+import {
+  FormControl,
+  InputLabel,
+  Input,
+  IconButton,
+  InputAdornment,
+  FormHelperText,
+} from "@mui/material";
+import { ChangeEventHandler, useState } from "react";
+import { BsEyeSlashFill, BsEyeFill } from "react-icons/bs";
 
 interface Props {
   type?: string;
@@ -8,7 +15,7 @@ interface Props {
   isPassword: boolean;
   htmlFor: string;
   onChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
-  value: string | number;
+  defaultValue?: string;
   errorInfo: {
     isError: boolean;
     message: string;
@@ -25,23 +32,29 @@ const CustomInput = ({
   isPassword,
   htmlFor,
   onChange,
-  value,
   helperText,
   errorInfo,
   disabled,
   icon,
   multiline,
+  defaultValue,
 }: Props) => {
   const { isError, message } = errorInfo;
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => {
-    setShowPassword(value => !value);
+    setShowPassword((value) => !value);
   };
-  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
     event.preventDefault();
   };
   return (
-    <FormControl sx={{ m: 1, width: '100%', margin: 0 }} variant="standard" disabled={disabled}>
+    <FormControl
+      sx={{ m: 1, width: "100%", margin: 0 }}
+      variant="standard"
+      disabled={disabled}
+    >
       <InputLabel htmlFor={htmlFor} error={isError}>
         {label}
       </InputLabel>
@@ -49,7 +62,7 @@ const CustomInput = ({
         <Input
           error={isError}
           id={htmlFor}
-          type={showPassword ? 'text' : 'password'}
+          type={showPassword ? "text" : "password"}
           onChange={onChange}
           endAdornment={
             <InputAdornment position="end">
@@ -57,7 +70,8 @@ const CustomInput = ({
                 aria-label="toggle password visibility"
                 onClick={handleClickShowPassword}
                 onMouseDown={handleMouseDownPassword}
-                edge="end">
+                edge="end"
+              >
                 {showPassword ? <BsEyeSlashFill /> : <BsEyeFill />}
               </IconButton>
             </InputAdornment>
@@ -66,26 +80,30 @@ const CustomInput = ({
       ) : icon ? (
         <Input
           id={htmlFor}
-          type={type ? type : 'text'}
+          type={type ? type : "text"}
           onChange={onChange}
           error={isError}
           endAdornment={icon}
-          value={value}
+          defaultValue={defaultValue}
         />
       ) : (
         <Input
           id={htmlFor}
-          type={type ? type : 'text'}
-          value={value}
+          type={type ? type : "text"}
           onChange={onChange}
           error={isError}
           multiline={multiline}
+          defaultValue={defaultValue}
         />
       )}
       {helperText ? <FormHelperText>{helperText}</FormHelperText> : null}
       {message ? <FormHelperText error>{message}</FormHelperText> : null}
     </FormControl>
   );
+};
+
+CustomInput.defaultProps = {
+  defaultValue: "",
 };
 
 export default CustomInput;
