@@ -1,20 +1,38 @@
-import styled from '@emotion/styled';
-import { Chip } from '@mui/material';
-import { roleFilterState, Key } from '@store/admin/roleFilterState';
-import { useRecoilState } from 'recoil';
-
+import styled from "@emotion/styled";
+import { Chip } from "@mui/material";
+import { roleFilterState, Key } from "@store/admin/roleFilterState";
+import { useRecoilState } from "recoil";
 
 const RoleFilter = () => {
-  const [{ admin, seller, buyer}, setRoleFilterState] = useRecoilState(roleFilterState);
+  const [{ admin, seller, buyer }, setRoleFilterState] =
+    useRecoilState(roleFilterState);
   const onChangeFilter = (e: any) => {
     const textContent: Key = e.target.textContent;
-    setRoleFilterState(state => ({ ...state, [textContent]: !state[textContent] }));
+    setRoleFilterState((state) => ({
+      ...state,
+      [textContent]: !state[textContent],
+    }));
   };
   return (
     <Box>
-      <Chip label="admin" variant={admin ? 'filled' : 'outlined'} onClick={onChangeFilter} className="filterChip" />
-      <Chip label="seller" variant={seller ? 'filled' : 'outlined'} onClick={onChangeFilter} className="filterChip" />
-      <Chip label="buyer" variant={buyer ? 'filled' : 'outlined'} onClick={onChangeFilter} className="filterChip" />
+      <Chip
+        label="admin"
+        variant={admin ? "filled" : "outlined"}
+        onClick={onChangeFilter}
+        className="filterChip"
+      />
+      <Chip
+        label="seller"
+        variant={seller ? "filled" : "outlined"}
+        onClick={onChangeFilter}
+        className="filterChip"
+      />
+      <Chip
+        label="buyer"
+        variant={buyer ? "filled" : "outlined"}
+        onClick={onChangeFilter}
+        className="filterChip"
+      />
     </Box>
   );
 };
