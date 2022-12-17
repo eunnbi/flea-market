@@ -1,15 +1,20 @@
-import CustomHead from '@components/common/CustomHead';
-import Header from '@components/common/Header';
-import ShoppingList, { ShoppingItem } from '@components/ShoppingList';
-import styled from '@emotion/styled';
-import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
-import { useEffect } from 'react';
+import CustomHead from "@components/common/CustomHead";
+import Header from "@components/common/Header";
+import RatingDialog from "@components/shopping/RatingDialog";
+import ShoppingList from "@components/shopping/ShoppingList";
+import styled from "@emotion/styled";
+import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import { useEffect } from "react";
 
-const MyShopping = ({ shopping, dates, user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const MyShopping = ({
+  shopping,
+  dates,
+  user,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   useEffect(() => {
     const vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
+    document.documentElement.style.setProperty("--vh", `${vh}px`);
   }, []);
   return (
     <>
@@ -18,6 +23,7 @@ const MyShopping = ({ shopping, dates, user }: InferGetServerSidePropsType<typeo
       <Main>
         <h1>{user.userId}님의 구매 목록</h1>
         <ShoppingList list={shopping} dates={dates} />
+        <RatingDialog />
       </Main>
     </>
   );
@@ -36,28 +42,32 @@ const Main = styled.main`
   }
 `;
 
-export const getServerSideProps = async ({ req }: GetServerSidePropsContext) => {
+export const getServerSideProps = async ({
+  req,
+}: GetServerSidePropsContext) => {
   const { cookies } = req;
   const baseUrl = getAbsoluteUrl(req);
   const response = await fetch(`${baseUrl}/api/user/verify`, {
     headers: {
-      Authorization: cookies.access_token ? `Bearer ${cookies.access_token}` : 'Bearer',
+      Authorization: cookies.access_token
+        ? `Bearer ${cookies.access_token}`
+        : "Bearer",
     },
   });
   const { verify, user } = await response.json();
   if (verify) {
-    if (user.role === 'SELLER') {
+    if (user.role === "SELLER") {
       return {
         redirect: {
-          destination: '/sell',
+          destination: "/sell",
           permanent: false,
         },
       };
     }
-    if (user.role === 'ADMIN') {
+    if (user.role === "ADMIN") {
       return {
         redirect: {
-          destination: '/admin',
+          destination: "/admin",
           permanent: false,
         },
       };
@@ -69,11 +79,13 @@ export const getServerSideProps = async ({ req }: GetServerSidePropsContext) => 
     });
     const shopping: ShoppingItem[] = await res.json();
     const dates = shopping.map(({ item }) => String(item.createdAt));
-    return { props: { isLogin: verify, shopping, dates: [...new Set(dates)], user } };
+    return {
+      props: { isLogin: verify, shopping, dates: [...new Set(dates)], user },
+    };
   }
   return {
     redirect: {
-      destination: '/',
+      destination: "/",
       permanent: false,
     },
   };
