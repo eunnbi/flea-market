@@ -40,7 +40,7 @@ const RatingDialog = () => {
       });
       setLoading(false);
       handleClose();
-      Router.replace("/mypage/shopping");
+      Router.replace("/shopping");
     } catch (e) {
       setLoading(false);
       handleClose();
