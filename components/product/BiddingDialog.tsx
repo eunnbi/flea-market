@@ -6,52 +6,78 @@ import {
   Button,
   OutlinedInput,
   FormHelperText,
-} from '@mui/material';
-import { useState } from 'react';
+} from "@mui/material";
+import { biddingState } from "@store/product/biddingState";
+import axios from "axios";
+import Router from "next/router";
+import { useState } from "react";
+import { useRecoilState } from "recoil";
 
-interface Props {
-  open: boolean;
-  handleClose: () => void;
-  onConfirm: (price: number) => Promise<void>;
-  maxPrice: number;
-}
-
-const BiddingDialog = ({ open, handleClose, onConfirm, maxPrice }: Props) => {
+const BiddingDialog = () => {
+  const [{ open, token, id, maxPrice }, setBiddingState] =
+    useRecoilState(biddingState);
   const [loading, setLoading] = useState(false);
-  const [price, setPrice] = useState('');
-  const [errorText, setErrorText] = useState('');
+  const [price, setPrice] = useState("");
+  const [errorText, setErrorText] = useState("");
+  const handleClose = () => {
+    setBiddingState((state) => ({ ...state, open: false }));
+  };
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPrice(e.target.value);
   };
   const onClickCancelButton = () => {
-    setErrorText('');
-    setPrice('');
+    setErrorText("");
+    setPrice("");
+    setLoading(false);
     handleClose();
   };
-  const onClickOkButton = () => {
-    if (price === '') {
-      setErrorText('입찰 가격을 입력해주세요');
+  const onClickOkButton = async () => {
+    if (price === "") {
+      setErrorText("입찰 가격을 입력해주세요");
       return;
     }
     //Suggested bidding price must be higher than the current price
     if (Number(price) <= maxPrice) {
-      setErrorText('현재 가장 높은 입찰 가격보다 작습니다. 다시 입력해주세요');
+      setErrorText("현재 가장 높은 입찰 가격보다 작습니다. 다시 입력해주세요");
       return;
     }
-    setErrorText('');
+    setErrorText("");
     setLoading(true);
-    onConfirm(Number(price)).then(() => {
-      handleClose();
-      setPrice('');
-    });
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    try {
+      const { data } = await axios.post("/api/product/bid", {
+        price: Number(price),
+        productId: id,
+      });
+
+      const { success } = data;
+      if (success) {
+        Router.replace(
+          `/products/${id}?alert=🎉 입찰 완료되었습니다!`,
+          `/products/${id}`
+        );
+        handleClose();
+        setPrice("");
+        setLoading(false);
+      } else {
+        setLoading(false);
+        alert("⚠️ 상품 구입에 실패했습니다. 다시 시도해주세요.");
+      }
+    } catch (e) {
+      setLoading(false);
+      alert("⚠️ 입찰에 실패했습니다. 다시 시도해주세요.");
+    }
   };
   return (
     <Dialog
       open={open}
       onClose={handleClose}
       aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description">
-      <DialogTitle id="alert-dialog-title">{loading ? '처리 중...' : '입찰 가격'}</DialogTitle>
+      aria-describedby="alert-dialog-description"
+    >
+      <DialogTitle id="alert-dialog-title">
+        {loading ? "처리 중..." : "입찰 가격"}
+      </DialogTitle>
       <DialogContent>
         <OutlinedInput type="number" value={price} onChange={onChange} />
         {errorText && <FormHelperText error>{errorText}</FormHelperText>}
@@ -60,7 +86,12 @@ const BiddingDialog = ({ open, handleClose, onConfirm, maxPrice }: Props) => {
         <Button onClick={onClickCancelButton} color="error" disabled={loading}>
           취소
         </Button>
-        <Button onClick={onClickOkButton} autoFocus color="secondary" disabled={loading}>
+        <Button
+          onClick={onClickOkButton}
+          autoFocus
+          color="secondary"
+          disabled={loading}
+        >
           입력
         </Button>
       </DialogActions>
