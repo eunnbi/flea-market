@@ -1,29 +1,35 @@
-import CustomHead from '@components/common/CustomHead';
-import { getImageUrl } from '@lib/getImageUrl';
-import { useState } from 'react';
-import styles from '@styles/ProductDetail.module.css';
-import { IoCallOutline } from 'react-icons/io5';
-import { FaRegComment } from 'react-icons/fa';
-import { IoMdHeartEmpty, IoMdHeart } from 'react-icons/io';
-import { BsCalendarDate } from 'react-icons/bs';
-import { BiUser } from 'react-icons/bi';
-import { FiMapPin } from 'react-icons/fi';
-import { RiHistoryLine } from 'react-icons/ri';
-import { TbChevronDown, TbChevronUp } from 'react-icons/tb';
-import { Button, Chip, Tooltip } from '@mui/material';
-import Router from 'next/router';
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
-import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
-import SimpleDialog from '@components/common/SimpleDialog';
-import axios from 'axios';
-import Header from '@components/common/Header';
-import { Bidding, Wish } from '@prisma/client';
-import BiddingDialog from '@components/BiddingDialog';
-import AuctionHistory from '@components/AuctionHistory';
-import { getDiffDay } from '@lib/getDiffDay';
-import Map from '@components/common/Map';
+import CustomHead from "@components/common/CustomHead";
+import { getImageUrl } from "@lib/getImageUrl";
+import { useEffect, useState } from "react";
+import styles from "@styles/ProductDetail.module.css";
+import { IoCallOutline } from "react-icons/io5";
+import { FaRegComment } from "react-icons/fa";
+import { IoMdHeartEmpty, IoMdHeart } from "react-icons/io";
+import { BsCalendarDate } from "react-icons/bs";
+import { BiUser } from "react-icons/bi";
+import { FiMapPin } from "react-icons/fi";
+import { RiHistoryLine } from "react-icons/ri";
+import { TbChevronDown, TbChevronUp } from "react-icons/tb";
+import { Button, Chip, Tooltip } from "@mui/material";
+import Router from "next/router";
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
+import SimpleDialog from "@components/common/SimpleDialog";
+import axios from "axios";
+import Header from "@components/common/Header";
+import { Bidding, Wish } from "@prisma/client";
+import BiddingDialog from "@components/product/BiddingDialog";
+import AuctionHistory from "@components/product/AuctionHistory";
+import { getDiffDay } from "@lib/getDiffDay";
+import Map from "@components/common/Map";
+import { useSetRecoilState } from "recoil";
+import { locationState } from "@store/locationState";
 
-const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const ProductDetail = ({
+  token,
+  product,
+  isLogin,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [openBuy, setOpenBuy] = useState(false);
   const [openBid, setOpenBid] = useState(false);
   const [openMap, setOpenMap] = useState(false);
@@ -33,81 +39,93 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
     if (token) {
       setOpenBuy(true);
     } else {
-      alert('🔒 로그인이 필요합니다.');
+      alert("🔒 로그인이 필요합니다.");
     }
   };
   const onClickBidButton = () => {
     if (token) {
       setOpenBid(true);
     } else {
-      alert('🔒 로그인이 필요합니다.');
+      alert("🔒 로그인이 필요합니다.");
     }
   };
   const onClickLikeButton = async (wish: Wish | null) => {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     if (token) {
       if (wish === null) {
         try {
           const { data } = await axios.post(`/api/product/wish/${id}`);
           const { success } = data;
           if (success) {
-            Router.replace(`/products/${id}?alert=❤️ 위시리스트에 추가되었습니다.`, `/products/${id}`);
+            Router.replace(
+              `/products/${id}?alert=❤️ 위시리스트에 추가되었습니다.`,
+              `/products/${id}`
+            );
           } else {
-            alert('⚠️ 위시리스트 추가에 실패했습니다. 다시 시도해주세요.');
+            alert("⚠️ 위시리스트 추가에 실패했습니다. 다시 시도해주세요.");
           }
         } catch (e) {
-          alert('⚠️ 위시리스트 추가에 실패했습니다. 다시 시도해주세요.');
+          alert("⚠️ 위시리스트 추가에 실패했습니다. 다시 시도해주세요.");
         }
       } else {
         try {
           const { data } = await axios.delete(`/api/product/wish/${id}`);
           const { success } = data;
           if (success) {
-            Router.replace(`/products/${id}?alert=🤍 위시리스트에서 삭제되었습니다.`, `/products/${id}`);
+            Router.replace(
+              `/products/${id}?alert=🤍 위시리스트에서 삭제되었습니다.`,
+              `/products/${id}`
+            );
           } else {
-            alert('⚠️ 위시리스트 삭제에 실패했습니다. 다시 시도해주세요.');
+            alert("⚠️ 위시리스트 삭제에 실패했습니다. 다시 시도해주세요.");
           }
         } catch (e) {
-          alert('⚠️ 위시리스트 삭제에 실패했습니다. 다시 시도해주세요.');
+          alert("⚠️ 위시리스트 삭제에 실패했습니다. 다시 시도해주세요.");
         }
       }
     } else {
-      alert('🔒 로그인이 필요합니다.');
+      alert("🔒 로그인이 필요합니다.");
     }
   };
   const onConfirmBuying = async () => {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     try {
-      const { data } = await axios.post('/api/product/buy', {
+      const { data } = await axios.post("/api/product/buy", {
         price,
         sellerId,
         productId: id,
       });
       const { success } = data;
       if (success) {
-        Router.replace(`/products/${id}?alert=🎉 구매 완료되었습니다! 쇼핑 리스트를 확인해보세요!`, `/products/${id}`);
+        Router.replace(
+          `/products/${id}?alert=🎉 구매 완료되었습니다! 쇼핑 리스트를 확인해보세요!`,
+          `/products/${id}`
+        );
       } else {
-        alert('⚠️ 상품 구입에 실패했습니다. 다시 시도해주세요.');
+        alert("⚠️ 상품 구입에 실패했습니다. 다시 시도해주세요.");
       }
     } catch (e) {
-      alert('⚠️ 상품 구입에 실패했습니다. 다시 시도해주세요.');
+      alert("⚠️ 상품 구입에 실패했습니다. 다시 시도해주세요.");
     }
   };
   const onConfirmBidding = async (price: number) => {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     try {
-      const { data } = await axios.post('/api/product/bid', {
+      const { data } = await axios.post("/api/product/bid", {
         price,
         productId: id,
       });
       const { success } = data;
       if (success) {
-        Router.replace(`/products/${id}?alert=🎉 입찰 완료되었습니다!`, `/products/${id}`);
+        Router.replace(
+          `/products/${id}?alert=🎉 입찰 완료되었습니다!`,
+          `/products/${id}`
+        );
       } else {
-        alert('⚠️ 상품 구입에 실패했습니다. 다시 시도해주세요.');
+        alert("⚠️ 상품 구입에 실패했습니다. 다시 시도해주세요.");
       }
     } catch (e) {
-      alert('⚠️ 입찰에 실패했습니다. 다시 시도해주세요.');
+      alert("⚠️ 입찰에 실패했습니다. 다시 시도해주세요.");
     }
   };
   const {
@@ -127,6 +145,10 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
     sellerId,
   } = product;
   const endingDate = new Date(String(endingAt));
+  const setLocaiontState = useSetRecoilState(locationState);
+  useEffect(() => {
+    setLocaiontState(tradingPlace);
+  }, [product]);
   return (
     <>
       <CustomHead title={product.name} />
@@ -135,22 +157,37 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
         <section>
           <img src={getImageUrl(image)} alt="product" />
           <h2>{name}</h2>
-          {status !== 'AUCTION' ? (
+          {status !== "AUCTION" ? (
             <p className={styles.price}>{price.toLocaleString()}원</p>
           ) : (
-            <p className={styles.price}>{bid.length === 0 ? '입찰 없음' : `${bid[0].price.toLocaleString()}원`}</p>
+            <p className={styles.price}>
+              {bid.length === 0
+                ? "입찰 없음"
+                : `${bid[0].price.toLocaleString()}원`}
+            </p>
           )}
         </section>
         <section className={styles.contentBox}>
           <div className={styles.row}>
-            <Chip label={status === 'AUCTION' ? '경매' : status === 'PROGRESS' ? '판매 진행중' : '판매 완료'} />
-            {status === 'AUCTION' && <Chip label={`D-${getDiffDay(endingDate)}`} />}
+            <Chip
+              label={
+                status === "AUCTION"
+                  ? "경매"
+                  : status === "PROGRESS"
+                  ? "판매 진행중"
+                  : "판매 완료"
+              }
+            />
+            {status === "AUCTION" && (
+              <Chip label={`D-${getDiffDay(endingDate)}`} />
+            )}
           </div>
-          {status === 'AUCTION' && (
+          {status === "AUCTION" && (
             <p className={styles.content}>
               <BsCalendarDate />
               <span>
-                {endingDate.getFullYear()}-{endingDate.getMonth() + 1}-{endingDate.getDate()}
+                {endingDate.getFullYear()}-{endingDate.getMonth() + 1}-
+                {endingDate.getDate()}
               </span>
             </p>
           )}
@@ -170,20 +207,20 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
             <div className={styles.grow}>
               <span className={styles.row}>
                 {tradingPlace}
-                <Tooltip title={openMap ? '지도 숨기기' : '지도 보기'} arrow>
-                  <button onClick={() => setOpenMap(state => !state)}>
+                <Tooltip title={openMap ? "지도 숨기기" : "지도 보기"} arrow>
+                  <button onClick={() => setOpenMap((state) => !state)}>
                     {openMap ? <TbChevronUp /> : <TbChevronDown />}
                   </button>
                 </Tooltip>
               </span>
-              {openMap && <Map location={tradingPlace} />}
+              {openMap && <Map />}
             </div>
           </div>
           <p className={styles.content}>
             <FaRegComment />
             {content}
           </p>
-          {status === 'AUCTION' && (
+          {status === "AUCTION" && (
             <div className={styles.contentStart}>
               <RiHistoryLine />
               <div className={styles.bidTable}>
@@ -196,13 +233,17 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
         <p className={styles.likeCnt}>
           <Tooltip title="위시리스트" arrow>
             <button onClick={() => onClickLikeButton(wish)}>
-              {wish ? <IoMdHeart className="heart_icon" /> : <IoMdHeartEmpty className="heart_icon" />}
+              {wish ? (
+                <IoMdHeart className="heart_icon" />
+              ) : (
+                <IoMdHeartEmpty className="heart_icon" />
+              )}
             </button>
           </Tooltip>
           <span>{likeCnt}</span>
         </p>
-        {status !== 'PURCHASED' &&
-          (status === 'PROGRESS' ? (
+        {status !== "PURCHASED" &&
+          (status === "PROGRESS" ? (
             <Button variant="outlined" onClick={onClickBuyButton}>
               구매하기
             </Button>
@@ -220,40 +261,49 @@ const ProductDetail = ({ token, product, isLogin }: InferGetServerSidePropsType<
         loadingTitle="처리중..."
         content=""
       />
-      {status === 'AUCTION' && (
+      {status === "AUCTION" && (
         <BiddingDialog
           open={openBid}
           handleClose={handleCloseBid}
           onConfirm={onConfirmBidding}
-          maxPrice={bid.length === 0 ? 0 : Math.max(...bid.map((elem: Bidding) => elem.price))}
+          maxPrice={
+            bid.length === 0
+              ? 0
+              : Math.max(...bid.map((elem: Bidding) => elem.price))
+          }
         />
       )}
     </>
   );
 };
 
-export const getServerSideProps = async ({ req, query }: GetServerSidePropsContext) => {
+export const getServerSideProps = async ({
+  req,
+  query,
+}: GetServerSidePropsContext) => {
   const { cookies } = req;
   const baseUrl = getAbsoluteUrl(req);
   const response = await fetch(`${baseUrl}/api/user/verify`, {
     headers: {
-      Authorization: cookies.access_token ? `Bearer ${cookies.access_token}` : 'Bearer',
+      Authorization: cookies.access_token
+        ? `Bearer ${cookies.access_token}`
+        : "Bearer",
     },
   });
   const { verify, user } = await response.json();
   if (verify) {
-    if (user.role === 'ADMIN') {
+    if (user.role === "ADMIN") {
       return {
         redirect: {
-          destination: '/admin',
+          destination: "/admin",
           permanent: false,
         },
       };
     }
-    if (user.role === 'SELLER') {
+    if (user.role === "SELLER") {
       return {
         redirect: {
-          destination: '/sell',
+          destination: "/sell",
           permanent: false,
         },
       };
