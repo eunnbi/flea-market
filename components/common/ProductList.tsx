@@ -117,7 +117,7 @@ const DefaultItem = ({ product }: { product: ProductItem }) => {
           <Image
             src={getImageUrl(image)}
             alt="product thumbnail"
-            layout="fill"
+            fill
             placeholder="blur"
             blurDataURL="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg=="
           />
@@ -222,8 +222,10 @@ export const StyledLink = styled(Link)`
 `;
 
 export const ImageWrapper = styled.div`
-  width: 250px;
-  height: 250px;
+  width: 80vmin;
+  height: 80vmin;
+  max-width: 250px;
+  max-height: 250px;
   border-radius: 5px;
   position: relative;
   img {
