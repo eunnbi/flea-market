@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import axios from "axios";
 import React, { useState } from "react";
-import LoginForm from "@components/LoginForm";
+import LoginForm from "@components/auth/LoginForm";
 import { BiMenu } from "react-icons/bi";
 
 const getHeaderInfo = (pathname: string, isLogin: boolean) => {
@@ -25,8 +25,8 @@ const getHeaderInfo = (pathname: string, isLogin: boolean) => {
       NAV: isLogin
         ? [
             { to: "/products/search", name: "Search Product" },
-            { to: "/mypage/shopping", name: "Shopping List" },
-            { to: "/mypage/wishlist", name: "Wish List" },
+            { to: "/shopping", name: "Shopping List" },
+            { to: "/wishlist", name: "Wish List" },
           ]
         : [],
     };
