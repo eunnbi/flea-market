@@ -1,10 +1,10 @@
 import { noError, createErrorObject } from "@lib/createErrorObject";
-import { Button, Chip, IconButton, InputAdornment } from "@mui/material";
+import { Button, IconButton, InputAdornment } from "@mui/material";
 import { Product } from "@prisma/client";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import CustomInput from "../common/CustomInput";
 import Map from "../common/Map";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import CustomDatePicker from "./CustomDatePicker";
 import { BiSearchAlt } from "react-icons/bi";
 import ImageUpload from "./ImageUpload";
@@ -12,6 +12,19 @@ import styled from "@emotion/styled";
 import axios from "axios";
 import Router from "next/router";
 import { getImageUrl } from "@lib/getImageUrl";
+import {
+  useRecoilState,
+  useRecoilValue,
+  useResetRecoilState,
+  useSetRecoilState,
+} from "recoil";
+import { productInputState } from "@store/product/inputState";
+import { errorInfoState } from "@store/product/errorInfoState";
+import { locationState } from "@store/locationState";
+import { statusState } from "@store/product/statusState";
+import StatusSelection from "./StatusSelection";
+import { endingAtState } from "@store/product/endingAtState";
+import { imageFileState } from "@store/product/imageFileState";
 
 type State = Pick<
   Product,
@@ -20,77 +33,31 @@ type State = Pick<
   price: string;
 };
 
-const ProductRegisterForm = ({
-  initialProduct,
-}: {
+interface Props {
   initialProduct: ProductItem | null;
-}) => {
-  const [errorInfo, setErrorInfo] = useState({
-    name: noError,
-    phoneNumber: noError,
-    price: noError,
-    tradingPlace: noError,
-    endingAt: noError,
-    imageFile: noError,
-    content: noError,
-  });
-  const [values, setValues] = useState<State>(
-    initialProduct === null
-      ? {
-          name: "",
-          phoneNumber: "",
-          price: "",
-          tradingPlace: "",
-          status: "PROGRESS",
-          content: "",
-        }
-      : {
-          name: initialProduct.name,
-          phoneNumber: initialProduct.phoneNumber,
-          price: String(initialProduct.price),
-          tradingPlace: initialProduct.tradingPlace,
-          status: initialProduct.status,
-          content: initialProduct.content,
-        }
-  );
-  const [location, setLocation] = useState(
-    initialProduct !== null ? initialProduct.tradingPlace : ""
-  );
-  const endingDate =
-    initialProduct === null || initialProduct?.endingAt === null
-      ? new Date()
-      : new Date(String(initialProduct.endingAt));
+}
 
-  const [endingAt, setEndingAt] = useState<Dayjs>(
-    dayjs(
-      `${endingDate.getFullYear()}-${
-        endingDate.getMonth() + 1
-      }-${endingDate.getDate()} 00:00:00`
-    )
-  );
-  const [imageFile, setImageFile] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-
-  const { name, phoneNumber, price, tradingPlace, status, content } = values;
+const ProductRegisterForm = ({ initialProduct }: Props) => {
+  const [errorInfo, setErrorInfo] = useRecoilState(errorInfoState);
+  const setProductInputState = useSetRecoilState(productInputState);
+  const setLocationState = useSetRecoilState(locationState);
+  const setStatusState = useSetRecoilState(statusState);
+  const setEndingAtState = useSetRecoilState(endingAtState);
+  const resetProductInputState = useResetRecoilState(productInputState);
+  const resetLocationState = useResetRecoilState(locationState);
+  const resetStatusState = useResetRecoilState(statusState);
+  const resetEndingAtState = useResetRecoilState(endingAtState);
+  const resetImageFileState = useResetRecoilState(imageFileState);
   const handleChange = useCallback(
     (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setValues((values) => ({ ...values, [prop]: event.target.value }));
+      setProductInputState((values) => ({
+        ...values,
+        [prop]: event.target.value,
+      }));
     },
     []
   );
-  const toggleStatus = useCallback(() => {
-    setValues((values) => ({
-      ...values,
-      status: values.status === "AUCTION" ? "PROGRESS" : "AUCTION",
-    }));
-  }, []);
-  const changeLocation = useCallback((location: string) => {
-    setLocation(location);
-  }, []);
-  const changeImageFile = useCallback((e: any) => {
-    setImageFile(e.target.files[0]);
-    e.target.value = "";
-  }, []);
+
   const setLocationErrorInfo = useCallback((isError: boolean) => {
     if (isError) {
       setErrorInfo((errorInfo) => ({
@@ -106,7 +73,148 @@ const ProductRegisterForm = ({
       }));
     }
   }, []);
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+
+  useEffect(() => {
+    if (initialProduct) {
+      setProductInputState({
+        name: initialProduct.name,
+        phoneNumber: initialProduct.phoneNumber,
+        price: String(initialProduct.price),
+        tradingPlace: initialProduct.tradingPlace,
+        content: initialProduct.content,
+      });
+      setLocationState(initialProduct.tradingPlace);
+      setStatusState(initialProduct.status);
+
+      const date = new Date(String(initialProduct.endingAt));
+      setEndingAtState(
+        dayjs(
+          `${date.getFullYear()}-${
+            date.getMonth() + 1
+          }-${date.getDate()} 00:00:00`
+        )
+      );
+    } else {
+      resetProductInputState();
+      resetEndingAtState();
+      resetLocationState();
+      resetStatusState();
+    }
+    resetImageFileState();
+  }, [initialProduct]);
+  return (
+    <Form>
+      <StatusSelection />
+      <ImageUpload
+        errorInfo={errorInfo.imageFile}
+        imageUrl={
+          initialProduct ? getImageUrl(initialProduct.image) : undefined
+        }
+      />
+      <CustomInput
+        label="🛍️ Product's Name"
+        onChange={handleChange("name")}
+        htmlFor="name"
+        isPassword={false}
+        errorInfo={errorInfo.name}
+        defaultValue={initialProduct?.name}
+      />
+      <CustomInput
+        label="📝 Product's Explanation"
+        onChange={handleChange("content")}
+        htmlFor="content"
+        isPassword={false}
+        multiline={true}
+        errorInfo={errorInfo.content}
+        defaultValue={initialProduct?.content}
+      />
+      <PriceInput
+        onChange={handleChange("price")}
+        errorInfo={errorInfo.price}
+        defaultValue={initialProduct ? String(initialProduct.price) : ""}
+      />
+      <CustomDatePicker />
+      <CustomInput
+        label="📞 Your Phone Number"
+        onChange={handleChange("phoneNumber")}
+        htmlFor="phoneNumber"
+        isPassword={false}
+        errorInfo={errorInfo.phoneNumber}
+        type="phone"
+        helperText="'-'를 포함해주세요 (예시: 010-1234-5678)"
+        defaultValue={initialProduct?.phoneNumber}
+      />
+      <div className="trading">
+        <CustomInput
+          label="📌 Trading Place"
+          htmlFor="search map"
+          onChange={handleChange("tradingPlace")}
+          isPassword={false}
+          errorInfo={errorInfo.tradingPlace}
+          icon={<SearchButton />}
+          defaultValue={initialProduct?.tradingPlace}
+        />
+        <Map setLocationErrorInfo={setLocationErrorInfo} />
+      </div>
+      <SubmitButton initialProduct={initialProduct} />
+    </Form>
+  );
+};
+
+// ---------------------------------------------------
+
+const SearchButton = () => {
+  const setProductInputState = useSetRecoilState(productInputState);
+  const setLocationState = useSetRecoilState(locationState);
+  const changeLocation = useCallback(() => {
+    setProductInputState((state) => {
+      setLocationState(state.tradingPlace);
+      return state;
+    });
+  }, []);
+  return (
+    <InputAdornment position="end">
+      <IconButton aria-label="search icon" edge="end" onClick={changeLocation}>
+        <BiSearchAlt />
+      </IconButton>
+    </InputAdornment>
+  );
+};
+
+// ----------------------------------------------------
+
+interface PriceInputProps {
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  errorInfo: typeof noError;
+  defaultValue?: string;
+}
+
+const PriceInput = ({ onChange, errorInfo, defaultValue }: PriceInputProps) => {
+  const status = useRecoilValue(statusState);
+  return status === "PROGRESS" ? (
+    <CustomInput
+      label="💲Price"
+      onChange={onChange}
+      htmlFor="price"
+      isPassword={false}
+      errorInfo={errorInfo}
+      defaultValue={defaultValue}
+    />
+  ) : null;
+};
+
+// ------------------------------------------------
+
+const SubmitButton = ({ initialProduct }: Props) => {
+  const [loading, setLoading] = useState(false);
+  const setErrorInfo = useSetRecoilState(errorInfoState);
+  const { name, content, tradingPlace, price, phoneNumber } =
+    useRecoilValue(productInputState);
+  const location = useRecoilValue(locationState);
+  const status = useRecoilValue(statusState);
+  const endingAt = useRecoilValue(endingAtState);
+  const imageFile = useRecoilValue(imageFileState);
+  const onSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (imageFile === null && !initialProduct?.image) {
       setErrorInfo((errorInfo) => ({
@@ -351,104 +459,20 @@ const ProductRegisterForm = ({
     }
   };
   return (
-    <Form onSubmit={onSubmit}>
-      <div className="row">
-        <Chip
-          label="판매"
-          variant={status === "PROGRESS" ? "filled" : "outlined"}
-          onClick={toggleStatus}
-          color="primary"
-        />
-        <Chip
-          label="경매"
-          variant={status === "AUCTION" ? "filled" : "outlined"}
-          onClick={toggleStatus}
-          color="primary"
-        />
-      </div>
-      <ImageUpload
-        imageFile={imageFile}
-        changeImageFile={changeImageFile}
-        errorInfo={errorInfo.imageFile}
-        imageUrl={
-          initialProduct ? getImageUrl(initialProduct.image) : undefined
-        }
-      />
-      <CustomInput
-        label="🛍️ Product's Name"
-        onChange={handleChange("name")}
-        htmlFor="name"
-        value={name}
-        isPassword={false}
-        errorInfo={errorInfo.name}
-      />
-      <CustomInput
-        label="📝 Product's Explanation"
-        onChange={handleChange("content")}
-        htmlFor="content"
-        value={content}
-        isPassword={false}
-        multiline={true}
-        errorInfo={errorInfo.content}
-      />
-      {status === "PROGRESS" ? (
-        <CustomInput
-          label="💲Price"
-          onChange={handleChange("price")}
-          htmlFor="price"
-          value={price}
-          isPassword={false}
-          errorInfo={errorInfo.price}
-        />
-      ) : (
-        <CustomDatePicker
-          date={endingAt}
-          setDate={setEndingAt}
-          errorInfo={errorInfo.endingAt}
-        />
-      )}
-      <CustomInput
-        label="📞 Your Phone Number"
-        onChange={handleChange("phoneNumber")}
-        htmlFor="phoneNumber"
-        isPassword={false}
-        errorInfo={errorInfo.phoneNumber}
-        type="phone"
-        value={phoneNumber}
-        helperText="'-'를 포함해주세요 (예시: 010-1234-5678)"
-      />
-      <div className="trading">
-        <CustomInput
-          label="📌 Trading Place"
-          htmlFor="search map"
-          value={tradingPlace}
-          onChange={handleChange("tradingPlace")}
-          isPassword={false}
-          errorInfo={errorInfo.tradingPlace}
-          icon={
-            <InputAdornment position="end">
-              <IconButton
-                aria-label="search icon"
-                edge="end"
-                onClick={() => changeLocation(tradingPlace)}
-              >
-                <BiSearchAlt />
-              </IconButton>
-            </InputAdornment>
-          }
-        />
-        <Map location={location} setLocationErrorInfo={setLocationErrorInfo} />
-      </div>
-      <Button variant="contained" type="submit" disabled={loading}>
-        {loading
-          ? initialProduct
-            ? "수정 중..."
-            : "등록 중..."
-          : initialProduct
-          ? "수정하기"
-          : "등록하기"}
-      </Button>
-    </Form>
+    <Button
+      variant="contained"
+      type="submit"
+      disabled={loading}
+      onClick={onSubmit}
+    >
+      {loading
+        ? initialProduct
+          ? "수정 중..."
+          : "등록 중..."
+        : initialProduct
+        ? "수정하기"
+        : "등록하기"}
+    </Button>
   );
 };
 
@@ -456,13 +480,6 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  .row {
-    display: flex;
-    gap: 1rem;
-    span {
-      font-size: 0.9rem;
-    }
-  }
   button[type="submit"] {
     max-width: 400px;
     margin: 0 auto;
