@@ -1,35 +1,59 @@
-import CustomHead from '@components/common/CustomHead';
-import { getImageUrl } from '@lib/getImageUrl';
-import Router from 'next/router';
-import { useState } from 'react';
-import styles from '@styles/ProductDetail.module.css';
-import { IoLocationOutline, IoCallOutline } from 'react-icons/io5';
-import { FaRegComment } from 'react-icons/fa';
-import { IoMdHeartEmpty } from 'react-icons/io';
-import { BsCalendarDate } from 'react-icons/bs';
-import { Button, Chip } from '@mui/material';
-import SimpleDialog from '@components/common/SimpleDialog';
-import axios from 'axios';
-import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
-import Header from '@components/common/Header';
-import { getDiffDay } from '@lib/getDiffDay';
-import AuctionHistory from '@components/AuctionHistory';
-import { RiHistoryLine } from 'react-icons/ri';
+import CustomHead from "@components/common/CustomHead";
+import { getImageUrl } from "@lib/getImageUrl";
+import Router from "next/router";
+import { useState } from "react";
+import styles from "@styles/ProductDetail.module.css";
+import { IoLocationOutline, IoCallOutline } from "react-icons/io5";
+import { FaRegComment } from "react-icons/fa";
+import { IoMdHeartEmpty } from "react-icons/io";
+import { BsCalendarDate } from "react-icons/bs";
+import { Button, Chip } from "@mui/material";
+import SimpleDialog from "@components/common/SimpleDialog";
+import axios from "axios";
+import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import Header from "@components/common/Header";
+import { getDiffDay } from "@lib/getDiffDay";
+import AuctionHistory from "@components/product/AuctionHistory";
+import { RiHistoryLine } from "react-icons/ri";
 
-const ProductDetail = ({ product }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const ProductDetail = ({
+  product,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [open, setOpen] = useState(false);
-  const { id, name, price, tradingPlace, endingAt, status, image, content, likeCnt, phoneNumber, bid, rating } =
-    product;
+  const {
+    id,
+    name,
+    price,
+    tradingPlace,
+    endingAt,
+    status,
+    image,
+    content,
+    likeCnt,
+    phoneNumber,
+    bid,
+    rating,
+  } = product;
   const endingDate = new Date(String(endingAt));
-  const onDelete = async () => {
+  const onClickDeleteButton = async () => {
     try {
       await axios.delete(`/api/product/${id}`);
-      Router.push(`/sell?alert=✂️ 상품이 정상적으로 삭제되었습니다`, '/sell');
+      Router.push(`/sell?alert=✂️ 상품이 정상적으로 삭제되었습니다`, "/sell");
     } catch (e) {
-      alert('상품을 삭제할 수 없습니다. 다시 시도해주세요.');
+      alert("상품을 삭제할 수 없습니다. 다시 시도해주세요.");
     }
   };
+  const onClickEditButton = () =>
+    Router.push(
+      {
+        pathname: "/sell/register",
+        query: {
+          id,
+        },
+      },
+      "/sell/register"
+    );
   return (
     <>
       <CustomHead title="Product Name" />
@@ -38,23 +62,40 @@ const ProductDetail = ({ product }: InferGetServerSidePropsType<typeof getServer
         <section>
           <img src={getImageUrl(image)} alt="product" />
           <h2>{name}</h2>
-          {status !== 'AUCTION' ? (
+          {status !== "AUCTION" ? (
             <p className={styles.price}>{price.toLocaleString()}원</p>
           ) : (
-            <p className={styles.price}>{bid.length === 0 ? '입찰 없음' : `${bid[0].price.toLocaleString()}원`}</p>
+            <p className={styles.price}>
+              {bid.length === 0
+                ? "입찰 없음"
+                : `${bid[0].price.toLocaleString()}원`}
+            </p>
           )}
         </section>
         <section className={styles.contentBox}>
           <div className={styles.row}>
-            <Chip label={status === 'AUCTION' ? '경매' : status === 'PROGRESS' ? '판매 진행중' : '판매 완료'} />
-            {status === 'AUCTION' && endingAt && <Chip label={`D-${getDiffDay(endingDate)}`} variant="outlined" />}
-            {status === 'PURCHASED' && <Chip label={`⭐ ${rating}`} variant="outlined" />}
+            <Chip
+              label={
+                status === "AUCTION"
+                  ? "경매"
+                  : status === "PROGRESS"
+                  ? "판매 진행중"
+                  : "판매 완료"
+              }
+            />
+            {status === "AUCTION" && endingAt && (
+              <Chip label={`D-${getDiffDay(endingDate)}`} variant="outlined" />
+            )}
+            {status === "PURCHASED" && (
+              <Chip label={`⭐ ${rating}`} variant="outlined" />
+            )}
           </div>
-          {status === 'AUCTION' && (
+          {status === "AUCTION" && (
             <p className={styles.content}>
               <BsCalendarDate />
               <span>
-                {endingDate.getFullYear()}-{endingDate.getMonth() + 1}-{endingDate.getDate()}
+                {endingDate.getFullYear()}-{endingDate.getMonth() + 1}-
+                {endingDate.getDate()}
               </span>
             </p>
           )}
@@ -84,21 +125,9 @@ const ProductDetail = ({ product }: InferGetServerSidePropsType<typeof getServer
           <IoMdHeartEmpty className="heart_icon" />
           {likeCnt}
         </p>
-        {status !== 'PURCHASED' && (
+        {status !== "PURCHASED" && (
           <div>
-            <Button
-              variant="outlined"
-              onClick={() =>
-                Router.push(
-                  {
-                    pathname: '/sell/register',
-                    query: {
-                      id,
-                    },
-                  },
-                  '/sell/register',
-                )
-              }>
+            <Button variant="outlined" onClick={onClickEditButton}>
               수정
             </Button>
             <Button variant="outlined" onClick={() => setOpen(true)}>
@@ -110,7 +139,7 @@ const ProductDetail = ({ product }: InferGetServerSidePropsType<typeof getServer
       <SimpleDialog
         open={open}
         handleClose={() => setOpen(false)}
-        onConfirm={onDelete}
+        onConfirm={onClickDeleteButton}
         basicTitle="정말 삭제하시겠습니까?"
         loadingTitle="삭제 중..."
         content=""
@@ -119,26 +148,33 @@ const ProductDetail = ({ product }: InferGetServerSidePropsType<typeof getServer
   );
 };
 
-export const getServerSideProps = async ({ req, query }: GetServerSidePropsContext) => {
+export const getServerSideProps = async ({
+  req,
+  query,
+}: GetServerSidePropsContext) => {
   const { cookies } = req;
   const baseUrl = getAbsoluteUrl(req);
   const res = await fetch(`${baseUrl}/api/user/verify`, {
     headers: {
-      Authorization: cookies.access_token ? `Bearer ${cookies.access_token}` : 'Bearer',
+      Authorization: cookies.access_token
+        ? `Bearer ${cookies.access_token}`
+        : "Bearer",
     },
   });
   const { verify, user } = await res.json();
   if (verify) {
-    if (user.role === 'ADMIN') {
+    if (user.role === "ADMIN") {
       return {
         redirect: {
-          destination: '/admin',
+          destination: "/admin",
           permanent: false,
         },
       };
     }
-    if (user.role === 'SELLER') {
-      const response = await fetch(`${baseUrl}/api/product?id=${query.id as string}`);
+    if (user.role === "SELLER") {
+      const response = await fetch(
+        `${baseUrl}/api/product?id=${query.id as string}`
+      );
       const product = await response.json();
       return {
         props: {
@@ -149,7 +185,7 @@ export const getServerSideProps = async ({ req, query }: GetServerSidePropsConte
   }
   return {
     redirect: {
-      destination: '/',
+      destination: "/",
       permanent: false,
     },
   };
