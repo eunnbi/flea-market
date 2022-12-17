@@ -14,7 +14,6 @@ import { Button, Chip, Tooltip } from "@mui/material";
 import Router from "next/router";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
-import SimpleDialog from "@components/common/SimpleDialog";
 import axios from "axios";
 import Header from "@components/common/Header";
 import { Bidding, Wish } from "@prisma/client";
@@ -24,32 +23,63 @@ import { getDiffDay } from "@lib/getDiffDay";
 import Map from "@components/common/Map";
 import { useSetRecoilState } from "recoil";
 import { locationState } from "@store/locationState";
+import { biddingState } from "@store/product/biddingState";
+import { buyingState } from "@store/product/buyingState";
+import BuyingDialog from "@components/product/BuyingDialog";
 
 const ProductDetail = ({
   token,
   product,
   isLogin,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const [openBuy, setOpenBuy] = useState(false);
-  const [openBid, setOpenBid] = useState(false);
+  const {
+    id,
+    name,
+    price,
+    tradingPlace,
+    endingAt,
+    status,
+    image,
+    content,
+    likeCnt,
+    phoneNumber,
+    user,
+    wish,
+    bid,
+    sellerId,
+  } = product;
+  const setBiddingState = useSetRecoilState(biddingState);
+  const setBuyingState = useSetRecoilState(buyingState);
   const [openMap, setOpenMap] = useState(false);
-  const handleCloseBuy = () => setOpenBuy(false);
-  const handleCloseBid = () => setOpenBid(false);
   const onClickBuyButton = () => {
     if (token) {
-      setOpenBuy(true);
+      setBuyingState({
+        open: true,
+        token,
+        id,
+        sellerId,
+        price,
+      });
     } else {
       alert("🔒 로그인이 필요합니다.");
     }
   };
   const onClickBidButton = () => {
     if (token) {
-      setOpenBid(true);
+      setBiddingState({
+        open: true,
+        token,
+        id,
+        maxPrice:
+          bid.length === 0
+            ? 0
+            : Math.max(...bid.map((elem: Bidding) => elem.price)),
+      });
     } else {
       alert("🔒 로그인이 필요합니다.");
     }
   };
-  const onClickLikeButton = async (wish: Wish | null) => {
+  const onClickLikeButton = async () => {
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     if (token) {
       if (wish === null) {
@@ -87,63 +117,7 @@ const ProductDetail = ({
       alert("🔒 로그인이 필요합니다.");
     }
   };
-  const onConfirmBuying = async () => {
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    try {
-      const { data } = await axios.post("/api/product/buy", {
-        price,
-        sellerId,
-        productId: id,
-      });
-      const { success } = data;
-      if (success) {
-        Router.replace(
-          `/products/${id}?alert=🎉 구매 완료되었습니다! 쇼핑 리스트를 확인해보세요!`,
-          `/products/${id}`
-        );
-      } else {
-        alert("⚠️ 상품 구입에 실패했습니다. 다시 시도해주세요.");
-      }
-    } catch (e) {
-      alert("⚠️ 상품 구입에 실패했습니다. 다시 시도해주세요.");
-    }
-  };
-  const onConfirmBidding = async (price: number) => {
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    try {
-      const { data } = await axios.post("/api/product/bid", {
-        price,
-        productId: id,
-      });
-      const { success } = data;
-      if (success) {
-        Router.replace(
-          `/products/${id}?alert=🎉 입찰 완료되었습니다!`,
-          `/products/${id}`
-        );
-      } else {
-        alert("⚠️ 상품 구입에 실패했습니다. 다시 시도해주세요.");
-      }
-    } catch (e) {
-      alert("⚠️ 입찰에 실패했습니다. 다시 시도해주세요.");
-    }
-  };
-  const {
-    id,
-    name,
-    price,
-    tradingPlace,
-    endingAt,
-    status,
-    image,
-    content,
-    likeCnt,
-    phoneNumber,
-    user,
-    wish,
-    bid,
-    sellerId,
-  } = product;
+
   const endingDate = new Date(String(endingAt));
   const setLocaiontState = useSetRecoilState(locationState);
   useEffect(() => {
@@ -232,7 +206,7 @@ const ProductDetail = ({
         </section>
         <p className={styles.likeCnt}>
           <Tooltip title="위시리스트" arrow>
-            <button onClick={() => onClickLikeButton(wish)}>
+            <button onClick={onClickLikeButton}>
               {wish ? (
                 <IoMdHeart className="heart_icon" />
               ) : (
@@ -253,26 +227,8 @@ const ProductDetail = ({
             </Button>
           ))}
       </main>
-      <SimpleDialog
-        open={openBuy}
-        handleClose={handleCloseBuy}
-        onConfirm={onConfirmBuying}
-        basicTitle="정말 구매하시겠습니까?"
-        loadingTitle="처리중..."
-        content=""
-      />
-      {status === "AUCTION" && (
-        <BiddingDialog
-          open={openBid}
-          handleClose={handleCloseBid}
-          onConfirm={onConfirmBidding}
-          maxPrice={
-            bid.length === 0
-              ? 0
-              : Math.max(...bid.map((elem: Bidding) => elem.price))
-          }
-        />
-      )}
+      <BuyingDialog />
+      <BiddingDialog />
     </>
   );
 };
