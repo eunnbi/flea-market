@@ -16,11 +16,14 @@ import Header from "@components/common/Header";
 import { getDiffDay } from "@lib/getDiffDay";
 import AuctionHistory from "@components/product/AuctionHistory";
 import { RiHistoryLine } from "react-icons/ri";
+import ProductDeleteDialog from "@components/product/ProductDeleteDialog";
+import { useSetRecoilState } from "recoil";
+import { productDeleteState } from "@store/product/deleteState";
 
 const ProductDetail = ({
   product,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const [open, setOpen] = useState(false);
+  const setProductDeleteState = useSetRecoilState(productDeleteState);
   const {
     id,
     name,
@@ -36,14 +39,6 @@ const ProductDetail = ({
     rating,
   } = product;
   const endingDate = new Date(String(endingAt));
-  const onClickDeleteButton = async () => {
-    try {
-      await axios.delete(`/api/product/${id}`);
-      Router.push(`/sell?alert=✂️ 상품이 정상적으로 삭제되었습니다`, "/sell");
-    } catch (e) {
-      alert("상품을 삭제할 수 없습니다. 다시 시도해주세요.");
-    }
-  };
   const onClickEditButton = () =>
     Router.push(
       {
@@ -54,6 +49,9 @@ const ProductDetail = ({
       },
       "/sell/register"
     );
+  const onClickDeleteButton = () => {
+    setProductDeleteState({ open: true, id });
+  };
   return (
     <>
       <CustomHead title="Product Name" />
@@ -130,20 +128,13 @@ const ProductDetail = ({
             <Button variant="outlined" onClick={onClickEditButton}>
               수정
             </Button>
-            <Button variant="outlined" onClick={() => setOpen(true)}>
+            <Button variant="outlined" onClick={onClickDeleteButton}>
               삭제
             </Button>
           </div>
         )}
       </main>
-      <SimpleDialog
-        open={open}
-        handleClose={() => setOpen(false)}
-        onConfirm={onClickDeleteButton}
-        basicTitle="정말 삭제하시겠습니까?"
-        loadingTitle="삭제 중..."
-        content=""
-      />
+      <ProductDeleteDialog />
     </>
   );
 };
