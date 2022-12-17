@@ -1,34 +1,31 @@
-import { noError } from '@lib/createErrorObject';
-import { TextField } from '@mui/material';
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { Dayjs } from 'dayjs';
+import { noError } from "@lib/createErrorObject";
+import { TextField } from "@mui/material";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { endingAtState } from "@store/product/endingAtState";
+import { statusState } from "@store/product/statusState";
+import React from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
 
-interface Props {
-  date: Dayjs;
-  setDate: React.Dispatch<React.SetStateAction<Dayjs>>;
-  errorInfo: typeof noError;
-}
-
-const CustomDatePicker = ({ date, setDate, errorInfo }: Props) => {
-  return (
+const CustomDatePicker = () => {
+  const status = useRecoilValue(statusState);
+  const [date, setDate] = useRecoilState(endingAtState);
+  return status !== "PROGRESS" ? (
     <div id="date-picker">
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker
           label="Choose Ending Date"
           value={date}
-          onChange={value => {
+          onChange={(value) => {
             if (value === null) return;
             setDate(value);
           }}
           disablePast
-          renderInput={params => (
-            <TextField {...params} disabled error={errorInfo.isError} helperText={errorInfo.message} />
-          )}
+          renderInput={(params) => <TextField {...params} disabled />}
         />
       </LocalizationProvider>
     </div>
-  );
+  ) : null;
 };
 
-export default CustomDatePicker;
+export default React.memo(CustomDatePicker);
