@@ -22,7 +22,7 @@ const Register = ({
       <CustomHead title="Register" />
       <Header isLogin={isLogin} />
       <main className={styles.main}>
-        <h1>회원가입</h1>
+        <h1 className="font-bold text-2xl">회원가입</h1>
         <RegisterForm />
       </main>
     </>

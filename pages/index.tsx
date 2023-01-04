@@ -37,8 +37,8 @@ const Home = ({
     <>
       <CustomHead title="Home" />
       <Header isLogin={isLogin} />
-      <Main>
-        <h1>Products</h1>
+      <main className="flex flex-col items-center max-w-screen-xl">
+        <h1 className="font-bold text-3xl mb-8">Products</h1>
         <StatusFilter />
         <SortFilter />
         <ProductList
@@ -84,20 +84,10 @@ const Home = ({
                   })
           }
         />
-      </Main>
+      </main>
     </>
   );
 };
-
-const Main = styled.main`
-  max-width: 1200px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  h1 {
-    margin-bottom: 2rem;
-  }
-`;
 
 export const getServerSideProps = async ({
   req,

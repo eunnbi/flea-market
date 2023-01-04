@@ -33,6 +33,15 @@ const getHeaderInfo = (pathname: string, isLogin: boolean) => {
   }
 };
 
+const buttonClassName =
+  "text-white border-white hover:border-white max-md:w-full max-md:py-4 max-md:text-center ";
+
+const navClassName =
+  "flex gap-8 items-center z-10 text-lg max-md:flex-col max-md:gap-0";
+
+const linkClassName = "max-md:w-full max-md:text-center max-md:py-4";
+const activeLinkClassName = `${linkClassName} font-bold`;
+
 const Header = ({ isLogin }: { isLogin: boolean }) => {
   const router = useRouter();
   const { pathname, query } = router;
@@ -46,36 +55,40 @@ const Header = ({ isLogin }: { isLogin: boolean }) => {
   const onToggle = () => setOpen((open) => !open);
   return (
     <>
-      <HeaderBox>
-        <div>
-          <div className="row">
+      <header className="fixed top-0 left-0 right-0 z-10 text-white bg-black h-header">
+        <div className="flex justify-between items-center max-w-screen-lg h-full mx-auto my-0 px-4 max-md:px-0 max-md:block">
+          <div className="flex justify-between items-center h-full max-md:px-4 max-md:w-full">
             <Link href={basePath}>
-              <h1>{basePath === "/admin" ? "DashBoard" : "Flea Market"}</h1>
+              <h1 className="text-4xl">
+                {basePath === "/admin" ? "DashBoard" : "Flea Market"}
+              </h1>
             </Link>
             <IconButton
               sx={{ color: "white" }}
-              className="menuBtn"
+              className="hidden max-md:block"
               onClick={onToggle}
             >
-              <BiMenu />
+              <BiMenu className="text-4xl" />
             </IconButton>
           </div>
-          <Wrapper>
-            <Nav>
+          <div className="flex items-center gap-12 max-md:hidden">
+            <nav className={navClassName}>
               {NAV.map((elem, index) => (
-                <StyledLink
-                  to={elem.to}
-                  path={pathname}
+                <Link
+                  className={
+                    elem.to === pathname ? activeLinkClassName : linkClassName
+                  }
                   key={index}
                   href={elem.to}
                 >
                   {elem.name}
-                </StyledLink>
+                </Link>
               ))}
-            </Nav>
+            </nav>
             {!isLogin ? (
-              <StyledButton
+              <Button
                 variant="outlined"
+                className={buttonClassName}
                 onClick={() =>
                   router.push(
                     `${window.location.pathname}?login=true`,
@@ -84,157 +97,54 @@ const Header = ({ isLogin }: { isLogin: boolean }) => {
                 }
               >
                 로그인
-              </StyledButton>
+              </Button>
             ) : (
-              <StyledButton variant="outlined" onClick={onLogout}>
+              <Button
+                variant="outlined"
+                className={buttonClassName}
+                onClick={onLogout}
+              >
                 로그아웃
-              </StyledButton>
+              </Button>
             )}
-          </Wrapper>
-          <Wrapper className={open ? "mobile open" : "mobile"}>
-            <Nav>
+          </div>
+          <div className={open ? "hidden max-md:block bg-black" : "hidden"}>
+            <nav className={navClassName}>
               {NAV.map((elem, index) => (
-                <StyledLink
-                  to={elem.to}
-                  path={pathname}
+                <Link
+                  className={
+                    elem.to === pathname ? activeLinkClassName : linkClassName
+                  }
                   key={index}
                   href={elem.to}
                 >
                   {elem.name}
-                </StyledLink>
+                </Link>
               ))}
-            </Nav>
+            </nav>
             {!isLogin ? (
-              <StyledButton
+              <Button
                 onClick={() =>
                   router.push(
                     `${window.location.pathname}?login=true`,
                     window.location.pathname
                   )
                 }
+                className={buttonClassName}
               >
                 로그인
-              </StyledButton>
+              </Button>
             ) : (
-              <StyledButton onClick={onLogout}>로그아웃</StyledButton>
+              <Button onClick={onLogout} className={buttonClassName}>
+                로그아웃
+              </Button>
             )}
-          </Wrapper>
+          </div>
         </div>
-      </HeaderBox>
+      </header>
       {!isLogin && query && query.login && <LoginForm />}
     </>
   );
 };
-
-const HeaderBox = styled.header`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background-color: #000;
-  color: #fff;
-  height: var(--hh);
-  z-index: 10;
-  h1 {
-    font-weight: normal;
-  }
-  .row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 100%;
-  }
-  & > div {
-    max-width: 1020px;
-    margin: 0 auto;
-    padding: 0 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 100%;
-    & > a {
-      height: var(--hh);
-      display: flex;
-      align-items: center;
-    }
-  }
-
-  #basic-button {
-    cursor: pointer;
-  }
-
-  .menuBtn {
-    display: none;
-    svg {
-      font-size: 2rem;
-    }
-  }
-  @media screen and (max-width: 620px) {
-    & > div {
-      display: block;
-      padding: 0;
-    }
-    .menuBtn {
-      display: block;
-    }
-    .row {
-      padding: 0 1rem;
-    }
-  }
-`;
-
-const Wrapper = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 3rem;
-  &.mobile {
-    display: none;
-  }
-  @media screen and (max-width: 620px) {
-    display: none;
-    &.mobile {
-      display: none;
-      background-color: #000;
-
-      &.open {
-        display: block;
-      }
-    }
-  }
-`;
-
-const Nav = styled.nav`
-  display: flex;
-  gap: 2rem;
-  font-size: 1.2rem;
-  align-items: center;
-  z-index: 10;
-  @media screen and (max-width: 620px) {
-    flex-direction: column;
-    gap: 0;
-  }
-`;
-
-const StyledLink = styled(Link)<{ to: string; path: string }>`
-  font-weight: ${({ to, path }) => (to === path ? "bold" : "normal")};
-  @media screen and (max-width: 620px) {
-    width: 100%;
-    text-align: center;
-    padding: 1rem 0;
-  }
-`;
-
-const StyledButton = styled(Button)`
-  color: white;
-  border-color: white;
-  &:hover {
-    border-color: white;
-  }
-  @media screen and (max-width: 620px) {
-    width: 100%;
-    text-align: center;
-    padding: 1rem 0;
-  }
-`;
 
 export default React.memo(Header);

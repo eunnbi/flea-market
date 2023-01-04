@@ -6,13 +6,12 @@ import {
   Radio,
   RadioGroup,
 } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
-import styles from "@styles/Register.module.css";
+import { useRef, useState } from "react";
 import CustomInput from "../common/CustomInput";
 import { noError, createErrorObject } from "@lib/createErrorObject";
 import Router from "next/router";
 import axios from "axios";
-import { useResetRecoilState, useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { registerFormState } from "@store/auth/registerFormState";
 
 const RegisterForm = () => {
@@ -150,7 +149,7 @@ const RegisterForm = () => {
     });
   };
   return (
-    <form className={styles.form} onSubmit={onSubmit}>
+    <form className="flex flex-col gap-6" onSubmit={onSubmit}>
       <CustomInput
         label="First Name"
         htmlFor="firstName"
@@ -165,7 +164,7 @@ const RegisterForm = () => {
         isPassword={false}
         errorInfo={errorInfo.lastName}
       />
-      <div className={styles.row}>
+      <div className="flex items-center">
         <CustomInput
           label="ID"
           htmlFor="userId"
@@ -211,7 +210,12 @@ const RegisterForm = () => {
           />
         </RadioGroup>
       </FormControl>
-      <Button variant="contained" type="submit" disabled={loading}>
+      <Button
+        variant="contained"
+        type="submit"
+        disabled={loading}
+        className="bg-black"
+      >
         {loading ? "회원가입 중..." : "회원가입"}
       </Button>
     </form>

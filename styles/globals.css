@@ -1,4 +1,7 @@
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.6/dist/web/static/pretendard.css');
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.6/dist/web/static/pretendard.css");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --vh: 100%;
@@ -74,30 +77,10 @@ button {
   -webkit-text-fill-color: #000;
 }
 
-.heart_icon {
-  color: red;
-  font-size: 1.2rem;
-}
-
-.cnt {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  margin-left: 6px;
-}
-
-.emptyText {
-  text-align: center;
-  color: gray;
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .MuiChip-root {
   font-size: 0.8rem;
 }
+
 .filterChip {
   font-size: 0.9rem;
 }

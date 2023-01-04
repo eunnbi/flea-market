@@ -1,26 +1,11 @@
-import styled from '@emotion/styled';
+import styled from "@emotion/styled";
 
 const Footer = () => {
   return (
-    <FooterBox>
-      <p>Flea Market &copy; 2022</p>
-    </FooterBox>
+    <footer className="absolute bottom-0 left-0 right-0 text-white bg-black flex items-center justify-center">
+      <p className="p-5">Flea Market &copy; 2022</p>
+    </footer>
   );
 };
-
-const FooterBox = styled.footer`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: #000;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  p {
-    padding: 1.5rem;
-  }
-`;
 
 export default Footer;

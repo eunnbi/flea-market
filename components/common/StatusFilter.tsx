@@ -7,7 +7,7 @@ import { useRecoilState } from "recoil";
 const StatusFilter = () => {
   const [filter, setFilter] = useRecoilState(statusFilterState);
   return (
-    <Div>
+    <div className="flex items-center gap-4">
       <Chip
         label="경매"
         onClick={() =>
@@ -32,14 +32,8 @@ const StatusFilter = () => {
         variant={filter.PURCHASED ? "filled" : "outlined"}
         className="filterChip"
       />
-    </Div>
+    </div>
   );
 };
-
-const Div = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
 
 export default React.memo(StatusFilter);

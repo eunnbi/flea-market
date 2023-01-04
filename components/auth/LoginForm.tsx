@@ -8,7 +8,6 @@ import { noError, createErrorObject } from "@lib/createErrorObject";
 import axios from "axios";
 import { getRedirectInfo } from "@lib/getRedirectInfo";
 import Link from "next/link";
-import styled from "@emotion/styled";
 import { useSetRecoilState } from "recoil";
 import { loginFormState } from "@store/auth/loginFormState";
 
@@ -81,16 +80,24 @@ const LoginForm = () => {
   };
 
   return (
-    <Wrapper>
-      <Form onSubmit={onSubmit}>
-        <CloseButton
+    <div className="fixed inset-0 z-10 bg-modal flex items-center justify-center">
+      <form
+        onSubmit={onSubmit}
+        className="relative flex flex-col gap-6 bg-white p-8 rounded shadow-xl"
+      >
+        <button
+          className="absolute top-2.5 right-2.5"
           type="button"
           onClick={() => Router.replace(window.location.pathname)}
         >
-          <IoClose />
-        </CloseButton>
-        <h1>로그인</h1>
-        {loginError ? <Alert severity="error">{loginError}</Alert> : null}
+          <IoClose className="text-2xl" />
+        </button>
+        <h1 className="text-center font-bold text-2xl">로그인</h1>
+        {loginError ? (
+          <Alert severity="error" className="flex items-center">
+            {loginError}
+          </Alert>
+        ) : null}
         <CustomInput
           label="ID"
           onChange={handleChange("userId")}
@@ -105,54 +112,20 @@ const LoginForm = () => {
           htmlFor="password"
           errorInfo={errorInfo.password}
         />
-        <Button variant="contained" type="submit" disabled={loading}>
+        <Button
+          variant="contained"
+          type="submit"
+          disabled={loading}
+          className="bg-black"
+        >
           {loading ? "로그인 중..." : "로그인"}
         </Button>
-        <Link href="/register">회원가입하러 가기</Link>
-      </Form>
-    </Wrapper>
+        <Link href="/register" className="text-center text-sm underline">
+          회원가입하러 가기
+        </Link>
+      </form>
+    </div>
   );
 };
-
-const Wrapper = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.3);
-  z-index: 10;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Form = styled.form`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  background-color: white;
-  padding: 2rem;
-  border-radius: 5px;
-  box-shadow: 1px 5px 10px 0px rgba(0, 0, 0, 0.3);
-  h1 {
-    text-align: center;
-  }
-  a {
-    text-align: center;
-    font-size: 0.9rem;
-    text-decoration: underline;
-  }
-`;
-
-const CloseButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  svg {
-    font-size: 1.5rem;
-  }
-`;
 
 export default LoginForm;
