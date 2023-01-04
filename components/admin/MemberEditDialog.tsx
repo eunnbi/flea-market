@@ -1,4 +1,3 @@
-import styled from "@emotion/styled";
 import {
   Dialog,
   DialogTitle,
@@ -14,15 +13,18 @@ import {
   Alert,
 } from "@mui/material";
 import { useState, useEffect } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { memberEditState } from "@store/admin/memberEditState";
+import { useSetRecoilState } from "recoil";
 import { membersState } from "@store/admin/membersState";
 import { alertMessageState } from "@store/admin/alertMessageState";
 import axios from "axios";
 
-const MemberEditDialog = () => {
-  const [{ open, id, initialState }, setMemberEditState] =
-    useRecoilState(memberEditState);
+interface Props {
+  id: string;
+  initialState: MemberTableState;
+  handleClose: () => void;
+}
+
+const MemberEditDialog = ({ id, initialState, handleClose }: Props) => {
   const setMembers = useSetRecoilState(membersState);
   const setAlertMessage = useSetRecoilState(alertMessageState);
   const [errorMessage, setErrorMessage] = useState("");
@@ -33,8 +35,6 @@ const MemberEditDialog = () => {
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setValues((values) => ({ ...values, [prop]: event.target.value }));
     };
-  const handleClose = () =>
-    setMemberEditState((state) => ({ ...state, open: false }));
   const onCancel = () => {
     setErrorMessage("");
     handleClose();
@@ -68,7 +68,7 @@ const MemberEditDialog = () => {
   }, [initialState]);
   return (
     <Dialog
-      open={open}
+      open={true}
       onClose={onCancel}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
@@ -78,7 +78,7 @@ const MemberEditDialog = () => {
       </DialogTitle>
       <DialogContent>
         {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
-        <Form>
+        <form className="flex flex-col gap-8 mt-4">
           <TextField
             label="ID"
             variant="standard"
@@ -124,7 +124,7 @@ const MemberEditDialog = () => {
               />
             </RadioGroup>
           </FormControl>
-        </Form>
+        </form>
       </DialogContent>
       <DialogActions>
         <Button
@@ -149,10 +149,4 @@ const MemberEditDialog = () => {
   );
 };
 
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  margin-top: 1rem;
-`;
 export default MemberEditDialog;

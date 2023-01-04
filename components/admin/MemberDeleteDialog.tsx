@@ -1,17 +1,17 @@
 import SimpleDialog from "@components/common/SimpleDialog";
 import { alertMessageState } from "@store/admin/alertMessageState";
-import { memberDeleteState } from "@store/admin/memberDeleteState";
 import { membersState } from "@store/admin/membersState";
 import axios from "axios";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 
-const MemberDeleteDialog = () => {
+interface Props {
+  id: string;
+  handleClose: () => void;
+}
+
+const MemberDeleteDialog = ({ id, handleClose }: Props) => {
   const setMembers = useSetRecoilState(membersState);
   const setAlertMessage = useSetRecoilState(alertMessageState);
-  const [{ open, id }, setMemberDeleteState] =
-    useRecoilState(memberDeleteState);
-  const handleClose = () =>
-    setMemberDeleteState((state) => ({ ...state, open: false }));
   const deleteMember = async () => {
     await axios.delete(`/api/user/${id}`);
     const { data } = await axios.get("/api/user");
@@ -20,7 +20,7 @@ const MemberDeleteDialog = () => {
   };
   return (
     <SimpleDialog
-      open={open}
+      open={true}
       handleClose={handleClose}
       onConfirm={deleteMember}
       basicTitle="정말 삭제하시겠습니까?"

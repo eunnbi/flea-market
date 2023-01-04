@@ -1,62 +1,57 @@
-import AlertMessage from '@components/admin/AlertMessage';
-import MemberDeleteDialog from '@components/admin/MemberDeleteDialog';
-import MemberEditDialog from '@components/admin/MemberEditDialog';
-import MemberTable from '@components/admin/MemberTable';
-import RoleFilter from '@components/admin/RoleFilter';
-import CustomHead from '@components/common/CustomHead';
-import Header from '@components/common/Header';
-import styled from '@emotion/styled';
-import { getAbsoluteUrl } from '@lib/getAbsoluteUrl';
-import { User } from '@prisma/client';
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import AlertMessage from "@components/admin/AlertMessage";
+import MemberTable from "@components/admin/MemberTable";
+import RoleFilter from "@components/admin/RoleFilter";
+import CustomHead from "@components/common/CustomHead";
+import Header from "@components/common/Header";
+import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
+import { User } from "@prisma/client";
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 
-const Admin = ({ members, isLogin }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const Admin = ({
+  members,
+  isLogin,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <>
       <CustomHead title="Dashboard" />
       <Header isLogin={isLogin} />
-      <Main>
-        <h1>Member Management</h1>
+      <main className="flex flex-col items-center gap-10">
+        <h1 className="font-bold text-2xl">Member Management</h1>
         <AlertMessage />
         <RoleFilter />
         <MemberTable initialMembers={members} />
-        <MemberDeleteDialog />
-        <MemberEditDialog />
-      </Main>
+      </main>
     </>
   );
 };
 
-const Main = styled.main`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2.5rem;
-`;
-
 export default Admin;
 
-export const getServerSideProps = async ({ req }: GetServerSidePropsContext) => {
+export const getServerSideProps = async ({
+  req,
+}: GetServerSidePropsContext) => {
   const { cookies } = req;
   const baseUrl = getAbsoluteUrl(req);
   const res = await fetch(`${baseUrl}/api/user/verify`, {
     headers: {
-      Authorization: cookies.access_token ? `Bearer ${cookies.access_token}` : 'Bearer ',
+      Authorization: cookies.access_token
+        ? `Bearer ${cookies.access_token}`
+        : "Bearer ",
     },
   });
   const { verify, user } = await res.json();
   if (verify) {
-    if (user.role === 'ADMIN') {
+    if (user.role === "ADMIN") {
       const response = await fetch(`${baseUrl}/api/user`, {
-        method: 'GET',
+        method: "GET",
       });
       const members: User[] = await response.json();
       return { props: { members, isLogin: verify } };
     }
-    if (user.role === 'SELLER') {
+    if (user.role === "SELLER") {
       return {
         redirect: {
-          destination: '/sell',
+          destination: "/sell",
           permanent: false,
         },
       };
@@ -64,7 +59,7 @@ export const getServerSideProps = async ({ req }: GetServerSidePropsContext) => 
   }
   return {
     redirect: {
-      destination: '/',
+      destination: "/",
       permanent: false,
     },
   };
