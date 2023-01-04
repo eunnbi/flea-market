@@ -11,7 +11,11 @@ const AlertMessage = () => {
       setMessage("");
     }, 2000);
   }, [message]);
-  return message ? <Alert severity="success">{message}</Alert> : null;
+  return message ? (
+    <Alert severity="success" className="flex items-center">
+      {message}
+    </Alert>
+  ) : null;
 };
 
 export default AlertMessage;
