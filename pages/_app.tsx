@@ -1,10 +1,11 @@
-import '../styles/globals.css';
-import type { AppProps } from 'next/app';
-import { ThemeProvider } from '@mui/material';
-import { theme } from 'styles/theme';
-import { useEffect } from 'react';
-import { RecoilRoot } from 'recoil';
-import Footer from '@components/common/Footer';
+import "../styles/globals.css";
+import type { AppProps } from "next/app";
+import ThemeProvider from "@mui/material/styles/ThemeProvider";
+import { theme } from "styles/theme";
+import { useEffect } from "react";
+import { RecoilRoot } from "recoil";
+import Footer from "@components/common/Footer";
+import { Modal } from "@components/common/Modal";
 
 export default function App({ Component, pageProps, router }: AppProps) {
   const { query, pathname } = router;
@@ -14,7 +15,10 @@ export default function App({ Component, pageProps, router }: AppProps) {
       timerId = setTimeout(() => {
         alert(query.alert);
         if (query.login) {
-          router.replace(`${window.location.pathname}?login=true`, window.location.pathname);
+          router.replace(
+            `${window.location.pathname}?login=true`,
+            window.location.pathname
+          );
         } else {
           router.replace(window.location.pathname);
         }
@@ -27,6 +31,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
       <ThemeProvider theme={theme}>
         <Component {...pageProps} />
         <Footer />
+        <Modal />
       </ThemeProvider>
     </RecoilRoot>
   );
