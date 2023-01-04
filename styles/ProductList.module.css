@@ -63,7 +63,7 @@
   border: 1px solid gray;
 }
 
-.likeCnt {
+.cnt {
   display: flex;
   align-items: center;
   gap: 2px;

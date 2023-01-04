@@ -1,11 +1,11 @@
-import styled from "@emotion/styled";
 import { getDiffDay } from "@lib/getDiffDay";
 import { getImageUrl } from "@lib/getImageUrl";
 import { Chip } from "@mui/material";
 import { IoMdHeart } from "react-icons/io";
-import ProductList, { ImageWrapper, StyledLink } from "./common/ProductList";
+import ProductList, { ImageWrapper } from "./common/ProductList";
 import Image from "next/image";
 import { BsFillPeopleFill } from "react-icons/bs";
+import styles from "@styles/ProductList.module.css";
 
 const WishList = ({ products }: { products: ProductItem[] }) => {
   return (
@@ -22,7 +22,7 @@ const Item = ({ product }: { product: ProductItem }) => {
   const endingDate = new Date(String(endingAt));
   return (
     <article>
-      <div className="imageBox">
+      <div className={styles.imageBox}>
         <ImageWrapper>
           <Image
             src={getImageUrl(image)}
@@ -40,24 +40,24 @@ const Item = ({ product }: { product: ProductItem }) => {
               ? "판매 진행중"
               : "판매 완료"
           }
-          className="status"
+          className={styles.status}
         />
         {status === "AUCTION" && (
           <Chip
             label={`D-${getDiffDay(endingDate)}`}
-            className="dday"
+            className={styles.dday}
             variant="outlined"
           />
         )}
       </div>
 
-      <div className="wrapper">
-        <h3>{name}</h3>
-        <div className="row">
+      <div className={styles.wrapper}>
+        <h3 className={styles.title}>{name}</h3>
+        <div className={styles.row}>
           {status != "AUCTION" ? (
-            <p className="price">{price.toLocaleString()}원</p>
+            <p className={styles.price}>{price.toLocaleString()}원</p>
           ) : (
-            <p className="price">
+            <p className={styles.price}>
               {bid.length === 0
                 ? "입찰 없음"
                 : `${Math.max(
@@ -65,15 +65,15 @@ const Item = ({ product }: { product: ProductItem }) => {
                   ).toLocaleString()}원`}
             </p>
           )}
-          <div className="row">
+          <div className={styles.row}>
             {status === "AUCTION" && (
-              <p className="cnt">
+              <p className={styles.cnt}>
                 <BsFillPeopleFill />
                 <span>{bid.length}</span>
               </p>
             )}
-            <p className="cnt">
-              <IoMdHeart className="heart_icon" />
+            <p className={styles.cnt}>
+              <IoMdHeart className={styles.heartIcon} />
               <span>{likeCnt}</span>
             </p>
           </div>

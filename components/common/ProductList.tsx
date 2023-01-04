@@ -7,6 +7,7 @@ import Link from "next/link";
 import { IoMdHeartEmpty, IoMdHeart } from "react-icons/io";
 import { BsFillPeopleFill } from "react-icons/bs";
 import Image from "next/image";
+import styles from "@styles/ProductList.module.css";
 
 const ProductList = ({
   products,
@@ -23,17 +24,18 @@ const ProductList = ({
 }) => {
   return (
     <>
-      {result && <p className="result">{products.length}개의 상품</p>}
+      {result && <p className={styles.result}>{products.length}개의 상품</p>}
       {products.length === 0 ? (
         emptyText ? (
-          <p className="emptyText">{emptyText}</p>
+          <p className={styles.emptyText}>{emptyText}</p>
         ) : null
       ) : (
         <>
           {products.length <= 2 ? (
             <FlexSection>
               {products.map((product) => (
-                <StyledLink
+                <Link
+                  className={styles.link}
                   href={
                     seller
                       ? `/sell/products/${product.id}`
@@ -47,13 +49,14 @@ const ProductList = ({
                   ) : (
                     <Item product={product} key={product.id} />
                   )}
-                </StyledLink>
+                </Link>
               ))}
             </FlexSection>
           ) : (
             <GridSection>
               {products.map((product) => (
-                <StyledLink
+                <Link
+                  className={styles.link}
                   href={
                     seller
                       ? `/sell/products/${product.id}`
@@ -67,7 +70,7 @@ const ProductList = ({
                   ) : (
                     <Item product={product} key={product.id} />
                   )}
-                </StyledLink>
+                </Link>
               ))}
             </GridSection>
           )}
@@ -112,7 +115,7 @@ const DefaultItem = ({ product }: { product: ProductItem }) => {
   const endingDate = new Date(String(endingAt));
   return (
     <article>
-      <div className="imageBox">
+      <div className={styles.imageBox}>
         <ImageWrapper>
           <Image
             src={getImageUrl(image)}
@@ -130,40 +133,38 @@ const DefaultItem = ({ product }: { product: ProductItem }) => {
               ? "판매 진행중"
               : "판매 완료"
           }
-          className="status"
+          className={styles.status}
         />
         {status === "AUCTION" && (
-          <Chip label={`D-${getDiffDay(endingDate)}`} className="dday" />
+          <Chip label={`D-${getDiffDay(endingDate)}`} className={styles.dday} />
         )}
       </div>
-      <div className="wrapper">
-        <div>
-          <h3>{name}</h3>
-          {status != "AUCTION" ? (
-            <p className="price">{price.toLocaleString()}원</p>
-          ) : (
-            <div className="row">
-              <p className="price">
-                {bid.length === 0
-                  ? "입찰 없음"
-                  : `${Math.max(
-                      ...bid.map((elem) => elem.price)
-                    ).toLocaleString()}원`}
-              </p>
-              <p className="cnt">
-                <BsFillPeopleFill />
-                <span>{bid.length}</span>
-              </p>
-            </div>
-          )}
-        </div>
-        <div className="row">
-          <p className="date">{getTimeForToday(String(createdAt))}</p>
-          <div className="cnt">
+      <div className={styles.wrapper}>
+        <h3 className={styles.title}>{name}</h3>
+        {status != "AUCTION" ? (
+          <p className={styles.price}>{price.toLocaleString()}원</p>
+        ) : (
+          <div className={styles.row}>
+            <p className={styles.price}>
+              {bid.length === 0
+                ? "입찰 없음"
+                : `${Math.max(
+                    ...bid.map((elem) => elem.price)
+                  ).toLocaleString()}원`}
+            </p>
+            <p className={styles.cnt}>
+              <BsFillPeopleFill />
+              <span>{bid.length}</span>
+            </p>
+          </div>
+        )}
+        <div className={styles.row}>
+          <p className={styles.date}>{getTimeForToday(String(createdAt))}</p>
+          <div className={styles.cnt}>
             {wish ? (
-              <IoMdHeart className="heart_icon" />
+              <IoMdHeart className={styles.heartIcon} />
             ) : (
-              <IoMdHeartEmpty className="heart_icon" />
+              <IoMdHeartEmpty className={styles.heartIcon} />
             )}
             <span>{likeCnt}</span>
           </div>
@@ -172,54 +173,6 @@ const DefaultItem = ({ product }: { product: ProductItem }) => {
     </article>
   );
 };
-
-export const StyledLink = styled(Link)`
-  border-radius: 5px;
-  h3 {
-    font-weight: normal;
-    margin: 3px 0;
-    font-size: 1.3rem;
-    text-transform: capitalize;
-  }
-  .price {
-    font-weight: bold;
-  }
-  .date {
-    font-size: 0.9rem;
-    color: gray;
-  }
-  .row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .imageBox {
-    position: relative;
-    .status {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      z-index: 2;
-      background-color: #222222;
-      color: white;
-      height: 30px;
-    }
-    .dday {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 2;
-      background-color: #fff;
-      color: gray;
-      border: 1px solid gray;
-    }
-  }
-`;
 
 export const ImageWrapper = styled.div`
   width: 80vmin;
