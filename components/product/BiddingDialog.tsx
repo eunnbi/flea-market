@@ -59,7 +59,7 @@ const BiddingDialog = ({ id, maxPrice, handleClose }: Props) => {
         setLoading(false);
       } else {
         setLoading(false);
-        alert("⚠️ 상품 구입에 실패했습니다. 다시 시도해주세요.");
+        alert("⚠️ 입찰에 실패했습니다. 다시 시도해주세요.");
       }
     } catch (e) {
       setLoading(false);
