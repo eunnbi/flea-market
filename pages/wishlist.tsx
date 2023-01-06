@@ -5,10 +5,11 @@ import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import styles from "@styles/Main.module.css";
 import { userAPI } from "api/user";
+import { productAPI } from "api/product";
 
 const MyWishList = ({
-  wish,
-  user,
+  wishList,
+  userId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <>
@@ -16,9 +17,9 @@ const MyWishList = ({
       <Header isLogin={true} />
       <main className={styles.main}>
         <h1 className="font-bold text-2xl text-center mb-6">
-          {user.userId}님의 위시리스트
+          {userId}님의 위시리스트
         </h1>
-        <WishList products={wish} />
+        <WishList wishList={wishList} />
       </main>
     </>
   );
@@ -29,9 +30,10 @@ export const getServerSideProps = async ({
 }: GetServerSidePropsContext) => {
   const { cookies } = req;
   const absoluteUrl = getAbsoluteUrl(req);
+  const token = cookies.access_token;
   const { data } = await userAPI.verify({
     absoluteUrl,
-    token: cookies.access_token,
+    token,
   });
   const { verify, user } = data;
   if (verify && user) {
@@ -51,13 +53,11 @@ export const getServerSideProps = async ({
         },
       };
     }
-    const res = await fetch(`${absoluteUrl}/api/product/wish`, {
-      headers: {
-        Authorization: `Bearer ${cookies.access_token}`,
-      },
+    const { data: wishList } = await productAPI.getWishList({
+      absoluteUrl,
+      token,
     });
-    const wish = await res.json();
-    return { props: { isLogin: verify, wish, user } };
+    return { props: { isLogin: verify, wishList, userId: user.userId } };
   }
   return {
     redirect: {

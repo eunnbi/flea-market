@@ -1,16 +1,16 @@
 import { getDiffDay } from "@lib/getDiffDay";
-import { getImageUrl } from "@lib/getImageUrl";
 import { Chip } from "@mui/material";
 import { IoMdHeart } from "react-icons/io";
 import ProductList from "./common/ProductList";
 import Image from "next/image";
 import { BsFillPeopleFill } from "react-icons/bs";
 import styles from "@styles/ProductList.module.css";
+import { ProductItem } from "types/product";
 
-const WishList = ({ products }: { products: ProductItem[] }) => {
+const WishList = ({ wishList }: { wishList: ProductItem[] }) => {
   return (
     <ProductList
-      products={products}
+      products={wishList}
       Item={Item}
       emptyText="좋아하는 상품이 없습니다. 상품을 추가해보세요."
     />
@@ -18,7 +18,8 @@ const WishList = ({ products }: { products: ProductItem[] }) => {
 };
 
 export const Item = ({ product }: { product: ProductItem }) => {
-  const { id, name, price, status, image, likeCnt, endingAt, bid } = product;
+  const { id, name, price, status, imageUrl, likeCnt, endingAt, bidding } =
+    product;
   const endingDate = new Date(String(endingAt));
   return (
     <article>
@@ -26,7 +27,7 @@ export const Item = ({ product }: { product: ProductItem }) => {
         <div className={styles.imageWrapper}>
           <Image
             className={styles.img}
-            src={getImageUrl(image)}
+            src={imageUrl}
             alt="product thumbnail"
             fill
             placeholder="blur"
@@ -55,22 +56,20 @@ export const Item = ({ product }: { product: ProductItem }) => {
       <div className={styles.wrapper}>
         <h3 className={styles.title}>{name}</h3>
         <div className={styles.row}>
-          {status != "AUCTION" ? (
+          {!bidding ? (
             <p className={styles.price}>{price.toLocaleString()}원</p>
           ) : (
             <p className={styles.price}>
-              {bid.length === 0
-                ? "입찰 없음"
-                : `${Math.max(
-                    ...bid.map((elem) => elem.price)
-                  ).toLocaleString()}원`}
+              {bidding.maxPrice
+                ? `${bidding.maxPrice.toLocaleString()}원`
+                : "입찰 없음"}
             </p>
           )}
           <div className={styles.row}>
-            {status === "AUCTION" && (
+            {bidding && (
               <p className={styles.cnt}>
                 <BsFillPeopleFill />
-                <span>{bid.length}</span>
+                <span>{bidding.cnt}</span>
               </p>
             )}
             <p className={styles.cnt}>
