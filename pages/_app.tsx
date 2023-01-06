@@ -4,11 +4,14 @@ import ThemeProvider from "@mui/material/styles/ThemeProvider";
 import { theme } from "styles/theme";
 import { useEffect } from "react";
 import { RecoilRoot } from "recoil";
-import Footer from "@components/common/Footer";
 import { Modal } from "@components/common/Modal";
 
 export default function App({ Component, pageProps, router }: AppProps) {
   const { query, pathname } = router;
+  useEffect(() => {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty("--vh", `${vh}px`);
+  }, []);
   useEffect(() => {
     let timerId: NodeJS.Timeout;
     if (query && query.alert) {
@@ -30,7 +33,6 @@ export default function App({ Component, pageProps, router }: AppProps) {
     <RecoilRoot>
       <ThemeProvider theme={theme}>
         <Component {...pageProps} />
-        <Footer />
         <Modal />
       </ThemeProvider>
     </RecoilRoot>
