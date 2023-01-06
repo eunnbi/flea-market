@@ -1,31 +1,25 @@
 import CustomHead from "@components/common/CustomHead";
 import { getImageUrl } from "@lib/getImageUrl";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import styles from "@styles/ProductDetail.module.css";
 import { IoCallOutline } from "react-icons/io5";
 import { FaRegComment } from "react-icons/fa";
-import { IoMdHeartEmpty, IoMdHeart } from "react-icons/io";
 import { BsCalendarDate } from "react-icons/bs";
 import { BiUser } from "react-icons/bi";
-import { FiMapPin } from "react-icons/fi";
 import { RiHistoryLine } from "react-icons/ri";
-import { TbChevronDown, TbChevronUp } from "react-icons/tb";
-import { Button, Chip, Tooltip } from "@mui/material";
-import Router from "next/router";
+import { Chip } from "@mui/material";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
-import axios from "axios";
 import Header from "@components/common/Header";
-import { Bidding, Wish } from "@prisma/client";
-import BiddingDialog from "@components/product/BiddingDialog";
+import { Bidding } from "@prisma/client";
 import AuctionHistory from "@components/product/AuctionHistory";
 import { getDiffDay } from "@lib/getDiffDay";
-import Map from "@components/common/Map";
 import { useSetRecoilState } from "recoil";
 import { locationState } from "@store/locationState";
-import { biddingState } from "@store/product/biddingState";
-import { buyingState } from "@store/product/buyingState";
-import BuyingDialog from "@components/product/BuyingDialog";
+import BuyingButton from "@components/product/BuyingButton";
+import BiddingButton from "@components/product/BiddingButton";
+import LikeButton from "@components/product/LikeButton";
+import TradingPlaceMap from "@components/product/TradingPlaceMap";
 
 const ProductDetail = ({
   token,
@@ -48,81 +42,11 @@ const ProductDetail = ({
     bid,
     sellerId,
   } = product;
-  const setBiddingState = useSetRecoilState(biddingState);
-  const setBuyingState = useSetRecoilState(buyingState);
-  const [openMap, setOpenMap] = useState(false);
-  const onClickBuyButton = () => {
-    if (token) {
-      setBuyingState({
-        open: true,
-        token,
-        id,
-        sellerId,
-        price,
-      });
-    } else {
-      alert("🔒 로그인이 필요합니다.");
-    }
-  };
-  const onClickBidButton = () => {
-    if (token) {
-      setBiddingState({
-        open: true,
-        token,
-        id,
-        maxPrice:
-          bid.length === 0
-            ? 0
-            : Math.max(...bid.map((elem: Bidding) => elem.price)),
-      });
-    } else {
-      alert("🔒 로그인이 필요합니다.");
-    }
-  };
-  const onClickLikeButton = async () => {
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    if (token) {
-      if (wish === null) {
-        try {
-          const { data } = await axios.post(`/api/product/wish/${id}`);
-          const { success } = data;
-          if (success) {
-            Router.replace(
-              `/products/${id}?alert=❤️ 위시리스트에 추가되었습니다.`,
-              `/products/${id}`
-            );
-          } else {
-            alert("⚠️ 위시리스트 추가에 실패했습니다. 다시 시도해주세요.");
-          }
-        } catch (e) {
-          alert("⚠️ 위시리스트 추가에 실패했습니다. 다시 시도해주세요.");
-        }
-      } else {
-        try {
-          const { data } = await axios.delete(`/api/product/wish/${id}`);
-          const { success } = data;
-          if (success) {
-            Router.replace(
-              `/products/${id}?alert=🤍 위시리스트에서 삭제되었습니다.`,
-              `/products/${id}`
-            );
-          } else {
-            alert("⚠️ 위시리스트 삭제에 실패했습니다. 다시 시도해주세요.");
-          }
-        } catch (e) {
-          alert("⚠️ 위시리스트 삭제에 실패했습니다. 다시 시도해주세요.");
-        }
-      }
-    } else {
-      alert("🔒 로그인이 필요합니다.");
-    }
-  };
-
   const endingDate = new Date(String(endingAt));
-  const setLocaiontState = useSetRecoilState(locationState);
+  const setLocationState = useSetRecoilState(locationState);
   useEffect(() => {
-    setLocaiontState(tradingPlace);
-  }, [product]);
+    setLocationState(tradingPlace);
+  }, [tradingPlace]);
   return (
     <>
       <CustomHead title={product.name} />
@@ -176,24 +100,11 @@ const ProductDetail = ({
             <IoCallOutline />
             {phoneNumber}
           </p>
-          <div className={styles.contentStart}>
-            <FiMapPin />
-            <div className={styles.grow}>
-              <span className={styles.row}>
-                {tradingPlace}
-                <Tooltip title={openMap ? "지도 숨기기" : "지도 보기"} arrow>
-                  <button onClick={() => setOpenMap((state) => !state)}>
-                    {openMap ? <TbChevronUp /> : <TbChevronDown />}
-                  </button>
-                </Tooltip>
-              </span>
-              {openMap && <Map />}
-            </div>
-          </div>
           <p className={styles.content}>
             <FaRegComment />
             {content}
           </p>
+          <TradingPlaceMap tradingPlace={tradingPlace} />
           {status === "AUCTION" && (
             <div className={styles.contentStart}>
               <RiHistoryLine />
@@ -204,31 +115,30 @@ const ProductDetail = ({
             </div>
           )}
         </section>
-        <p className={styles.likeCnt}>
-          <Tooltip title="위시리스트" arrow>
-            <button onClick={onClickLikeButton}>
-              {wish ? (
-                <IoMdHeart className="heart_icon" />
-              ) : (
-                <IoMdHeartEmpty className="heart_icon" />
-              )}
-            </button>
-          </Tooltip>
+        <div className={styles.likeCnt}>
+          <LikeButton token={token} id={id} wish={wish} />
           <span>{likeCnt}</span>
-        </p>
+        </div>
         {status !== "PURCHASED" &&
           (status === "PROGRESS" ? (
-            <Button variant="outlined" onClick={onClickBuyButton}>
-              구매하기
-            </Button>
+            <BuyingButton
+              price={price}
+              id={id}
+              sellerId={sellerId}
+              token={token}
+            />
           ) : (
-            <Button variant="outlined" onClick={onClickBidButton}>
-              입찰하기
-            </Button>
+            <BiddingButton
+              token={token}
+              id={id}
+              maxPrice={
+                bid.length === 0
+                  ? 0
+                  : Math.max(...bid.map((elem: Bidding) => elem.price))
+              }
+            />
           ))}
       </main>
-      <BuyingDialog />
-      <BiddingDialog />
     </>
   );
 };

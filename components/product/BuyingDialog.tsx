@@ -1,16 +1,16 @@
 import SimpleDialog from "@components/common/SimpleDialog";
-import { buyingState } from "@store/product/buyingState";
 import axios from "axios";
-import { useRecoilState } from "recoil";
 import Router from "next/router";
 
-const BuyingDialog = () => {
-  const [{ open, price, sellerId, id, token }, setBuyingState] =
-    useRecoilState(buyingState);
-  const handleClose = () =>
-    setBuyingState((state) => ({ ...state, open: false }));
+export interface Props {
+  id: string;
+  price: number;
+  sellerId: string;
+  handleClose: () => void;
+}
+
+const BuyingDialog = ({ id, price, sellerId, handleClose }: Props) => {
   const onConfirmBuying = async () => {
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     try {
       const { data } = await axios.post("/api/product/buy", {
         price,
@@ -32,7 +32,7 @@ const BuyingDialog = () => {
   };
   return (
     <SimpleDialog
-      open={open}
+      open={true}
       handleClose={handleClose}
       onConfirm={onConfirmBuying}
       basicTitle="정말 구매하시겠습니까?"

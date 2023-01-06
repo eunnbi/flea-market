@@ -1,12 +1,13 @@
-import { productDeleteState } from "@store/product/deleteState";
-import { useRecoilState } from "recoil";
 import axios from "axios";
 import Router from "next/router";
 import SimpleDialog from "@components/common/SimpleDialog";
 
-const ProductDeleteDialog = () => {
-  const [{ open, id }, setProductDeleteState] =
-    useRecoilState(productDeleteState);
+interface Props {
+  id: string;
+  handleClose: () => void;
+}
+
+const ProductDeleteDialog = ({ id, handleClose }: Props) => {
   const onDelete = async () => {
     try {
       await axios.delete(`/api/product/${id}`);
@@ -15,11 +16,9 @@ const ProductDeleteDialog = () => {
       alert("상품을 삭제할 수 없습니다. 다시 시도해주세요.");
     }
   };
-  const handleClose = () =>
-    setProductDeleteState((state) => ({ ...state, open: false }));
   return (
     <SimpleDialog
-      open={open}
+      open={true}
       handleClose={handleClose}
       onConfirm={onDelete}
       basicTitle="정말 삭제하시겠습니까?"

@@ -7,21 +7,20 @@ import {
   OutlinedInput,
   FormHelperText,
 } from "@mui/material";
-import { biddingState } from "@store/product/biddingState";
 import axios from "axios";
 import Router from "next/router";
 import { useState } from "react";
-import { useRecoilState } from "recoil";
 
-const BiddingDialog = () => {
-  const [{ open, token, id, maxPrice }, setBiddingState] =
-    useRecoilState(biddingState);
+export interface Props {
+  id: string;
+  maxPrice: number;
+  handleClose: () => void;
+}
+
+const BiddingDialog = ({ id, maxPrice, handleClose }: Props) => {
   const [loading, setLoading] = useState(false);
   const [price, setPrice] = useState("");
   const [errorText, setErrorText] = useState("");
-  const handleClose = () => {
-    setBiddingState((state) => ({ ...state, open: false }));
-  };
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPrice(e.target.value);
   };
@@ -43,7 +42,6 @@ const BiddingDialog = () => {
     }
     setErrorText("");
     setLoading(true);
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     try {
       const { data } = await axios.post("/api/product/bid", {
         price: Number(price),
@@ -70,7 +68,7 @@ const BiddingDialog = () => {
   };
   return (
     <Dialog
-      open={open}
+      open={true}
       onClose={handleClose}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
