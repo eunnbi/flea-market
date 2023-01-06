@@ -50,7 +50,7 @@ export const getUsersByRole = async (role: User["role"]) => {
 };
 
 const getSellerWithRating = async (user: User) => {
-  const res = await prisma.shopping.findMany({
+  const res = await prisma.rating.findMany({
     where: { sellerId: user.userId },
     select: { rating: true },
   });

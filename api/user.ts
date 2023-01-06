@@ -25,8 +25,10 @@ class UserAPI extends BaseAPI {
   deleteUser(id: User["id"]) {
     return axios.delete<UserDeleteResponse>(`${this.baseUrl}/${id}`);
   }
-  getSellers() {
-    return axios.get<SellersGetResponse>(`${this.baseUrl}?role=SELLER`);
+  getSellers(absoluteUrl?: string) {
+    return axios.get<SellersGetResponse>(
+      `${absoluteUrl}${this.baseUrl}?role=SELLER`
+    );
   }
   verify({
     absoluteUrl,

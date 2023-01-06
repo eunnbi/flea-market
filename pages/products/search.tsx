@@ -103,7 +103,7 @@ export const getServerSideProps = async ({
       };
     }
   }
-  const { data } = await userAPI.getSellers();
+  const { data } = await userAPI.getSellers(baseUrl);
   return {
     props: {
       sellers: data.sort(({ rating: a }, { rating: b }) => {
