@@ -1,9 +1,19 @@
 import { User } from "@prisma/client";
+import { SellerItem } from "types/user";
 import prisma from "./prisma";
 
 // READ
 export const getAllUsers = async () => {
-  const users = await prisma.user.findMany({});
+  const users = await prisma.user.findMany({
+    select: {
+      id: true,
+      userId: true,
+      firstName: true,
+      lastName: true,
+      role: true,
+      createdAt: true,
+    },
+  });
   return users;
 };
 
@@ -37,6 +47,12 @@ export const getUserByLogin = async ({
 export const getUsersByRole = async (role: User["role"]) => {
   const users = await prisma.user.findMany({
     where: { role },
+    select: {
+      id: true,
+      userId: true,
+      firstName: true,
+      lastName: true,
+    },
   });
   if (role === "SELLER") {
     const res = await Promise.all(
@@ -49,7 +65,7 @@ export const getUsersByRole = async (role: User["role"]) => {
   return users;
 };
 
-const getSellerWithRating = async (user: User) => {
+const getSellerWithRating = async (user: Omit<SellerItem, "rating">) => {
   const res = await prisma.rating.findMany({
     where: { sellerId: user.userId },
     select: { rating: true },

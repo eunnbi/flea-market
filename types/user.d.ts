@@ -15,8 +15,10 @@ declare type UserVerifyResponse = {
   user: Omit<User, "id" | "password"> | null;
 };
 
-declare type SellersGetResponse = (Pick<
+declare type SellerItem = Pick<
   User,
   "id" | "firstName" | "lastName" | "userId"
 > &
-  Pick<Rating, "rating">)[];
+  Pick<Rating, "rating">;
+
+declare type SellersGetResponse = SellerItem[];
