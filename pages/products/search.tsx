@@ -12,6 +12,8 @@ import { priceState } from "@store/search/priceState";
 import { nameState } from "@store/search/nameState";
 import { sellerState } from "@store/search/sellerState";
 import { userAPI } from "api/user";
+import { ProductItem } from "types/product";
+import { productAPI } from "api/product";
 
 const ProductsSearch = ({
   sellers,
@@ -23,24 +25,10 @@ const ProductsSearch = ({
   const seller = useRecoilValue(sellerState);
   const [products, setProducts] = useState<ProductItem[] | []>([]);
   useEffect(() => {
-    if (!isLogin) {
-      fetch(`/api/product?name=${name}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setProducts(data);
-        });
-    } else {
-      fetch(`/api/product?name=${name}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          setProducts(data);
-        });
-    }
-  }, [name, isLogin, token]);
+    productAPI.getProductsByName(token, name).then(({ data }) => {
+      setProducts(data);
+    });
+  }, [name]);
   return (
     <>
       <CustomHead title="Search Products" />
@@ -99,19 +87,25 @@ export const getServerSideProps = async ({
         },
       };
     }
+    const { data: sellers } = await userAPI.getSellers(absoluteUrl);
+    return {
+      props: {
+        sellers: sellers.sort(({ rating: a }, { rating: b }) => {
+          if (Number(a) < Number(b)) {
+            return 1;
+          } else if (Number(a) > Number(b)) {
+            return -1;
+          } else return 0;
+        }),
+        isLogin: verify,
+        token: cookies.access_token === undefined ? null : cookies.access_token,
+      },
+    };
   }
-  const { data: sellers } = await userAPI.getSellers(absoluteUrl);
   return {
-    props: {
-      sellers: sellers.sort(({ rating: a }, { rating: b }) => {
-        if (Number(a) < Number(b)) {
-          return 1;
-        } else if (Number(a) > Number(b)) {
-          return -1;
-        } else return 0;
-      }),
-      isLogin: verify,
-      token: cookies.access_token === undefined ? null : cookies.access_token,
+    redirect: {
+      destination: "/",
+      permanent: false,
     },
   };
 };

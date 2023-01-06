@@ -1,6 +1,4 @@
-import styled from "@emotion/styled";
 import { getDiffDay } from "@lib/getDiffDay";
-import { getImageUrl } from "@lib/getImageUrl";
 import { getTimeForToday } from "@lib/getTimeForToday";
 import { Chip } from "@mui/material";
 import Link from "next/link";
@@ -9,6 +7,8 @@ import { BsFillPeopleFill } from "react-icons/bs";
 import Image from "next/image";
 import styles from "@styles/ProductList.module.css";
 import EmptyText from "./EmptyText";
+import { ProductItem } from "types/product";
+import { useEffect, useState } from "react";
 
 const ProductList = ({
   products,
@@ -87,21 +87,25 @@ const DefaultItem = ({ product }: { product: ProductItem }) => {
     name,
     price,
     status,
-    image,
+    imageUrl,
     createdAt,
     likeCnt,
     endingAt,
-    wish,
-    bid,
+    isLike,
+    bidding,
   } = product;
   const endingDate = new Date(String(endingAt));
+  const [timeForToday, setTimeForToday] = useState("");
+  useEffect(() => {
+    setTimeForToday(getTimeForToday(String(createdAt)));
+  }, [createdAt]);
   return (
     <article>
       <div className={styles.imageBox}>
         <div className={styles.imageWrapper}>
           <Image
             className={styles.img}
-            src={getImageUrl(image)}
+            src={imageUrl}
             alt="product thumbnail"
             fill
             placeholder="blur"
@@ -124,27 +128,25 @@ const DefaultItem = ({ product }: { product: ProductItem }) => {
       </div>
       <div className={styles.wrapper}>
         <h3 className={styles.title}>{name}</h3>
-        {status != "AUCTION" ? (
+        {!bidding ? (
           <p className={styles.price}>{price.toLocaleString()}원</p>
         ) : (
           <div className={styles.row}>
             <p className={styles.price}>
-              {bid.length === 0
-                ? "입찰 없음"
-                : `${Math.max(
-                    ...bid.map((elem) => elem.price)
-                  ).toLocaleString()}원`}
+              {bidding.maxPrice
+                ? `${bidding.maxPrice.toLocaleString()}원`
+                : "입찰 없음"}
             </p>
             <p className={styles.cnt}>
               <BsFillPeopleFill />
-              <span>{bid.length}</span>
+              <span>{bidding.cnt}</span>
             </p>
           </div>
         )}
         <div className={styles.row}>
-          <p className={styles.date}>{getTimeForToday(String(createdAt))}</p>
+          <p className={styles.date}>{timeForToday}</p>
           <div className={styles.cnt}>
-            {wish ? (
+            {isLike ? (
               <IoMdHeart className={styles.heartIcon} />
             ) : (
               <IoMdHeartEmpty className={styles.heartIcon} />

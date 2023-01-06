@@ -1,11 +1,11 @@
-import { Bidding } from '@prisma/client';
-import prisma from './prisma';
+import { Bidding } from "@prisma/client";
+import prisma from "./prisma";
 
 export const createBidding = async ({
   bidderId,
   price,
   productId,
-}: Pick<Bidding, 'bidderId' | 'price' | 'productId'>) => {
+}: Pick<Bidding, "bidderId" | "price" | "productId">) => {
   const res = await prisma.bidding.create({
     data: {
       bidderId,
@@ -16,36 +16,61 @@ export const createBidding = async ({
   return res;
 };
 
-export const getBidding = async (productId: Bidding['productId']) => {
+export const getBidding = async (productId: Bidding["productId"]) => {
   const bidding = await prisma.bidding.findMany({
     where: { productId },
     orderBy: [
       {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     ],
   });
   const res = await Promise.all(
-    bidding.map(async bid => {
+    bidding.map(async (bid) => {
       const user = await prisma.user.findUnique({
         where: { userId: bid.bidderId },
       });
       return { ...user, ...bid };
-    }),
+    })
   );
   return res;
 };
 
-export const deleteBiddingByProduct = async (productId: Bidding['productId']) => {
+export const deleteBiddingByProduct = async (
+  productId: Bidding["productId"]
+) => {
   const res = await prisma.bidding.deleteMany({
     where: { productId },
   });
   return res;
 };
 
-export const deleteBiddingByUser = async (bidderId: Bidding['bidderId']) => {
+export const deleteBiddingByUser = async (bidderId: Bidding["bidderId"]) => {
   const res = await prisma.bidding.deleteMany({
     where: { bidderId },
   });
   return res;
+};
+
+export const getBidCnt = async (productId: Bidding["productId"]) => {
+  const res = await prisma.bidding.findMany({
+    where: {
+      productId,
+    },
+  });
+  return res.length;
+};
+
+export const getBidMaxPrice = async (
+  productId: Bidding["productId"]
+): Promise<number | undefined> => {
+  const bidding = await prisma.bidding.findMany({
+    where: { productId },
+    orderBy: [
+      {
+        createdAt: "desc",
+      },
+    ],
+  });
+  return bidding.length === 0 ? undefined : bidding[0].price;
 };

@@ -1,6 +1,5 @@
 import CustomHead from "@components/common/CustomHead";
 import ProductList from "@components/common/ProductList";
-import { useState, useEffect } from "react";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import StatusFilter from "@components/common/StatusFilter";
 import SortFilter from "@components/common/SortFilter";
@@ -11,26 +10,16 @@ import { statusFilterState } from "@store/statusFilterState";
 import { sortFilterState } from "@store/sortFilterState";
 import styles from "@styles/Main.module.css";
 import { userAPI } from "api/user";
+import { productAPI } from "api/product";
 
 const mainClassName = `${styles.main} max-w-screen-xl`;
 
 const Sell = ({
-  token,
-  data,
+  products,
   user,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const filter = useRecoilValue(statusFilterState);
   const sort = useRecoilValue(sortFilterState);
-  const [products, setProducts] = useState<ProductItem[]>(data);
-  useEffect(() => {
-    fetch(`/api/product`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => setProducts(data));
-  }, [token]);
   return (
     <>
       <CustomHead title="Home" />
@@ -94,9 +83,10 @@ export const getServerSideProps = async ({
 }: GetServerSidePropsContext) => {
   const { cookies } = req;
   const absoluteUrl = getAbsoluteUrl(req);
+  const token = cookies.access_token;
   const { data } = await userAPI.verify({
     absoluteUrl,
-    token: cookies.access_token,
+    token,
   });
   const { verify, user } = data;
   if (verify && user) {
@@ -109,14 +99,12 @@ export const getServerSideProps = async ({
       };
     }
     if (user.role === "SELLER") {
-      const response = await fetch(`${absoluteUrl}/api/product`, {
-        headers: {
-          Authorization: `Bearer ${cookies.access_token}`,
-        },
+      const { data: products } = await productAPI.getSellerProducts({
+        absoluteUrl,
+        token,
       });
-      const data = await response.json();
       return {
-        props: { token: cookies.access_token, data, user },
+        props: { products, user },
       };
     }
   }

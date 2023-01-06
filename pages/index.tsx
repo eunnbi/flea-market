@@ -9,6 +9,7 @@ import { useRecoilValue } from "recoil";
 import { statusFilterState } from "@store/statusFilterState";
 import { sortFilterState } from "@store/sortFilterState";
 import { userAPI } from "api/user";
+import { productAPI } from "api/product";
 
 const Home = ({
   isLogin,
@@ -16,6 +17,7 @@ const Home = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const filter = useRecoilValue(statusFilterState);
   const sort = useRecoilValue(sortFilterState);
+
   return (
     <>
       <CustomHead title="Home" />
@@ -76,9 +78,9 @@ export const getServerSideProps = async ({
   req,
 }: GetServerSidePropsContext) => {
   const { cookies } = req;
-  const baseUrl = getAbsoluteUrl(req);
+  const absoluteUrl = getAbsoluteUrl(req);
   const { data } = await userAPI.verify({
-    absoluteUrl: baseUrl,
+    absoluteUrl,
     token: cookies.access_token,
   });
   const { verify, user } = data;
@@ -99,22 +101,23 @@ export const getServerSideProps = async ({
         },
       };
     }
-    const response = await fetch(`${baseUrl}/api/product`, {
-      headers: {
-        Authorization: `Bearer ${cookies.access_token}`,
-      },
+    const { data: products } = await productAPI.getProducts({
+      absoluteUrl,
+      token: cookies.access_token,
     });
-    const products = await response.json();
     return {
       props: {
         isLogin: verify,
         token: cookies.access_token,
         products,
+        user,
       },
     };
   }
-  const res = await fetch(`${baseUrl}/api/product`);
-  const products = await res.json();
+  const { data: products } = await productAPI.getProducts({
+    absoluteUrl,
+    token: cookies.access_token,
+  });
   return { props: { isLogin: verify, token: null, products } };
 };
 
