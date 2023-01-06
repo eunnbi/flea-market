@@ -16,11 +16,12 @@ import { useState, useEffect } from "react";
 import { useSetRecoilState } from "recoil";
 import { membersState } from "@store/admin/membersState";
 import { alertMessageState } from "@store/admin/alertMessageState";
-import axios from "axios";
+import { userAPI } from "api/user";
+import { UserPatchResquest } from "types/user";
 
 interface Props {
   id: string;
-  initialState: MemberTableState;
+  initialState: UserPatchResquest;
   handleClose: () => void;
 }
 
@@ -31,7 +32,7 @@ const MemberEditDialog = ({ id, initialState, handleClose }: Props) => {
   const [loading, setLoading] = useState(false);
   const [values, setValues] = useState(initialState);
   const handleChange =
-    (prop: keyof MemberTableState) =>
+    (prop: keyof UserPatchResquest) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setValues((values) => ({ ...values, [prop]: event.target.value }));
     };
@@ -52,8 +53,8 @@ const MemberEditDialog = ({ id, initialState, handleClose }: Props) => {
     setErrorMessage("");
     setLoading(true);
     try {
-      await axios.patch(`/api/user/${id}`, values);
-      const { data } = await axios.get(`/api/user`);
+      await userAPI.patchUser(id, values);
+      const { data } = await userAPI.getUsers();
       setMembers(data);
       setAlertMessage("수정이 완료되었습니다.");
       setLoading(false);

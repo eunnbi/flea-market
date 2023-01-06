@@ -11,6 +11,7 @@ import Header from "@components/common/Header";
 import { priceState } from "@store/search/priceState";
 import { nameState } from "@store/search/nameState";
 import { sellerState } from "@store/search/sellerState";
+import { userAPI } from "api/user";
 
 const ProductsSearch = ({
   sellers,
@@ -102,12 +103,10 @@ export const getServerSideProps = async ({
       };
     }
   }
-  const res = await fetch(`${baseUrl}/api/user?role=SELLER`);
-  const sellers = await res.json();
+  const { data } = await userAPI.getSellers();
   return {
     props: {
-      //@ts-ignore
-      sellers: sellers.sort(({ rating: a }, { rating: b }) => {
+      sellers: data.sort(({ rating: a }, { rating: b }) => {
         if (Number(a) < Number(b)) {
           return 1;
         } else if (Number(a) > Number(b)) {

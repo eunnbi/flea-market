@@ -24,8 +24,13 @@ import { roleFilterState } from "@store/admin/roleFilterState";
 import useModal from "hooks/useModal";
 import MemberDeleteDialog from "./MemberDeleteDialog";
 import MemberEditDialog from "./MemberEditDialog";
+import { UsersGetResponse } from "types/user";
 
-const MemberTable = ({ initialMembers }: { initialMembers: User[] }) => {
+const MemberTable = ({
+  initialMembers,
+}: {
+  initialMembers: UsersGetResponse;
+}) => {
   const [isAscending, setIsAscending] = useState(true);
   const { admin, seller, buyer } = useRecoilValue(roleFilterState);
   const [members, setMembers] = useRecoilState(membersState);

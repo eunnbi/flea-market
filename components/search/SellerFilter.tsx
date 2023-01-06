@@ -13,12 +13,9 @@ import React, { useState } from "react";
 import { useRecoilState } from "recoil";
 import { BiUser } from "react-icons/bi";
 import { sellerState } from "@store/search/sellerState";
+import { SellersGetResponse } from "types/user";
 
-type State = User & {
-  rating: string;
-};
-
-const SellerFilter = ({ sellers }: { sellers: State[] }) => {
+const SellerFilter = ({ sellers }: { sellers: SellersGetResponse }) => {
   const [open, setOpen] = useState(false);
   const [seller, setSeller] = useRecoilState(sellerState);
   const handleClose = () => setOpen(false);
