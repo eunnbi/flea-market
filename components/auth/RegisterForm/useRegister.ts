@@ -1,9 +1,10 @@
 import { noError, createErrorObject } from "@lib/createErrorObject";
 import { registerFormState } from "@store/auth/registerFormState";
-import axios from "axios";
+import { authAPI } from "api/auth";
 import Router from "next/router";
 import { useState, useRef } from "react";
 import { useSetRecoilState } from "recoil";
+import { RegisterRequest } from "types/auth";
 
 export default function useRegister() {
   const [loading, setLoading] = useState(false);
@@ -22,14 +23,16 @@ export default function useRegister() {
   const setRegisterFormState = useSetRecoilState(registerFormState);
   const isCheckIdDuplicate = useRef(false);
   const isIdDuplicate = useRef(false);
+
   const handleChange =
-    (prop: keyof RegisterFormState) =>
+    (prop: keyof RegisterRequest) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setRegisterFormState((values) => ({
         ...values,
         [prop]: event.target.value,
       }));
     };
+
   const checkIdDuplicate = () => {
     setRegisterFormState((state) => {
       const { userId } = state;
@@ -44,28 +47,24 @@ export default function useRegister() {
         ...errorInfo,
         userId: noError,
       }));
-      fetch(`/api/auth/idDuplicate?userId=${userId}`, {
-        method: "GET",
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          const { idDuplicate } = data;
-          isIdDuplicate.current = idDuplicate;
-          if (idDuplicate) {
-            setHelperText((text) => ({ ...text, userId: "" }));
-            setErrorInfo((errorInfo) => ({
-              ...errorInfo,
-              userId: createErrorObject("중복된 아이디입니다"),
-            }));
-          } else {
-            setHelperText((text) => ({
-              ...text,
-              userId: "사용 가능한 아이디입니다.",
-            }));
-            setErrorInfo((errorInfo) => ({ ...errorInfo, userId: noError }));
-          }
-          isCheckIdDuplicate.current = true;
-        });
+      authAPI.idDuplicate(userId).then(({ data }) => {
+        const { idDuplicate } = data;
+        isIdDuplicate.current = idDuplicate;
+        if (idDuplicate) {
+          setHelperText((text) => ({ ...text, userId: "" }));
+          setErrorInfo((errorInfo) => ({
+            ...errorInfo,
+            userId: createErrorObject("중복된 아이디입니다"),
+          }));
+        } else {
+          setHelperText((text) => ({
+            ...text,
+            userId: "사용 가능한 아이디입니다.",
+          }));
+          setErrorInfo((errorInfo) => ({ ...errorInfo, userId: noError }));
+        }
+        isCheckIdDuplicate.current = true;
+      });
       return state;
     });
   };
@@ -122,8 +121,8 @@ export default function useRegister() {
         });
         // register api 호출
         setLoading(true);
-        axios
-          .post<{ success: boolean }>("/api/auth/register", state)
+        authAPI
+          .register(state)
           .then(() => {
             setLoading(false);
             Router.push(

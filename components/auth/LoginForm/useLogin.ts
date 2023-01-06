@@ -1,10 +1,10 @@
 import { noError, createErrorObject } from "@lib/createErrorObject";
 import { getRedirectInfo } from "@lib/getRedirectInfo";
-import { User } from "@prisma/client";
 import { loginFormState } from "@store/auth/loginFormState";
-import axios from "axios";
+import { authAPI } from "api/auth";
 import { useState } from "react";
 import { useSetRecoilState } from "recoil";
+import { LoginRequest } from "types/auth";
 
 export default function useLogin() {
   const [loading, setLoading] = useState(false);
@@ -15,7 +15,7 @@ export default function useLogin() {
   });
   const setLoginFormState = useSetRecoilState(loginFormState);
   const handleChange =
-    (prop: keyof LoginFormState) =>
+    (prop: keyof LoginRequest) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setLoginFormState((values) => ({
         ...values,
@@ -43,8 +43,8 @@ export default function useLogin() {
         setLoading(true);
         setErrorMessage("");
         let isSuccess = false;
-        axios
-          .post<{ success: boolean; user: User }>("/api/auth/login", state)
+        authAPI
+          .login(state)
           .then(({ data }) => {
             const { success, user } = data;
             setLoading(false);

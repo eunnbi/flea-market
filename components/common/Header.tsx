@@ -1,11 +1,10 @@
-import styled from "@emotion/styled";
 import { Button, IconButton } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import axios from "axios";
 import React, { useState } from "react";
 import LoginForm from "@components/auth/LoginForm";
 import { BiMenu } from "react-icons/bi";
+import { authAPI } from "api/auth";
 
 const getHeaderInfo = (pathname: string, isLogin: boolean) => {
   const page = pathname.split("/")[1];
@@ -48,7 +47,7 @@ const Header = ({ isLogin }: { isLogin: boolean }) => {
   const [open, setOpen] = useState(false);
   const { basePath, NAV } = getHeaderInfo(pathname, isLogin);
   const onLogout = () => {
-    axios.post("/api/auth/logout").then(() => {
+    authAPI.logout().then(() => {
       router.push("/");
     });
   };
