@@ -20,6 +20,7 @@ import BuyingButton from "@components/product/BuyingButton";
 import BiddingButton from "@components/product/BiddingButton";
 import LikeButton from "@components/product/LikeButton";
 import TradingPlaceMap from "@components/product/TradingPlaceMap";
+import { userAPI } from "api/user";
 
 const ProductDetail = ({
   token,
@@ -148,16 +149,13 @@ export const getServerSideProps = async ({
   query,
 }: GetServerSidePropsContext) => {
   const { cookies } = req;
-  const baseUrl = getAbsoluteUrl(req);
-  const response = await fetch(`${baseUrl}/api/user/verify`, {
-    headers: {
-      Authorization: cookies.access_token
-        ? `Bearer ${cookies.access_token}`
-        : "Bearer",
-    },
+  const absoluteUrl = getAbsoluteUrl(req);
+  const { data } = await userAPI.verify({
+    absoluteUrl,
+    token: cookies.access_token,
   });
-  const { verify, user } = await response.json();
-  if (verify) {
+  const { verify, user } = data;
+  if (verify && user) {
     if (user.role === "ADMIN") {
       return {
         redirect: {
@@ -174,11 +172,14 @@ export const getServerSideProps = async ({
         },
       };
     }
-    const res = await fetch(`${baseUrl}/api/product?id=${query.id as string}`, {
-      headers: {
-        Authorization: `Bearer ${cookies.access_token}`,
-      },
-    });
+    const res = await fetch(
+      `${absoluteUrl}/api/product?id=${query.id as string}`,
+      {
+        headers: {
+          Authorization: `Bearer ${cookies.access_token}`,
+        },
+      }
+    );
     const product = await res.json();
     return {
       props: {
@@ -188,7 +189,9 @@ export const getServerSideProps = async ({
       },
     };
   }
-  const res = await fetch(`${baseUrl}/api/product?id=${query.id as string}`);
+  const res = await fetch(
+    `${absoluteUrl}/api/product?id=${query.id as string}`
+  );
   const product = await res.json();
   return {
     props: {

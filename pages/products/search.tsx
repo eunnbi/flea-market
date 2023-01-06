@@ -76,16 +76,13 @@ export const getServerSideProps = async ({
   req,
 }: GetServerSidePropsContext) => {
   const { cookies } = req;
-  const baseUrl = getAbsoluteUrl(req);
-  const response = await fetch(`${baseUrl}/api/user/verify`, {
-    headers: {
-      Authorization: cookies.access_token
-        ? `Bearer ${cookies.access_token}`
-        : "Bearer",
-    },
+  const absoluteUrl = getAbsoluteUrl(req);
+  const { data } = await userAPI.verify({
+    absoluteUrl,
+    token: cookies.access_token,
   });
-  const { verify, user } = await response.json();
-  if (verify) {
+  const { verify, user } = data;
+  if (verify && user) {
     if (user.role === "ADMIN") {
       return {
         redirect: {
@@ -103,10 +100,10 @@ export const getServerSideProps = async ({
       };
     }
   }
-  const { data } = await userAPI.getSellers(baseUrl);
+  const { data: sellers } = await userAPI.getSellers(absoluteUrl);
   return {
     props: {
-      sellers: data.sort(({ rating: a }, { rating: b }) => {
+      sellers: sellers.sort(({ rating: a }, { rating: b }) => {
         if (Number(a) < Number(b)) {
           return 1;
         } else if (Number(a) > Number(b)) {

@@ -4,6 +4,7 @@ import WishList from "@components/WishList";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import styles from "@styles/Main.module.css";
+import { userAPI } from "api/user";
 
 const MyWishList = ({
   wish,
@@ -27,16 +28,13 @@ export const getServerSideProps = async ({
   req,
 }: GetServerSidePropsContext) => {
   const { cookies } = req;
-  const baseUrl = getAbsoluteUrl(req);
-  const response = await fetch(`${baseUrl}/api/user/verify`, {
-    headers: {
-      Authorization: cookies.access_token
-        ? `Bearer ${cookies.access_token}`
-        : "Bearer",
-    },
+  const absoluteUrl = getAbsoluteUrl(req);
+  const { data } = await userAPI.verify({
+    absoluteUrl,
+    token: cookies.access_token,
   });
-  const { verify, user } = await response.json();
-  if (verify) {
+  const { verify, user } = data;
+  if (verify && user) {
     if (user.role === "SELLER") {
       return {
         redirect: {
@@ -53,7 +51,7 @@ export const getServerSideProps = async ({
         },
       };
     }
-    const res = await fetch(`${baseUrl}/api/product/wish`, {
+    const res = await fetch(`${absoluteUrl}/api/product/wish`, {
       headers: {
         Authorization: `Bearer ${cookies.access_token}`,
       },

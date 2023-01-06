@@ -1,6 +1,5 @@
 import CustomHead from "@components/common/CustomHead";
 import ProductList from "@components/common/ProductList";
-import { useState, useEffect } from "react";
 import StatusFilter from "@components/common/StatusFilter";
 import SortFilter from "@components/common/SortFilter";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
@@ -9,29 +8,14 @@ import Header from "@components/common/Header";
 import { useRecoilValue } from "recoil";
 import { statusFilterState } from "@store/statusFilterState";
 import { sortFilterState } from "@store/sortFilterState";
+import { userAPI } from "api/user";
 
 const Home = ({
   isLogin,
-  token,
+  products,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const filter = useRecoilValue(statusFilterState);
   const sort = useRecoilValue(sortFilterState);
-  const [products, setProducts] = useState<ProductItem[] | []>([]);
-  useEffect(() => {
-    if (!isLogin) {
-      fetch(`/api/product`)
-        .then((res) => res.json())
-        .then((data) => setProducts(data));
-    } else {
-      fetch(`/api/product`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => setProducts(data));
-    }
-  }, [isLogin, token]);
   return (
     <>
       <CustomHead title="Home" />
@@ -93,15 +77,12 @@ export const getServerSideProps = async ({
 }: GetServerSidePropsContext) => {
   const { cookies } = req;
   const baseUrl = getAbsoluteUrl(req);
-  const response = await fetch(`${baseUrl}/api/user/verify`, {
-    headers: {
-      Authorization: cookies.access_token
-        ? `Bearer ${cookies.access_token}`
-        : "Bearer",
-    },
+  const { data } = await userAPI.verify({
+    absoluteUrl: baseUrl,
+    token: cookies.access_token,
   });
-  const { verify, user } = await response.json();
-  if (verify) {
+  const { verify, user } = data;
+  if (verify && user) {
     if (user.role === "SELLER") {
       return {
         redirect: {
@@ -123,18 +104,18 @@ export const getServerSideProps = async ({
         Authorization: `Bearer ${cookies.access_token}`,
       },
     });
-    const data = await response.json();
+    const products = await response.json();
     return {
       props: {
         isLogin: verify,
         token: cookies.access_token,
-        data,
+        products,
       },
     };
   }
   const res = await fetch(`${baseUrl}/api/product`);
-  const data = await res.json();
-  return { props: { isLogin: verify, token: null, data } };
+  const products = await res.json();
+  return { props: { isLogin: verify, token: null, products } };
 };
 
 export default Home;

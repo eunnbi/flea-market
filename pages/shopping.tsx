@@ -4,6 +4,7 @@ import ShoppingList from "@components/shopping/ShoppingList";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import styles from "@styles/Main.module.css";
+import { userAPI } from "api/user";
 
 const MyShopping = ({
   shopping,
@@ -28,16 +29,13 @@ export const getServerSideProps = async ({
   req,
 }: GetServerSidePropsContext) => {
   const { cookies } = req;
-  const baseUrl = getAbsoluteUrl(req);
-  const response = await fetch(`${baseUrl}/api/user/verify`, {
-    headers: {
-      Authorization: cookies.access_token
-        ? `Bearer ${cookies.access_token}`
-        : "Bearer",
-    },
+  const absoluteUrl = getAbsoluteUrl(req);
+  const { data } = await userAPI.verify({
+    absoluteUrl,
+    token: cookies.access_token,
   });
-  const { verify, user } = await response.json();
-  if (verify) {
+  const { verify, user } = data;
+  if (verify && user) {
     if (user.role === "SELLER") {
       return {
         redirect: {
@@ -54,7 +52,7 @@ export const getServerSideProps = async ({
         },
       };
     }
-    const res = await fetch(`${baseUrl}/api/product/buy`, {
+    const res = await fetch(`${absoluteUrl}/api/product/buy`, {
       headers: {
         Authorization: `Bearer ${cookies.access_token}`,
       },

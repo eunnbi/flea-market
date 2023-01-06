@@ -2,6 +2,7 @@ import CustomHead from "@components/common/CustomHead";
 import Header from "@components/common/Header";
 import ProductRegisterForm from "@components/product/ProductRegisterForm";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
+import { userAPI } from "api/user";
 import axios from "axios";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 
@@ -29,16 +30,13 @@ export const getServerSideProps = async ({
   query,
 }: GetServerSidePropsContext) => {
   const { cookies } = req;
-  const baseUrl = getAbsoluteUrl(req);
-  const res = await fetch(`${baseUrl}/api/user/verify`, {
-    headers: {
-      Authorization: cookies.access_token
-        ? `Bearer ${cookies.access_token}`
-        : "Bearer",
-    },
+  const absoluteUrl = getAbsoluteUrl(req);
+  const { data } = await userAPI.verify({
+    absoluteUrl,
+    token: cookies.access_token,
   });
-  const { verify, user } = await res.json();
-  if (verify) {
+  const { verify, user } = data;
+  if (verify && user) {
     if (user.role === "ADMIN") {
       return {
         redirect: {
@@ -49,7 +47,7 @@ export const getServerSideProps = async ({
     }
     if (user.role === "SELLER") {
       if (query.id) {
-        const res = await fetch(`${baseUrl}/api/product?id=${query.id}`);
+        const res = await fetch(`${absoluteUrl}/api/product?id=${query.id}`);
         const data = await res.json();
         return {
           props: {

@@ -4,7 +4,7 @@ import RoleFilter from "@components/admin/RoleFilter";
 import CustomHead from "@components/common/CustomHead";
 import Header from "@components/common/Header";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
-import { User } from "@prisma/client";
+import { userAPI } from "api/user";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 
 const Admin = ({
@@ -31,22 +31,16 @@ export const getServerSideProps = async ({
   req,
 }: GetServerSidePropsContext) => {
   const { cookies } = req;
-  const baseUrl = getAbsoluteUrl(req);
-  const res = await fetch(`${baseUrl}/api/user/verify`, {
-    headers: {
-      Authorization: cookies.access_token
-        ? `Bearer ${cookies.access_token}`
-        : "Bearer ",
-    },
+  const absoluteUrl = getAbsoluteUrl(req);
+  const { data } = await userAPI.verify({
+    absoluteUrl,
+    token: cookies.access_token,
   });
-  const { verify, user } = await res.json();
-  if (verify) {
+  const { verify, user } = data;
+  if (verify && user) {
     if (user.role === "ADMIN") {
-      const response = await fetch(`${baseUrl}/api/user`, {
-        method: "GET",
-      });
-      const members: User[] = await response.json();
-      return { props: { members, isLogin: verify } };
+      const { data } = await userAPI.getUsers(absoluteUrl);
+      return { props: { members: data, isLogin: verify } };
     }
     if (user.role === "SELLER") {
       return {
