@@ -52,7 +52,7 @@ const SellerFilter = ({ sellers }: { sellers: SellersGetResponse }) => {
               <ListItem
                 disablePadding
                 key={seller.id}
-                data-id={seller.userId}
+                data-id={seller.id}
                 data-name={`${seller.firstName} ${seller.lastName}`}
                 onClick={onClick}
               >
