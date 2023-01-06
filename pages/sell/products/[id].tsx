@@ -1,29 +1,24 @@
 import CustomHead from "@components/common/CustomHead";
 import { getImageUrl } from "@lib/getImageUrl";
 import Router from "next/router";
-import { useState } from "react";
 import styles from "@styles/ProductDetail.module.css";
 import { IoLocationOutline, IoCallOutline } from "react-icons/io5";
 import { FaRegComment } from "react-icons/fa";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { BsCalendarDate } from "react-icons/bs";
 import { Button, Chip } from "@mui/material";
-import SimpleDialog from "@components/common/SimpleDialog";
-import axios from "axios";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import Header from "@components/common/Header";
 import { getDiffDay } from "@lib/getDiffDay";
 import AuctionHistory from "@components/product/AuctionHistory";
 import { RiHistoryLine } from "react-icons/ri";
+import useModal from "hooks/useModal";
 import ProductDeleteDialog from "@components/product/ProductDeleteDialog";
-import { useSetRecoilState } from "recoil";
-import { productDeleteState } from "@store/product/deleteState";
 
 const ProductDetail = ({
   product,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const setProductDeleteState = useSetRecoilState(productDeleteState);
   const {
     id,
     name,
@@ -39,6 +34,7 @@ const ProductDetail = ({
     rating,
   } = product;
   const endingDate = new Date(String(endingAt));
+  const { openModal, closeModal } = useModal();
   const onClickEditButton = () =>
     Router.push(
       {
@@ -50,7 +46,10 @@ const ProductDetail = ({
       "/sell/register"
     );
   const onClickDeleteButton = () => {
-    setProductDeleteState({ open: true, id });
+    openModal(ProductDeleteDialog, {
+      id,
+      handleClose: closeModal,
+    });
   };
   return (
     <>
@@ -120,7 +119,7 @@ const ProductDetail = ({
           )}
         </section>
         <p className={styles.likeCnt}>
-          <IoMdHeartEmpty className="heart_icon" />
+          <IoMdHeartEmpty className={styles.heartIcon} />
           {likeCnt}
         </p>
         {status !== "PURCHASED" && (
@@ -134,7 +133,6 @@ const ProductDetail = ({
           </div>
         )}
       </main>
-      <ProductDeleteDialog />
     </>
   );
 };
