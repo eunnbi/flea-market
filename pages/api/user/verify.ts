@@ -12,7 +12,7 @@ export default async function handle(
     switch (req.method) {
       case "GET": {
         if (!req.headers.authorization) {
-          return res.json({ verify: false, user: undefined });
+          return res.json({ verify: false, user: null });
         } else {
           const token = req.headers.authorization.split(" ")[1];
           if (token) {
