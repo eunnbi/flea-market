@@ -1,7 +1,6 @@
 import CustomHead from "@components/common/CustomHead";
 import Header from "@components/common/Header";
 import ProductRegisterForm from "@components/product/ProductRegisterForm";
-import styled from "@emotion/styled";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import axios from "axios";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
@@ -17,19 +16,13 @@ const ProductRegister = ({
     <>
       <CustomHead title="Register Product" />
       <Header isLogin={true} />
-      <Main>
-        <h2>Product Registration</h2>
+      <main>
+        <h1 className="font-bold text-2xl mb-6">Product Registration</h1>
         <ProductRegisterForm initialProduct={data} />
-      </Main>
+      </main>
     </>
   );
 };
-
-const Main = styled.main`
-  h2 {
-    margin-bottom: 1.5rem;
-  }
-`;
 
 export const getServerSideProps = async ({
   req,

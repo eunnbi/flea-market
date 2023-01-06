@@ -3,7 +3,6 @@ import ProductList from "@components/common/ProductList";
 import { useState, useEffect } from "react";
 import StatusFilter from "@components/common/StatusFilter";
 import SortFilter from "@components/common/SortFilter";
-import styled from "@emotion/styled";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import Header from "@components/common/Header";

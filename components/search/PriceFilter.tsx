@@ -1,4 +1,3 @@
-import styled from "@emotion/styled";
 import {
   Button,
   Dialog,
@@ -143,7 +142,7 @@ const Inputs = ({ handleClose }: { handleClose: () => void }) => {
   };
   return (
     <>
-      <Div>
+      <div className="flex items-center gap-4 px-5">
         <OutlinedInput
           sx={{ width: "150px" }}
           type="number"
@@ -155,7 +154,7 @@ const Inputs = ({ handleClose }: { handleClose: () => void }) => {
           type="number"
           onChange={handleChange("max")}
         />
-      </Div>
+      </div>
       {errorText && (
         <FormHelperText sx={{ padding: "0 20px" }} error>
           {errorText}
@@ -167,12 +166,5 @@ const Inputs = ({ handleClose }: { handleClose: () => void }) => {
     </>
   );
 };
-
-const Div = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0 20px;
-`;
 
 export default React.memo(PriceFilter);

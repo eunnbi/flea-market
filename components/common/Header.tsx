@@ -55,7 +55,7 @@ const Header = ({ isLogin }: { isLogin: boolean }) => {
   const onToggle = () => setOpen((open) => !open);
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-10 text-white bg-black h-header">
+      <header className="fixed top-0 left-0 right-0 z-10 text-white bg-black h-header max-md:h-24">
         <div className="flex justify-between items-center max-w-screen-lg h-full mx-auto my-0 px-4 max-md:px-0 max-md:block">
           <div className="flex justify-between items-center h-full max-md:px-4 max-md:w-full">
             <Link href={basePath}>

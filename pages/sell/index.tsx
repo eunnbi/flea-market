@@ -4,12 +4,14 @@ import { useState, useEffect } from "react";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import StatusFilter from "@components/common/StatusFilter";
 import SortFilter from "@components/common/SortFilter";
-import styled from "@emotion/styled";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import Header from "@components/common/Header";
 import { useRecoilValue } from "recoil";
 import { statusFilterState } from "@store/statusFilterState";
 import { sortFilterState } from "@store/sortFilterState";
+import styles from "@styles/Main.module.css";
+
+const mainClassName = `${styles.main} max-w-screen-xl`;
 
 const Sell = ({
   token,
@@ -32,8 +34,8 @@ const Sell = ({
     <>
       <CustomHead title="Home" />
       <Header isLogin={true} />
-      <Main>
-        <h1>{user.userId}님의 상품들</h1>
+      <main className={mainClassName}>
+        <h1 className="font-bold text-3xl mb-8">{user.userId}님의 상품들</h1>
         <StatusFilter />
         <SortFilter />
         <ProductList
@@ -81,24 +83,10 @@ const Sell = ({
                   })
           }
         />
-      </Main>
+      </main>
     </>
   );
 };
-
-const Main = styled.main`
-  max-width: 1200px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: calc(100vh - var(--hh));
-  h1 {
-    margin-bottom: 2rem;
-  }
-  @media screen and (max-width: 620px) {
-    min-height: calc(var(--vh, 1vh) * 100 - var(--hh));
-  }
-`;
 
 export const getServerSideProps = async ({
   req,
