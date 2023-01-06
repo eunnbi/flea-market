@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
-import { SellerItem } from "types/user";
 import prisma from "./prisma";
+import { getSellerRating } from "./rating";
 
 // READ
 export const getAllUsers = async () => {
@@ -56,23 +56,14 @@ export const getUsersByRole = async (role: User["role"]) => {
   });
   if (role === "SELLER") {
     const res = await Promise.all(
-      users.map((user) => {
-        return getSellerWithRating(user);
+      users.map(async (user) => {
+        const rating = await getSellerRating(user.id);
+        return { ...user, rating };
       })
     );
     return res;
   }
   return users;
-};
-
-const getSellerWithRating = async (user: Omit<SellerItem, "rating">) => {
-  const res = await prisma.rating.findMany({
-    where: { sellerId: user.userId },
-    select: { rating: true },
-  });
-  if (res.length === 0) return { ...user, rating: 0 };
-  const rating = res.reduce((acc, cur) => acc + cur.rating, 0) / res.length;
-  return { ...user, rating: rating.toFixed(1) };
 };
 
 // CREATE
