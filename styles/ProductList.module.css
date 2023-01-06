@@ -4,15 +4,6 @@
   margin-bottom: 2rem;
 }
 
-.emptyText {
-  text-align: center;
-  color: gray;
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .link {
   border-radius: 5px;
 }
@@ -73,4 +64,18 @@
 .heartIcon {
   color: red;
   font-size: 1.2rem;
+}
+
+.imageWrapper {
+  width: 80vmin;
+  height: 80vmin;
+  max-width: 250px;
+  max-height: 250px;
+  border-radius: 5px;
+  position: relative;
+}
+
+.img {
+  border-radius: 5px;
+  object-fit: cover;
 }

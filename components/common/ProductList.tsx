@@ -8,6 +8,7 @@ import { IoMdHeartEmpty, IoMdHeart } from "react-icons/io";
 import { BsFillPeopleFill } from "react-icons/bs";
 import Image from "next/image";
 import styles from "@styles/ProductList.module.css";
+import EmptyText from "./EmptyText";
 
 const ProductList = ({
   products,
@@ -27,12 +28,12 @@ const ProductList = ({
       {result && <p className={styles.result}>{products.length}개의 상품</p>}
       {products.length === 0 ? (
         emptyText ? (
-          <p className={styles.emptyText}>{emptyText}</p>
+          <EmptyText>{emptyText}</EmptyText>
         ) : null
       ) : (
         <>
           {products.length <= 2 ? (
-            <FlexSection>
+            <section className="flex justify-center flex-wrap gap-8">
               {products.map((product) => (
                 <Link
                   className={styles.link}
@@ -51,9 +52,9 @@ const ProductList = ({
                   )}
                 </Link>
               ))}
-            </FlexSection>
+            </section>
           ) : (
-            <GridSection>
+            <section className="grid grid-cols-3 gap-8 max-lg:grid-cols-2 max-md:grid-cols-1">
               {products.map((product) => (
                 <Link
                   className={styles.link}
@@ -72,32 +73,13 @@ const ProductList = ({
                   )}
                 </Link>
               ))}
-            </GridSection>
+            </section>
           )}
         </>
       )}
     </>
   );
 };
-
-const FlexSection = styled.section`
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 2rem;
-`;
-
-const GridSection = styled.section`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 2rem;
-  @media screen and (max-width: 920px) {
-    grid-template-columns: 1fr 1fr;
-  }
-  @media screen and (max-width: 600px) {
-    grid-template-columns: 1fr;
-  }
-`;
 
 const DefaultItem = ({ product }: { product: ProductItem }) => {
   const {
@@ -116,15 +98,16 @@ const DefaultItem = ({ product }: { product: ProductItem }) => {
   return (
     <article>
       <div className={styles.imageBox}>
-        <ImageWrapper>
+        <div className={styles.imageWrapper}>
           <Image
+            className={styles.img}
             src={getImageUrl(image)}
             alt="product thumbnail"
             fill
             placeholder="blur"
             blurDataURL="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg=="
           />
-        </ImageWrapper>
+        </div>
         <Chip
           label={
             status === "AUCTION"
@@ -173,18 +156,5 @@ const DefaultItem = ({ product }: { product: ProductItem }) => {
     </article>
   );
 };
-
-export const ImageWrapper = styled.div`
-  width: 80vmin;
-  height: 80vmin;
-  max-width: 250px;
-  max-height: 250px;
-  border-radius: 5px;
-  position: relative;
-  img {
-    border-radius: 5px;
-    object-fit: cover;
-  }
-`;
 
 export default ProductList;
