@@ -3,7 +3,6 @@ import ProductList from "@components/common/ProductList";
 import SearchBar from "@components/search/SearchBar";
 import SellerFilter from "@components/search/SellerFilter";
 import PriceFilter from "@components/search/PriceFilter";
-import styled from "@emotion/styled";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { useEffect, useState } from "react";
@@ -45,14 +44,14 @@ const ProductsSearch = ({
     <>
       <CustomHead title="Search Products" />
       <Header isLogin={isLogin} />
-      <Main>
+      <main className="flex flex-col items-center gap-4">
         <SearchBar />
-        <div className="row">
+        <div className="flex items-center gap-4">
           <SellerFilter sellers={sellers} />
           <PriceFilter />
         </div>
-        <div style={{ marginTop: "1rem" }}>
-          <h2>검색 결과</h2>
+        <div className="mt-4">
+          <h1 className="text-2xl text-center mb-4 font-bold">검색 결과</h1>
           <ProductList
             result={true}
             products={products
@@ -67,34 +66,10 @@ const ProductsSearch = ({
               )}
           />
         </div>
-      </Main>
+      </main>
     </>
   );
 };
-const Main = styled.main`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.2rem;
-  h1 {
-    margin-bottom: 2rem;
-  }
-  h2 {
-    font-size: 1.5rem;
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-  .result {
-    color: gray;
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-  .row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-`;
 
 export const getServerSideProps = async ({
   req,
