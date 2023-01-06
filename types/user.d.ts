@@ -12,7 +12,7 @@ declare type UserDeleteResponse = SuccessResponse;
 
 declare type UserVerifyResponse = {
   verify: boolean;
-  user: Omit<User, "id" | "password"> | null;
+  user: Omit<User, "password"> | null;
 };
 
 declare type SellerItem = Pick<

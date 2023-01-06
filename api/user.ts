@@ -16,8 +16,7 @@ class UserAPI extends BaseAPI {
   }
 
   getUsers(absoluteUrl?: string) {
-    const url = absoluteUrl ? `${absoluteUrl}${this.baseUrl}` : this.baseUrl;
-    return axios.get<UsersGetResponse>(url);
+    return axios.get<UsersGetResponse>(this.getFullBaseUrl(absoluteUrl));
   }
   patchUser(id: User["id"], payload: UserPatchResquest) {
     return axios.patch<UserPatchResponse>(`${this.baseUrl}/${id}`, payload);
@@ -27,7 +26,7 @@ class UserAPI extends BaseAPI {
   }
   getSellers(absoluteUrl?: string) {
     return axios.get<SellersGetResponse>(
-      `${absoluteUrl}${this.baseUrl}?role=SELLER`
+      `${this.getFullBaseUrl(absoluteUrl)}?role=SELLER`
     );
   }
   verify({
@@ -37,9 +36,7 @@ class UserAPI extends BaseAPI {
     absoluteUrl: string;
     token: string | undefined;
   }) {
-    axios.defaults.headers.common["Authorization"] = token
-      ? `Bearer ${token}`
-      : "Bearer";
+    this.setAuthorizationHeader(token);
     return axios.get<UserVerifyResponse>(
       `${absoluteUrl}${this.baseUrl}/verify`
     );
