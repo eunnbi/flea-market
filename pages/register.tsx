@@ -1,5 +1,5 @@
 import CustomHead from "@components/common/CustomHead";
-import styles from "@styles/Register.module.css";
+import styles from "@styles/Main.module.css";
 import RegisterForm from "@components/auth/RegisterForm";
 import { useEffect } from "react";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
@@ -14,8 +14,6 @@ const Register = ({
   const resetRegisterFormState = useResetRecoilState(registerFormState);
   useEffect(() => {
     resetRegisterFormState();
-    const vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty("--vh", `${vh}px`);
   }, []);
   return (
     <>

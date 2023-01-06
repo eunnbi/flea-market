@@ -1,0 +1,14 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow-y: hidden;
+  min-height: calc(100vh - var(--hh));
+}
+
+@media screen and (max-width: 620px) {
+  .main {
+    min-height: calc(var(--vh, 1vh) * 100 - var(--hh));
+  }
+}
