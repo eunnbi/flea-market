@@ -6,8 +6,9 @@ import { IoLocationOutline } from "react-icons/io5";
 import Image from "next/image";
 import Link from "next/link";
 import { Button, Rating } from "@mui/material";
-import { useSetRecoilState } from "recoil";
-import { ratingState } from "@store/ratingState";
+import EmptyText from "@components/common/EmptyText";
+import useModal from "hooks/useModal";
+import RatingDialog from "./RatingDialog";
 
 const ShoppingList = ({
   list,
@@ -16,15 +17,15 @@ const ShoppingList = ({
   list: ShoppingItem[];
   dates: string[];
 }) => {
-  const setRatingState = useSetRecoilState(ratingState);
+  const { openModal, closeModal } = useModal();
   const handleOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
     const id = e.currentTarget.dataset.itemid;
     const rating = e.currentTarget.dataset.rating;
     if (id === undefined || rating === undefined) return;
-    setRatingState({
-      open: true,
-      initialRating: Number(rating),
+    openModal(RatingDialog, {
       id,
+      initialRating: Number(rating),
+      handleClose: closeModal,
     });
   };
 
@@ -40,12 +41,12 @@ const ShoppingList = ({
   ];
 
   return dates.length === 0 ? (
-    <p className="emptyText">구매 목록이 없습니다.</p>
+    <EmptyText>구매 목록이 없습니다.</EmptyText>
   ) : (
-    <Section>
+    <section className="flex flex-col gap-4 w-full">
       {newDates.map((date, index) => (
         <article key={index}>
-          <h3>{date}</h3>
+          <h3 className="font-bold mb-4">{date}</h3>
           <div>
             {list
               .filter(({ item }) => {
@@ -93,7 +94,7 @@ const ShoppingList = ({
           </div>
         </article>
       ))}
-    </Section>
+    </section>
   );
 };
 
@@ -108,6 +109,7 @@ const Product = ({
   return (
     <Link href={`/products/${id}`} passHref>
       <Image
+        className="w-32 h-32"
         src={getImageUrl(image)}
         width={130}
         height={130}
@@ -132,15 +134,6 @@ const Product = ({
     </Link>
   );
 };
-
-const Section = styled.section`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  h3 {
-    margin-bottom: 1rem;
-  }
-`;
 
 const Item = styled.div`
   display: flex;
