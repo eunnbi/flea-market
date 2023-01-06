@@ -2,7 +2,7 @@ import { getDiffDay } from "@lib/getDiffDay";
 import { getImageUrl } from "@lib/getImageUrl";
 import { Chip } from "@mui/material";
 import { IoMdHeart } from "react-icons/io";
-import ProductList, { ImageWrapper } from "./common/ProductList";
+import ProductList from "./common/ProductList";
 import Image from "next/image";
 import { BsFillPeopleFill } from "react-icons/bs";
 import styles from "@styles/ProductList.module.css";
@@ -17,21 +17,22 @@ const WishList = ({ products }: { products: ProductItem[] }) => {
   );
 };
 
-const Item = ({ product }: { product: ProductItem }) => {
+export const Item = ({ product }: { product: ProductItem }) => {
   const { id, name, price, status, image, likeCnt, endingAt, bid } = product;
   const endingDate = new Date(String(endingAt));
   return (
     <article>
       <div className={styles.imageBox}>
-        <ImageWrapper>
+        <div className={styles.imageWrapper}>
           <Image
+            className={styles.img}
             src={getImageUrl(image)}
             alt="product thumbnail"
             fill
             placeholder="blur"
             blurDataURL="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg=="
           />
-        </ImageWrapper>
+        </div>
         <Chip
           label={
             status === "AUCTION"
