@@ -19,11 +19,12 @@ const ProductsSearch = ({
   sellers,
   isLogin,
   token,
+  initialProducts,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { startPrice, lastPrice } = useRecoilValue(priceState);
   const name = useRecoilValue(nameState);
   const seller = useRecoilValue(sellerState);
-  const [products, setProducts] = useState<ProductItem[] | []>([]);
+  const [products, setProducts] = useState<ProductItem[]>(initialProducts);
   useEffect(() => {
     productAPI.getProductsByName(token, name).then(({ data }) => {
       setProducts(data);
@@ -65,9 +66,10 @@ export const getServerSideProps = async ({
 }: GetServerSidePropsContext) => {
   const { cookies } = req;
   const absoluteUrl = getAbsoluteUrl(req);
+  const token = cookies.access_token;
   const { data } = await userAPI.verify({
     absoluteUrl,
-    token: cookies.access_token,
+    token,
   });
   const { verify, user } = data;
   if (verify && user) {
@@ -87,6 +89,10 @@ export const getServerSideProps = async ({
         },
       };
     }
+    const { data: initialProducts } = await productAPI.getProducts({
+      absoluteUrl,
+      token,
+    });
     const { data: sellers } = await userAPI.getSellers(absoluteUrl);
     return {
       props: {
@@ -97,8 +103,9 @@ export const getServerSideProps = async ({
             return -1;
           } else return 0;
         }),
+        initialProducts,
         isLogin: verify,
-        token: cookies.access_token === undefined ? null : cookies.access_token,
+        token: token === undefined ? null : token,
       },
     };
   }

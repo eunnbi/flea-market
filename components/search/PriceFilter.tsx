@@ -104,19 +104,19 @@ const PriceFilter = () => {
             ))}
           </List>
         </DialogContent>
-        <Inputs handleClose={handleClose} />
+        <PriceInputs handleClose={handleClose} />
       </Dialog>
     </>
   );
 };
 
-const Inputs = ({ handleClose }: { handleClose: () => void }) => {
+const PriceInputs = ({ handleClose }: { handleClose: () => void }) => {
   const setPrice = useSetRecoilState(priceState);
+  const [errorText, setErrorText] = useState("");
   const [inputs, setInputs] = useState({
     min: "",
     max: "",
   });
-  const [errorText, setErrorText] = useState("");
   const handleChange =
     (type: "min" | "max") => (e: React.ChangeEvent<HTMLInputElement>) => {
       setInputs((inputs) => ({

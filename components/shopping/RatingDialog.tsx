@@ -7,7 +7,7 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Router from "next/router";
 import { productAPI } from "api/product";
 
@@ -20,7 +20,7 @@ interface Props {
 const RatingDialog = ({ initialRating, id, handleClose }: Props) => {
   const [loading, setLoading] = useState(false);
   const [errorText, setErrorText] = useState("");
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(initialRating);
   const onConfirm = async () => {
     if (rating === 0) {
       setErrorText("0점 평가는 불가합니다.");
@@ -47,9 +47,6 @@ const RatingDialog = ({ initialRating, id, handleClose }: Props) => {
       handleClose();
     }
   };
-  useEffect(() => {
-    setRating(initialRating);
-  }, [initialRating]);
   return (
     <Dialog
       open={true}

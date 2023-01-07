@@ -8,7 +8,6 @@ import {
   ListItemButton,
   ListItemText,
 } from "@mui/material";
-import { User } from "@prisma/client";
 import React, { useState } from "react";
 import { useRecoilState } from "recoil";
 import { BiUser } from "react-icons/bi";
@@ -18,6 +17,7 @@ import { SellersGetResponse } from "types/user";
 const SellerFilter = ({ sellers }: { sellers: SellersGetResponse }) => {
   const [open, setOpen] = useState(false);
   const [seller, setSeller] = useRecoilState(sellerState);
+  const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const onClick = (e: React.MouseEvent<HTMLLIElement>) => {
     const { id, name } = e.currentTarget.dataset;
@@ -34,7 +34,7 @@ const SellerFilter = ({ sellers }: { sellers: SellersGetResponse }) => {
         icon={<BiUser />}
         label={`판매자 : ${seller.name}`}
         variant={seller.name === "" ? "outlined" : "filled"}
-        onClick={() => setOpen(true)}
+        onClick={handleOpen}
         onDelete={seller.name === "" ? undefined : onDelete}
         sx={{ textTransform: "capitalize" }}
         className="filterChip"
