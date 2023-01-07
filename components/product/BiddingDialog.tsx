@@ -8,17 +8,16 @@ import {
   FormHelperText,
 } from "@mui/material";
 import { productAPI } from "api/product";
-import axios from "axios";
 import Router from "next/router";
 import { useState } from "react";
+import { BiddingCreateRequest } from "types/product";
 
-export interface Props {
-  id: string;
+export interface Props extends Pick<BiddingCreateRequest, "productId"> {
   maxPrice: number;
   handleClose: () => void;
 }
 
-const BiddingDialog = ({ id, maxPrice, handleClose }: Props) => {
+const BiddingDialog = ({ productId, maxPrice, handleClose }: Props) => {
   const [loading, setLoading] = useState(false);
   const [price, setPrice] = useState("");
   const [errorText, setErrorText] = useState("");
@@ -45,14 +44,14 @@ const BiddingDialog = ({ id, maxPrice, handleClose }: Props) => {
     setLoading(true);
     try {
       const { data } = await productAPI.createBidding({
-        productId: id,
+        productId,
         price: Number(price),
       });
       const { success } = data;
       if (success) {
         Router.replace(
-          `/products/${id}?alert=🎉 입찰 완료되었습니다!`,
-          `/products/${id}`
+          `/products/${productId}?alert=🎉 입찰 완료되었습니다!`,
+          `/products/${productId}`
         );
         handleClose();
         setPrice("");

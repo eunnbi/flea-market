@@ -6,7 +6,7 @@ import { FaRegComment } from "react-icons/fa";
 import { BsCalendarDate } from "react-icons/bs";
 import { BiUser } from "react-icons/bi";
 import { RiHistoryLine } from "react-icons/ri";
-import { Chip } from "@mui/material";
+import { Button, Chip } from "@mui/material";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import Header from "@components/common/Header";
@@ -14,12 +14,14 @@ import AuctionHistory from "@components/product/AuctionHistory";
 import { getDiffDay } from "@lib/getDiffDay";
 import { useSetRecoilState } from "recoil";
 import { locationState } from "@store/locationState";
-import BuyingButton from "@components/product/BuyingButton";
-import BiddingButton from "@components/product/BiddingButton";
 import LikeButton from "@components/product/LikeButton";
 import TradingPlaceMap from "@components/product/TradingPlaceMap";
 import { userAPI } from "api/user";
 import { productAPI } from "api/product";
+import BiddingDialog from "@components/product/BiddingDialog";
+import useModal from "hooks/useModal";
+import axios from "axios";
+import BuyingDialog from "@components/product/BuyingDialog";
 
 const ProductDetail = ({
   token,
@@ -43,6 +45,33 @@ const ProductDetail = ({
   } = product;
   const endingDate = new Date(String(endingAt));
   const setLocationState = useSetRecoilState(locationState);
+  const { openModal, closeModal } = useModal();
+
+  const onClickBiddingButton = () => {
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      openModal(BiddingDialog, {
+        productId: id,
+        maxPrice: bidding.length === 0 ? 0 : bidding[0].price,
+        handleClose: closeModal,
+      });
+    } else {
+      alert("🔒 로그인이 필요합니다.");
+    }
+  };
+
+  const onClickBuyingButton = () => {
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      openModal(BuyingDialog, {
+        productId: id,
+        handleClose: closeModal,
+      });
+    } else {
+      alert("🔒 로그인이 필요합니다.");
+    }
+  };
+
   useEffect(() => {
     setLocationState(tradingPlace);
   }, [tradingPlace]);
@@ -123,18 +152,13 @@ const ProductDetail = ({
         </div>
         {status !== "PURCHASED" &&
           (status === "PROGRESS" ? (
-            <BuyingButton
-              price={price}
-              id={id}
-              sellerId={seller.id}
-              token={token}
-            />
+            <Button variant="outlined" onClick={onClickBuyingButton}>
+              구매하기
+            </Button>
           ) : (
-            <BiddingButton
-              token={token}
-              id={id}
-              maxPrice={bidding.length === 0 ? 0 : bidding[0].price}
-            />
+            <Button variant="outlined" onClick={onClickBiddingButton}>
+              구매하기
+            </Button>
           ))}
       </main>
     </>

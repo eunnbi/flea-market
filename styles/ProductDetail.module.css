@@ -12,6 +12,7 @@
   text-align: center;
   margin-top: 5px;
   font-size: 1.5rem;
+  text-transform: capitalize;
 }
 
 .contentBox {
@@ -66,21 +67,11 @@
   width: 100%;
 }
 
-.main > div {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
 .likeCnt {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 5px;
   font-size: 1rem;
-}
-
-.likeCnt svg {
-  margin-top: 2px;
 }
 
 .row {
