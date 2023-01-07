@@ -3,7 +3,7 @@ import { deleteUser, updateUser } from "@db/user";
 import { deleteProductsBySeller, getProductBySeller } from "@db/product";
 import { deleteImage } from "@db/image";
 import { deleteShoppingByProduct, deleteShoppingByUser } from "@db/shopping";
-import { deleteWishByProduct, deleteWishByUser } from "@db/wish";
+import { deleteWishByProduct, deleteWishByUser } from "@db/wishlist";
 import { deleteBiddingByProduct, deleteBiddingByUser } from "@db/bidding";
 
 export default async function handle(

@@ -8,8 +8,8 @@ import {
   Button,
 } from "@mui/material";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import Router from "next/router";
+import { productAPI } from "api/product";
 
 interface Props {
   initialRating: number;
@@ -28,9 +28,17 @@ const RatingDialog = ({ initialRating, id, handleClose }: Props) => {
     }
     try {
       setLoading(true);
-      await axios.patch(`/api/product/buy/${id}`, {
-        rating,
-      });
+      if (initialRating === 0) {
+        await productAPI.createRating({
+          productId: id,
+          rating,
+        });
+      } else {
+        await productAPI.updateRating({
+          productId: id,
+          rating,
+        });
+      }
       setLoading(false);
       handleClose();
       Router.replace("/shopping");

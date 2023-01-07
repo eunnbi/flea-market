@@ -7,5 +7,43 @@ export const getSellerRating = async (sellerId: Rating["sellerId"]) => {
   });
   if (res.length === 0) return 0;
   const rating = res.reduce((acc, cur) => acc + cur.rating, 0) / res.length;
-  return rating.toFixed(1);
+  return Number(rating.toFixed(1));
+};
+
+export const getProductRating = async (productId: Rating["productId"]) => {
+  const res = await prisma.rating.findFirst({
+    where: { productId },
+    select: { rating: true },
+  });
+  return res === null ? 0 : res.rating;
+};
+
+export const createRating = async ({
+  productId,
+  sellerId,
+  rating,
+}: Omit<Rating, "id">) => {
+  const res = await prisma.rating.create({
+    data: {
+      productId,
+      sellerId,
+      rating,
+    },
+  });
+  return res;
+};
+
+export const updateRating = async ({
+  productId,
+  rating,
+}: Pick<Rating, "productId" | "rating">) => {
+  const res = await prisma.rating.update({
+    where: {
+      productId,
+    },
+    data: {
+      rating,
+    },
+  });
+  return res;
 };

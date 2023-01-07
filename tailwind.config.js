@@ -12,12 +12,14 @@ module.exports = {
       screens: {
         md: "620px",
         lg: "920px",
+        sm: "420px",
       },
       zIndex: {
         2: "2",
       },
       borderColor: {
         gray: "gray",
+        lightGray: "lightgray",
       },
       textColor: {
         gray: "gray",

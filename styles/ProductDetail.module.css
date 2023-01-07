@@ -31,7 +31,7 @@
   font-weight: bold;
   text-align: center;
   font-size: 1.2rem;
-  margin-top: 0.5rem;
+  margin-top: 0.1rem;
 }
 
 .content {
@@ -48,9 +48,6 @@
   gap: 10px;
   font-size: 1.05rem;
   width: 100%;
-}
-.content svg {
-  margin-top: 3px;
 }
 
 .contentStart svg {

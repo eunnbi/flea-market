@@ -1,8 +1,12 @@
-import { updateAuctionProduct } from "@db/product";
+import {
+  getProductById,
+  updateAuctionProduct,
+  updateProduct,
+} from "@db/product";
 import { NextApiRequest, NextApiResponse } from "next";
 import jwt from "jsonwebtoken";
 import { User } from "@prisma/client";
-import { createWish, deleteWish, getWishList } from "@db/wishlist";
+import { createShopping, getShoppingList } from "@db/shopping";
 
 const KEY = String(process.env.JSON_KEY);
 
@@ -21,24 +25,18 @@ export default async function handler(
           const token = req.headers.authorization.split(" ")[1];
           const decoded = jwt.verify(token, KEY);
           const { id }: User = decoded as User;
-          const { productId, wish } = req.body;
-          if (wish) {
-            await createWish({
-              productId,
-              buyerId: id,
-            });
-            return res.status(200).json({ success: true });
-          } else {
-            const wish = await deleteWish({
-              productId,
-              buyerId: id,
-            });
-            if (wish === null) {
-              return res.status(200).json({ success: false });
-            } else {
-              return res.status(200).json({ success: true });
-            }
-          }
+          const { productId } = req.body;
+          const { price, seller } = await getProductById(productId);
+          await createShopping({
+            price,
+            productId,
+            buyerId: id,
+            sellerId: seller.id,
+          });
+          await updateProduct(req.body.productId, {
+            status: "PURCHASED",
+          });
+          return res.status(200).json({ success: true });
         }
       }
       case "GET": {
@@ -51,8 +49,8 @@ export default async function handler(
           const token = req.headers.authorization.split(" ")[1];
           const decoded = jwt.verify(token, KEY);
           const { id }: User = decoded as User;
-          const wish = await getWishList(id);
-          return res.status(200).json(wish);
+          const shopping = await getShoppingList(id);
+          return res.status(200).json(shopping);
         }
       }
       default:

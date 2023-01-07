@@ -1,4 +1,5 @@
 import { Bidding } from "@prisma/client";
+import { BiddingItem } from "types/product";
 import prisma from "./prisma";
 
 export const createBidding = async ({
@@ -16,21 +17,34 @@ export const createBidding = async ({
   return res;
 };
 
-export const getBidding = async (productId: Bidding["productId"]) => {
-  const bidding = await prisma.bidding.findMany({
+export const getBiddingList = async (
+  productId: Bidding["productId"]
+): Promise<BiddingItem[]> => {
+  const biddingList = await prisma.bidding.findMany({
     where: { productId },
     orderBy: [
       {
         createdAt: "desc",
       },
     ],
+    select: {
+      id: true,
+      price: true,
+      createdAt: true,
+      bidderId: true,
+    },
   });
   const res = await Promise.all(
-    bidding.map(async (bid) => {
+    biddingList.map(async (bid) => {
       const user = await prisma.user.findUnique({
-        where: { userId: bid.bidderId },
+        where: { id: bid.bidderId },
       });
-      return { ...user, ...bid };
+      return {
+        id: bid.id,
+        price: bid.price,
+        createdAt: bid.createdAt,
+        userId: user!.userId,
+      };
     })
   );
   return res;

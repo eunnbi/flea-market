@@ -7,6 +7,7 @@ import {
   OutlinedInput,
   FormHelperText,
 } from "@mui/material";
+import { productAPI } from "api/product";
 import axios from "axios";
 import Router from "next/router";
 import { useState } from "react";
@@ -43,11 +44,10 @@ const BiddingDialog = ({ id, maxPrice, handleClose }: Props) => {
     setErrorText("");
     setLoading(true);
     try {
-      const { data } = await axios.post("/api/product/bid", {
-        price: Number(price),
+      const { data } = await productAPI.createBidding({
         productId: id,
+        price: Number(price),
       });
-
       const { success } = data;
       if (success) {
         Router.replace(

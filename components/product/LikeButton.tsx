@@ -3,20 +3,24 @@ import axios from "axios";
 import Router from "next/router";
 import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import styles from "@styles/ProductDetail.module.css";
+import { productAPI } from "api/product";
 
 interface Props {
-  wish: boolean;
+  isLike?: boolean;
   token: string | null;
   id: string;
 }
 
-const LikeButton = ({ wish, token, id }: Props) => {
+const LikeButton = ({ isLike, token, id }: Props) => {
   const onClickLikeButton = async () => {
     if (token) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      if (wish === null) {
+      if (!isLike) {
         try {
-          const { data } = await axios.post(`/api/product/wish/${id}`);
+          const { data } = await productAPI.updateWish({
+            productId: id,
+            wish: true,
+          });
           const { success } = data;
           if (success) {
             Router.replace(
@@ -31,7 +35,10 @@ const LikeButton = ({ wish, token, id }: Props) => {
         }
       } else {
         try {
-          const { data } = await axios.delete(`/api/product/wish/${id}`);
+          const { data } = await productAPI.updateWish({
+            productId: id,
+            wish: false,
+          });
           const { success } = data;
           if (success) {
             Router.replace(
@@ -52,7 +59,7 @@ const LikeButton = ({ wish, token, id }: Props) => {
   return (
     <Tooltip title="위시리스트" arrow>
       <button onClick={onClickLikeButton}>
-        {wish ? (
+        {isLike ? (
           <IoMdHeart className={styles.heartIcon} />
         ) : (
           <IoMdHeartEmpty className={styles.heartIcon} />

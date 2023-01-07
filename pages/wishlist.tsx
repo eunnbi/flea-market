@@ -3,7 +3,6 @@ import Header from "@components/common/Header";
 import WishList from "@components/WishList";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
-import styles from "@styles/Main.module.css";
 import { userAPI } from "api/user";
 import { productAPI } from "api/product";
 
@@ -15,7 +14,7 @@ const MyWishList = ({
     <>
       <CustomHead title="My Page" />
       <Header isLogin={true} />
-      <main className={styles.main}>
+      <main className="flex flex-col">
         <h1 className="font-bold text-2xl text-center mb-6">
           {userId}님의 위시리스트
         </h1>

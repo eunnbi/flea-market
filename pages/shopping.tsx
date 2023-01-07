@@ -3,23 +3,22 @@ import Header from "@components/common/Header";
 import ShoppingList from "@components/shopping/ShoppingList";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
-import styles from "@styles/Main.module.css";
 import { userAPI } from "api/user";
+import { productAPI } from "api/product";
 
 const MyShopping = ({
-  shopping,
-  dates,
-  user,
+  shoppingList,
+  userId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <>
       <CustomHead title="My Page" />
       <Header isLogin={true} />
-      <main className={styles.main}>
+      <main className="flex flex-col">
         <h1 className="text-center mb-6 font-bold text-2xl">
-          {user.userId}님의 구매 목록
+          {userId}님의 구매 목록
         </h1>
-        <ShoppingList list={shopping} dates={dates} />
+        <ShoppingList shoppingList={shoppingList} />
       </main>
     </>
   );
@@ -30,9 +29,10 @@ export const getServerSideProps = async ({
 }: GetServerSidePropsContext) => {
   const { cookies } = req;
   const absoluteUrl = getAbsoluteUrl(req);
+  const token = cookies.access_token;
   const { data } = await userAPI.verify({
     absoluteUrl,
-    token: cookies.access_token,
+    token,
   });
   const { verify, user } = data;
   if (verify && user) {
@@ -52,15 +52,13 @@ export const getServerSideProps = async ({
         },
       };
     }
-    const res = await fetch(`${absoluteUrl}/api/product/buy`, {
-      headers: {
-        Authorization: `Bearer ${cookies.access_token}`,
-      },
+    const { data: shoppingList } = await productAPI.getShoppingList({
+      absoluteUrl,
+      token,
     });
-    const shopping: ShoppingItem[] = await res.json();
-    const dates = shopping.map(({ item }) => String(item.createdAt));
+    console.log(shoppingList);
     return {
-      props: { isLogin: verify, shopping, dates: [...new Set(dates)], user },
+      props: { isLogin: verify, shoppingList, userId: user.userId },
     };
   }
   return {

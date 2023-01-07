@@ -8,16 +8,14 @@ import {
   TableBody,
   IconButton,
   Tooltip,
-  Alert,
 } from "@mui/material";
-import { User } from "@prisma/client";
 import { styled } from "@mui/material/styles";
 import { IoMdTrash } from "react-icons/io";
 import { FaEdit } from "react-icons/fa";
 import { tableCellClasses } from "@mui/material/TableCell";
 import { useState, useEffect } from "react";
 import { BsArrowUpShort, BsArrowDownShort } from "react-icons/bs";
-import { changeDateFormat } from "@lib/changeDateFormat";
+import { changeDateTimeFormat } from "@lib/datetimeFormat";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { membersState } from "@store/admin/membersState";
 import { roleFilterState } from "@store/admin/roleFilterState";
@@ -121,7 +119,7 @@ const MemberTable = ({
                   {member.role}
                 </StyledTableCell>
                 <StyledTableCell>
-                  {changeDateFormat(new Date(String(member.createdAt)))}
+                  {changeDateTimeFormat(new Date(String(member.createdAt)))}
                 </StyledTableCell>
                 <StyledTableCell align="center">
                   <Tooltip title="edit" arrow>

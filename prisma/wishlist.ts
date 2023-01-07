@@ -1,7 +1,7 @@
 import { Wish } from "@prisma/client";
 import { WishListGetResponse } from "types/product";
 import prisma from "./prisma";
-import { getProductById, getWishItemInfo } from "./product";
+import { getWishItemInfo } from "./product";
 
 export const createWish = async ({
   buyerId,

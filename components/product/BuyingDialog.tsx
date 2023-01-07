@@ -1,4 +1,5 @@
 import SimpleDialog from "@components/common/SimpleDialog";
+import { productAPI } from "api/product";
 import axios from "axios";
 import Router from "next/router";
 
@@ -9,12 +10,10 @@ export interface Props {
   handleClose: () => void;
 }
 
-const BuyingDialog = ({ id, price, sellerId, handleClose }: Props) => {
+const BuyingDialog = ({ id, handleClose }: Props) => {
   const onConfirmBuying = async () => {
     try {
-      const { data } = await axios.post("/api/product/buy", {
-        price,
-        sellerId,
+      const { data } = await productAPI.createShopping({
         productId: id,
       });
       const { success } = data;

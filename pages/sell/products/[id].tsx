@@ -1,5 +1,4 @@
 import CustomHead from "@components/common/CustomHead";
-import { getImageUrl } from "@lib/getImageUrl";
 import Router from "next/router";
 import styles from "@styles/ProductDetail.module.css";
 import { IoLocationOutline, IoCallOutline } from "react-icons/io5";
@@ -16,6 +15,7 @@ import { RiHistoryLine } from "react-icons/ri";
 import useModal from "hooks/useModal";
 import ProductDeleteDialog from "@components/product/ProductDeleteDialog";
 import { userAPI } from "api/user";
+import { productAPI } from "api/product";
 
 const ProductDetail = ({
   product,
@@ -27,11 +27,11 @@ const ProductDetail = ({
     tradingPlace,
     endingAt,
     status,
-    image,
+    imageUrl,
     content,
     likeCnt,
     phoneNumber,
-    bid,
+    bidding,
     rating,
   } = product;
   const endingDate = new Date(String(endingAt));
@@ -58,15 +58,15 @@ const ProductDetail = ({
       <Header isLogin={true} />
       <main className={styles.main}>
         <section>
-          <img src={getImageUrl(image)} alt="product" />
+          <img src={imageUrl} alt="product" />
           <h2>{name}</h2>
           {status !== "AUCTION" ? (
             <p className={styles.price}>{price.toLocaleString()}원</p>
           ) : (
             <p className={styles.price}>
-              {bid.length === 0
+              {bidding.length === 0
                 ? "입찰 없음"
-                : `${bid[0].price.toLocaleString()}원`}
+                : `${bidding[0].price.toLocaleString()}원`}
             </p>
           )}
         </section>
@@ -92,8 +92,9 @@ const ProductDetail = ({
             <p className={styles.content}>
               <BsCalendarDate />
               <span>
-                {endingDate.getFullYear()}-{endingDate.getMonth() + 1}-
-                {endingDate.getDate()}
+                {endingDate.getFullYear()}-
+                {(endingDate.getMonth() + 1).toString().padStart(2, "0")}-
+                {endingDate.getDate().toString().padStart(2, "0")}
               </span>
             </p>
           )}
@@ -113,8 +114,8 @@ const ProductDetail = ({
             <div className={styles.contentStart}>
               <RiHistoryLine />
               <div className={styles.bidTable}>
-                <span>입찰목록 ({bid.length})</span>
-                <AuctionHistory history={bid} />
+                <span>입찰목록 ({bidding.length})</span>
+                <AuctionHistory history={bidding} />
               </div>
             </div>
           )}
@@ -144,9 +145,10 @@ export const getServerSideProps = async ({
 }: GetServerSidePropsContext) => {
   const { cookies } = req;
   const absoluteUrl = getAbsoluteUrl(req);
+  const token = cookies.access_token;
   const { data } = await userAPI.verify({
     absoluteUrl,
-    token: cookies.access_token,
+    token,
   });
   const { verify, user } = data;
   if (verify && user) {
@@ -159,10 +161,13 @@ export const getServerSideProps = async ({
       };
     }
     if (user.role === "SELLER") {
-      const response = await fetch(
-        `${absoluteUrl}/api/product?id=${query.id as string}`
+      const { data: product } = await productAPI.getProductDetails(
+        {
+          absoluteUrl,
+          token,
+        },
+        query.id as string
       );
-      const product = await response.json();
       return {
         props: {
           product,

@@ -1,5 +1,4 @@
 import CustomHead from "@components/common/CustomHead";
-import { getImageUrl } from "@lib/getImageUrl";
 import { useEffect } from "react";
 import styles from "@styles/ProductDetail.module.css";
 import { IoCallOutline } from "react-icons/io5";
@@ -11,7 +10,6 @@ import { Chip } from "@mui/material";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import Header from "@components/common/Header";
-import { Bidding } from "@prisma/client";
 import AuctionHistory from "@components/product/AuctionHistory";
 import { getDiffDay } from "@lib/getDiffDay";
 import { useSetRecoilState } from "recoil";
@@ -21,6 +19,7 @@ import BiddingButton from "@components/product/BiddingButton";
 import LikeButton from "@components/product/LikeButton";
 import TradingPlaceMap from "@components/product/TradingPlaceMap";
 import { userAPI } from "api/user";
+import { productAPI } from "api/product";
 
 const ProductDetail = ({
   token,
@@ -34,14 +33,13 @@ const ProductDetail = ({
     tradingPlace,
     endingAt,
     status,
-    image,
+    imageUrl,
     content,
     likeCnt,
     phoneNumber,
-    user,
-    wish,
-    bid,
-    sellerId,
+    bidding,
+    seller,
+    isLike,
   } = product;
   const endingDate = new Date(String(endingAt));
   const setLocationState = useSetRecoilState(locationState);
@@ -54,15 +52,15 @@ const ProductDetail = ({
       <Header isLogin={isLogin} />
       <main className={styles.main}>
         <section>
-          <img src={getImageUrl(image)} alt="product" />
+          <img src={imageUrl} alt="product" />
           <h2>{name}</h2>
           {status !== "AUCTION" ? (
             <p className={styles.price}>{price.toLocaleString()}원</p>
           ) : (
             <p className={styles.price}>
-              {bid.length === 0
+              {bidding.length === 0
                 ? "입찰 없음"
-                : `${bid[0].price.toLocaleString()}원`}
+                : `${bidding[0].price.toLocaleString()}원`}
             </p>
           )}
         </section>
@@ -82,25 +80,28 @@ const ProductDetail = ({
             )}
           </div>
           {status === "AUCTION" && (
-            <p className={styles.content}>
+            <div className={styles.content}>
               <BsCalendarDate />
               <span>
-                {endingDate.getFullYear()}-{endingDate.getMonth() + 1}-
-                {endingDate.getDate()}
+                {endingDate.getFullYear()}-
+                {(endingDate.getMonth() + 1).toString().padStart(2, "0")}-
+                {endingDate.getDate().toString().padStart(2, "0")}
               </span>
-            </p>
+            </div>
           )}
           <div className={styles.content}>
             <BiUser />
-            <div className={styles.name}>
-              {user.firstName} {user.lastName}
-            </div>
-            <Chip label={`⭐ ${user.rating}`} size="small" variant="outlined" />
+            <div className={styles.name}>{seller.name}</div>
+            <Chip
+              label={`⭐ ${seller.rating}`}
+              size="small"
+              variant="outlined"
+            />
           </div>
-          <p className={styles.content}>
+          <div className={styles.content}>
             <IoCallOutline />
             {phoneNumber}
-          </p>
+          </div>
           <p className={styles.content}>
             <FaRegComment />
             {content}
@@ -110,14 +111,14 @@ const ProductDetail = ({
             <div className={styles.contentStart}>
               <RiHistoryLine />
               <div className={styles.bidTable}>
-                <span>입찰목록 ({bid.length})</span>
-                <AuctionHistory history={bid} />
+                <span>입찰목록 ({bidding.length})</span>
+                <AuctionHistory history={bidding} />
               </div>
             </div>
           )}
         </section>
         <div className={styles.likeCnt}>
-          <LikeButton token={token} id={id} wish={wish} />
+          <LikeButton token={token} id={id} isLike={isLike} />
           <span>{likeCnt}</span>
         </div>
         {status !== "PURCHASED" &&
@@ -125,18 +126,14 @@ const ProductDetail = ({
             <BuyingButton
               price={price}
               id={id}
-              sellerId={sellerId}
+              sellerId={seller.id}
               token={token}
             />
           ) : (
             <BiddingButton
               token={token}
               id={id}
-              maxPrice={
-                bid.length === 0
-                  ? 0
-                  : Math.max(...bid.map((elem: Bidding) => elem.price))
-              }
+              maxPrice={bidding.length === 0 ? 0 : bidding[0].price}
             />
           ))}
       </main>
@@ -150,9 +147,10 @@ export const getServerSideProps = async ({
 }: GetServerSidePropsContext) => {
   const { cookies } = req;
   const absoluteUrl = getAbsoluteUrl(req);
+  const token = cookies.access_token;
   const { data } = await userAPI.verify({
     absoluteUrl,
-    token: cookies.access_token,
+    token,
   });
   const { verify, user } = data;
   if (verify && user) {
@@ -172,31 +170,32 @@ export const getServerSideProps = async ({
         },
       };
     }
-    const res = await fetch(
-      `${absoluteUrl}/api/product?id=${query.id as string}`,
+    const { data: product } = await productAPI.getProductDetails(
       {
-        headers: {
-          Authorization: `Bearer ${cookies.access_token}`,
-        },
-      }
+        absoluteUrl,
+        token,
+      },
+      query.id as string
     );
-    const product = await res.json();
     return {
       props: {
         product,
-        token: cookies.access_token === undefined ? null : cookies.access_token,
+        token: token === undefined ? null : token,
         isLogin: verify,
       },
     };
   }
-  const res = await fetch(
-    `${absoluteUrl}/api/product?id=${query.id as string}`
+  const { data: product } = await productAPI.getProductDetails(
+    {
+      absoluteUrl,
+      token,
+    },
+    query.id as string
   );
-  const product = await res.json();
   return {
     props: {
       product,
-      token: cookies.access_token === undefined ? null : cookies.access_token,
+      token: token === undefined ? null : token,
       isLogin: verify,
     },
   };
