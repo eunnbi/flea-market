@@ -79,9 +79,10 @@ export const getServerSideProps = async ({
 }: GetServerSidePropsContext) => {
   const { cookies } = req;
   const absoluteUrl = getAbsoluteUrl(req);
+  const token = cookies.access_token;
   const { data } = await userAPI.verify({
     absoluteUrl,
-    token: cookies.access_token,
+    token,
   });
   const { verify, user } = data;
   if (verify && user) {
@@ -101,24 +102,12 @@ export const getServerSideProps = async ({
         },
       };
     }
-    const { data: products } = await productAPI.getProducts({
-      absoluteUrl,
-      token: cookies.access_token,
-    });
-    return {
-      props: {
-        isLogin: verify,
-        token: cookies.access_token,
-        products,
-        user,
-      },
-    };
   }
   const { data: products } = await productAPI.getProducts({
     absoluteUrl,
-    token: cookies.access_token,
+    token,
   });
-  return { props: { isLogin: verify, token: null, products } };
+  return { props: { isLogin: verify, products } };
 };
 
 export default Home;
