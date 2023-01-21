@@ -19,10 +19,14 @@ class ImageAPI extends BaseAPI {
       "upload_preset",
       String(process.env.NEXT_PUBLIC_IMAGE_PRESET)
     );
-    const { data: imageData } = await axios.post<ImageCreateRequest>(
+    const response = await fetch(
       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUD_NAME}/image/upload`,
-      formData
+      {
+        method: "POST",
+        body: formData,
+      }
     );
+    const imageData = (await response.json()) as ImageCreateRequest;
     const { format, public_id: publicId, version } = imageData;
     return axios.post<ImageCreateResponse>(this.baseUrl, {
       format,
