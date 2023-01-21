@@ -38,7 +38,9 @@ const ImageUpload = ({ imageUrl, errorInfo }: Props) => {
           ref={ref}
           onChange={changeImageFile}
         />
-        {errorInfo.isError && <p className="warning">{errorInfo.message}</p>}
+        {errorInfo.isError && (
+          <p className="text-xs mt-2 text-red-600">{errorInfo.message}</p>
+        )}
       </div>
     </Wrapper>
   );

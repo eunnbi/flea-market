@@ -1,13 +1,10 @@
 import { noError } from "@lib/createErrorObject";
 import { Button } from "@mui/material";
-import React, { useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import CustomInput from "../../common/CustomInput";
 import Map from "../../common/Map";
 import CustomDatePicker from "./CustomDatePicker";
 import ImageUpload from "./ImageUpload";
-import styled from "@emotion/styled";
-import axios from "axios";
-import Router from "next/router";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { errorInfoState } from "@store/product/errorInfoState";
 import { locationState } from "@store/mapState";
@@ -17,9 +14,11 @@ import productFormState, {
   ProductForm,
   statusState,
 } from "@store/product/productFormState";
-import { useInitialize } from "./useInitialize";
-import { useValidation } from "./useValidation";
+import { useInitialize } from "./hooks/useInitialize";
+import { useValidation } from "./hooks/useValidation";
 import MapSearchButton from "./MapSearchButton";
+import { usePostProduct } from "./hooks/usePostProduct";
+import { usePatchProduct } from "./hooks/usePatchProduct";
 
 type State = Pick<
   ProductForm,
@@ -45,7 +44,7 @@ const ProductRegisterForm = ({ initialProduct }: Props) => {
 
   useInitialize(initialProduct);
   return (
-    <Form>
+    <form className="flex flex-col gap-8">
       <StatusSelection />
       <ImageUpload
         errorInfo={errorInfo.imageFile}
@@ -97,7 +96,7 @@ const ProductRegisterForm = ({ initialProduct }: Props) => {
         <Map />
       </div>
       <SubmitButton initialProduct={initialProduct} />
-    </Form>
+    </form>
   );
 };
 
@@ -126,211 +125,49 @@ const PriceInput = ({ onChange, errorInfo, defaultValue }: PriceInputProps) => {
 // ------------------------------------------------
 
 const SubmitButton = ({ initialProduct }: Props) => {
-  const [loading, setLoading] = useState(false);
   const location = useRecoilValue(locationState);
-  const {
-    status,
-    endingAt,
-    imageFile,
-    name,
-    content,
-    tradingPlace,
-    price,
-    phoneNumber,
-  } = useRecoilValue(productFormState);
+  const productForm = useRecoilValue(productFormState);
   const { validate } = useValidation();
+  const { loading: postLoading, postProduct } = usePostProduct();
+  const { loading: patchLoading, patchProduct } = usePatchProduct();
   const onSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    validate({
-      location,
-      status,
-      imageFile,
-      name,
-      content,
-      tradingPlace,
-      price,
-      phoneNumber,
-      imageId: initialProduct?.imageId,
-    });
-    /*
-    try {
-      setLoading(true);
-      if (initialProduct) {
-        // 수정
-        if (imageFile === null) {
-          // 이미지 수정은 없음
-          if (status === "AUCTION") {
-            await axios.patch(`/api/product/${initialProduct.id}`, {
-              name,
-              price: 0,
-              endingAt,
-              phoneNumber,
-              tradingPlace,
-              status,
-              content,
-            });
-          } else {
-            await axios.patch(`/api/product/${initialProduct.id}`, {
-              name,
-              price: Number(price),
-              endingAt: null,
-              phoneNumber,
-              tradingPlace,
-              status,
-              content,
-            });
-          }
-        } else {
-          // 이미지 수정 있음
-          await axios.delete(`/api/product/image/${initialProduct.imageId}`);
-          const formData = new FormData();
-          formData.append("file", imageFile);
-          formData.append(
-            "upload_preset",
-            String(process.env.NEXT_PUBLIC_IMAGE_PRESET)
-          );
-          const response = await fetch(
-            `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUD_NAME}/image/upload`,
-            {
-              method: "POST",
-              body: formData,
-            }
-          );
-          const imageData = await response.json();
-          const { format, public_id: publicId, version } = imageData;
-          const { data } = await axios.post("/api/product/image", {
-            format,
-            publicId,
-            version: String(version),
-          });
-          if (status === "AUCTION") {
-            await axios.patch(`/api/product/${initialProduct.id}`, {
-              name,
-              price: 0,
-              endingAt,
-              phoneNumber,
-              tradingPlace,
-              imageId: data.image.id,
-              status,
-              content,
-            });
-          } else {
-            await axios.patch(`/api/product/${initialProduct.id}`, {
-              name,
-              price: Number(price),
-              endingAt: null,
-              phoneNumber,
-              tradingPlace,
-              status,
-              content,
-              imageId: data.image.id,
-            });
-          }
-        }
-        setLoading(false);
-        Router.push(
-          `/sell/products/${initialProduct.id}?alert=🎉 상품을 성공적으로 수정했습니다.`,
-          `/sell/products/${initialProduct.id}`
-        );
-      } else {
-        const formData = new FormData();
-        formData.append("file", imageFile);
-        formData.append(
-          "upload_preset",
-          String(process.env.NEXT_PUBLIC_IMAGE_PRESET)
-        );
-        const response = await fetch(
-          `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUD_NAME}/image/upload`,
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
-        const imageData = await response.json();
-        const { format, public_id: publicId, version } = imageData;
-        const { data } = await axios.post("/api/product/image", {
-          format,
-          publicId,
-          version: String(version),
-        });
-        if (status === "AUCTION") {
-          const { data: productData } = await axios.post("/api/product", {
-            name,
-            price: 0,
-            endingAt,
-            phoneNumber,
-            tradingPlace,
-            imageId: data.image.id,
-            status,
-            content,
-          });
-          const { success, product } = productData;
-          if (success) {
-            Router.push(
-              `/sell/products/${product.id}?alert=🎉 상품을 성공적으로 등록했습니다.`,
-              `/sell/products/${product.id}`
-            );
-          } else {
-            setLoading(false);
-            alert("상품 등록에 실패하였습니다. 다시 등록해주세요.");
-          }
-        } else {
-          const { data: productData } = await axios.post("/api/product", {
-            name,
-            price: Number(price),
-            endingAt: null,
-            phoneNumber,
-            tradingPlace,
-            imageId: data.image.id,
-            status,
-            content,
-          });
-          const { success, product } = productData;
-          if (success) {
-            Router.push(
-              `/sell/products/${product.id}?alert=🎉 상품을 성공적으로 등록했습니다.`,
-              `/sell/products/${product.id}`
-            );
-          } else {
-            setLoading(false);
-            alert("상품 등록에 실패하였습니다. 다시 등록해주세요.");
-          }
-        }
-      }
-    } catch (e) {
-      setLoading(false);
-      alert("상품 등록에 실패하였습니다. 다시 등록해주세요.");
+    if (
+      !validate({
+        ...productForm,
+        location,
+        imageId: initialProduct?.imageId,
+      })
+    )
+      return;
+
+    if (initialProduct) {
+      await patchProduct({
+        ...productForm,
+        id: initialProduct.id,
+        imageId: initialProduct.imageId,
+      });
+    } else {
+      await postProduct(productForm);
     }
-    */
   };
   return (
-    <Button variant="contained" type="submit" disabled={loading}>
-      {loading
-        ? initialProduct
-          ? "수정 중..."
-          : "등록 중..."
+    <Button
+      variant="contained"
+      type="submit"
+      className="bg-black my-0 mx-auto max-w-sm"
+      onClick={onSubmit}
+      disabled={postLoading || patchLoading}
+    >
+      {patchLoading
+        ? "수정 중..."
+        : postLoading
+        ? "등록 중..."
         : initialProduct
         ? "수정하기"
         : "등록하기"}
     </Button>
   );
 };
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  button[type="submit"] {
-    max-width: 400px;
-    margin: 0 auto;
-    background-color: black;
-  }
-  p.warning {
-    color: red;
-  }
-  #map {
-    margin-top: 1rem;
-  }
-`;
 
 export default ProductRegisterForm;
