@@ -30,7 +30,6 @@ model Product {
   sellerId     String    @db.ObjectId()
   imageId      String    @db.ObjectId()
   status       Status
-  likeCnt      Int       @default(0)
   endingAt     DateTime?
   createdAt    DateTime  @default(now())
 }

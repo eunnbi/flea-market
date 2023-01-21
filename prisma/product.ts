@@ -103,10 +103,31 @@ export const getAllProducts = async (
   return res;
 };
 
-export const getProductById = async (
+export const getProductById = async (id: Product["id"]) => {
+  const product = await prisma.product.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      price: true,
+      endingAt: true,
+      status: true,
+      tradingPlace: true,
+      phoneNumber: true,
+      content: true,
+      imageId: true,
+    },
+  });
+  const imageUrl = await getProductImageUrl(product!.imageId);
+  return {
+    ...product!,
+    imageUrl,
+  };
+};
+
+export const getProductDetails = async (
   id: Product["id"],
-  buyerId?: Wish["buyerId"],
-  withSeller: boolean = true
+  buyerId?: Wish["buyerId"]
 ): Promise<ProductDetailResponse> => {
   const product = await prisma.product.findUnique({
     where: { id },
