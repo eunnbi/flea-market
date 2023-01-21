@@ -31,7 +31,7 @@ export default async function handler(
             ...req.body,
             sellerId: id,
           });
-          return res.status(200).json({ success: true, product });
+          return res.status(200).json({ success: true, productId: product.id });
         }
       }
       case "GET": {

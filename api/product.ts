@@ -17,12 +17,22 @@ import {
   RatingUpdateRequest,
   RatingUpdateResponse,
   ProductGetResponse,
+  ProductCreateRequest,
+  ProductCreateResponse,
+  ProductUpdateRequest,
+  ProductUpdateResponse,
 } from "types/product";
 import { BaseAPI } from "./base";
 
 class ProductAPI extends BaseAPI {
   constructor(baseUrl: string) {
     super(baseUrl);
+  }
+  createProduct(payload: ProductCreateRequest) {
+    return axios.post<ProductCreateResponse>(this.baseUrl, payload);
+  }
+  updateProduct(id: Product["id"], payload: ProductUpdateRequest) {
+    return axios.patch<ProductUpdateResponse>(`${this.baseUrl}/${id}`, payload);
   }
   getProducts({ absoluteUrl, token }: CommonParams) {
     this.setAuthorizationHeader(token);

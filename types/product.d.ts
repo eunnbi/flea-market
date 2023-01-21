@@ -12,6 +12,13 @@ declare type ProductCreateRequest = Pick<
   | "imageId"
 >;
 
+declare type ProductCreateResponse = SuccessResponse & {
+  productId: Product["id"];
+};
+
+declare type ProductUpdateRequest = Partial<ProductCreateRequest>;
+declare type ProductUpdateResponse = ProductCreateResponse;
+
 declare type ProductItem = Pick<
   Product,
   "id" | "name" | "price" | "endingAt" | "createdAt" | "status" | "imageId"
