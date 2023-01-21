@@ -23,6 +23,7 @@ main {
 #map {
   width: 100%;
   height: 500px;
+  margin-top: 1rem;
 }
 
 #date-picker .MuiFormControl-root label,
