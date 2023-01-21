@@ -43,6 +43,7 @@ const PRICE_FILTER: { startPrice: number; lastPrice: number }[] = [
 const PriceFilter = () => {
   const [open, setOpen] = useState(false);
   const [price, setPrice] = useRecoilState(priceState);
+  const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const onClick = (e: React.MouseEvent<HTMLLIElement>) => {
     const { min, max } = e.currentTarget.dataset;
@@ -66,7 +67,7 @@ const PriceFilter = () => {
               }`
         }`}
         variant={startPrice === 0 && lastPrice === 0 ? "outlined" : "filled"}
-        onClick={() => setOpen(true)}
+        onClick={handleOpen}
         onDelete={startPrice === 0 && lastPrice === 0 ? undefined : onDelete}
         className="filterChip"
       />
