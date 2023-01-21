@@ -1,5 +1,17 @@
 import { Bidding, Product, Rating, Shopping, Wish } from "@prisma/client";
 
+declare type ProductCreateRequest = Pick<
+  Product,
+  | "name"
+  | "content"
+  | "price"
+  | "tradingPlace"
+  | "phoneNumber"
+  | "status"
+  | "endingAt"
+  | "imageId"
+>;
+
 declare type ProductItem = Pick<
   Product,
   "id" | "name" | "price" | "endingAt" | "createdAt" | "status" | "imageId"
@@ -15,7 +27,6 @@ declare type ProductItem = Pick<
 };
 
 declare type ProductsGetResponse = ProductItem[];
-declare type WishListGetResponse = ProductItem[];
 
 declare type BiddingItem = {
   id: string;
@@ -48,16 +59,32 @@ declare type ProductDetailResponse = Pick<
   rating: number;
 };
 
+declare type ProductGetResponse = Pick<
+  Product,
+  | "id"
+  | "name"
+  | "price"
+  | "endingAt"
+  | "status"
+  | "tradingPlace"
+  | "phoneNumber"
+  | "content"
+  | "imageId"
+> & {
+  imageUrl: string;
+};
+
+declare type WishListGetResponse = ProductItem[];
+declare type WishUpdateRequest = Pick<Wish, "productId"> & {
+  wish: boolean;
+};
+declare type WishUpdateResponse = SuccessResponse;
+
 declare type BiddingCreateRequest = Pick<Bidding, "productId" | "price">;
 declare type BiddingCreateResponse = SuccessResponse;
 
 declare type ShoppingCreateRequest = Pick<Shopping, "productId">;
 declare type ShoppingCreateResponse = SuccessResponse;
-
-declare type WishUpdateRequest = Pick<Wish, "productId"> & {
-  wish: boolean;
-};
-declare type WishUpdateResponse = SuccessResponse;
 
 declare type ShoppingItem = Pick<
   Product,
@@ -70,7 +97,6 @@ declare type ShoppingItem = Pick<
     name: string;
   };
 };
-
 declare type ShoppingListResponse = {
   date: Date;
   list: ShoppingItem[];
@@ -78,6 +104,5 @@ declare type ShoppingListResponse = {
 
 declare type RatingCreateRequest = Pick<Rating, "productId" | "rating">;
 declare type RatingCreateResponse = SuccessResponse;
-
 declare type RatingUpdateRequest = Pick<Rating, "productId" | "rating">;
 declare type RatingUpdateResponse = SuccessResponse;
