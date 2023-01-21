@@ -84,3 +84,9 @@
   color: red;
   font-size: 1.2rem;
 }
+
+.buttonWrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}

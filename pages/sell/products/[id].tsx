@@ -125,7 +125,7 @@ const ProductDetail = ({
           {likeCnt}
         </p>
         {status !== "PURCHASED" && (
-          <div>
+          <div className={styles.buttonWrapper}>
             <Button variant="outlined" onClick={onClickEditButton}>
               수정
             </Button>
