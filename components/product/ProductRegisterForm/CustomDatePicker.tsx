@@ -1,14 +1,12 @@
-import { noError } from "@lib/createErrorObject";
 import { TextField } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { endingAtState } from "@store/product/endingAtState";
-import { productStatusState } from "@store/product/statusState";
+import { endingAtState, statusState } from "@store/product/productFormState";
 import React from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 
 const CustomDatePicker = () => {
-  const status = useRecoilValue(productStatusState);
+  const status = useRecoilValue(statusState);
   const [date, setDate] = useRecoilState(endingAtState);
   return status !== "PROGRESS" ? (
     <div id="date-picker">

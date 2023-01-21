@@ -1,9 +1,9 @@
 import { Chip } from "@mui/material";
-import { productStatusState } from "@store/product/statusState";
+import { statusState } from "@store/product/productFormState";
 import { useRecoilState } from "recoil";
 
 const StatusSelection = () => {
-  const [status, setStatus] = useRecoilState(productStatusState);
+  const [status, setStatus] = useRecoilState(statusState);
   const toggleStatus = () => {
     setStatus((value) => (value === "AUCTION" ? "PROGRESS" : "AUCTION"));
   };

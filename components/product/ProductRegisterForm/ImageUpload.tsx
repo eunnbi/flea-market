@@ -1,9 +1,9 @@
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
-import React, { useRef } from "react";
+import React, { ChangeEvent, useRef } from "react";
 import styled from "@emotion/styled";
 import { noError } from "@lib/createErrorObject";
 import { useRecoilState } from "recoil";
-import { imageFileState } from "@store/product/imageFileState";
+import { imageFileState } from "@store/product/productFormState";
 
 interface Props {
   imageUrl?: string;
@@ -13,8 +13,11 @@ interface Props {
 const ImageUpload = ({ imageUrl, errorInfo }: Props) => {
   const ref = useRef<HTMLInputElement | null>(null);
   const [imageFile, setImageFile] = useRecoilState(imageFileState);
-  const changeImageFile = (e: any) => {
-    setImageFile(e.target.files[0]);
+  const changeImageFile = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setImageFile(e.target.files![0]);
+    }
+
     e.target.value = "";
   };
   return (

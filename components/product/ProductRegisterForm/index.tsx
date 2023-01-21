@@ -1,56 +1,41 @@
-import { noError, createErrorObject } from "@lib/createErrorObject";
-import { Button, IconButton, InputAdornment } from "@mui/material";
-import { Product } from "@prisma/client";
-import React, { useState, useCallback, useEffect } from "react";
-import CustomInput from "../common/CustomInput";
-import Map from "../common/Map";
-import dayjs from "dayjs";
+import { noError } from "@lib/createErrorObject";
+import { Button } from "@mui/material";
+import React, { useState, useCallback } from "react";
+import CustomInput from "../../common/CustomInput";
+import Map from "../../common/Map";
 import CustomDatePicker from "./CustomDatePicker";
-import { BiSearchAlt } from "react-icons/bi";
 import ImageUpload from "./ImageUpload";
 import styled from "@emotion/styled";
 import axios from "axios";
 import Router from "next/router";
-import { getImageUrl } from "@lib/getImageUrl";
-import {
-  useRecoilState,
-  useRecoilValue,
-  useResetRecoilState,
-  useSetRecoilState,
-} from "recoil";
-import { productInputState } from "@store/product/inputState";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { errorInfoState } from "@store/product/errorInfoState";
-import { locationState } from "@store/locationState";
-import { productStatusState } from "@store/product/statusState";
+import { locationState } from "@store/mapState";
 import StatusSelection from "./StatusSelection";
-import { endingAtState } from "@store/product/endingAtState";
-import { imageFileState } from "@store/product/imageFileState";
+import { ProductGetResponse } from "types/product";
+import productFormState, {
+  ProductForm,
+  statusState,
+} from "@store/product/productFormState";
+import { useInitialize } from "./useInitialize";
+import { useValidation } from "./useValidation";
+import MapSearchButton from "./MapSearchButton";
 
 type State = Pick<
-  Product,
-  "name" | "phoneNumber" | "tradingPlace" | "status" | "content"
-> & {
-  price: string;
-};
+  ProductForm,
+  "name" | "phoneNumber" | "tradingPlace" | "status" | "content" | "price"
+>;
 
 interface Props {
-  initialProduct: ProductItem | null;
+  initialProduct: ProductGetResponse | null;
 }
 
 const ProductRegisterForm = ({ initialProduct }: Props) => {
-  const [errorInfo, setErrorInfo] = useRecoilState(errorInfoState);
-  const setProductInputState = useSetRecoilState(productInputState);
-  const setLocationState = useSetRecoilState(locationState);
-  const setStatusState = useSetRecoilState(productStatusState);
-  const setEndingAtState = useSetRecoilState(endingAtState);
-  const resetProductInputState = useResetRecoilState(productInputState);
-  const resetLocationState = useResetRecoilState(locationState);
-  const resetStatusState = useResetRecoilState(productStatusState);
-  const resetEndingAtState = useResetRecoilState(endingAtState);
-  const resetImageFileState = useResetRecoilState(imageFileState);
+  const errorInfo = useRecoilValue(errorInfoState);
+  const setProductFormState = useSetRecoilState(productFormState);
   const handleChange = useCallback(
     (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setProductInputState((values) => ({
+      setProductFormState((values) => ({
         ...values,
         [prop]: event.target.value,
       }));
@@ -58,58 +43,13 @@ const ProductRegisterForm = ({ initialProduct }: Props) => {
     []
   );
 
-  const setLocationErrorInfo = useCallback((isError: boolean) => {
-    if (isError) {
-      setErrorInfo((errorInfo) => ({
-        ...errorInfo,
-        tradingPlace: createErrorObject(
-          "잘못된 주소입니다. 정확한 주소값을 입력해주세요."
-        ),
-      }));
-    } else {
-      setErrorInfo((errorInfo) => ({
-        ...errorInfo,
-        tradingPlace: noError,
-      }));
-    }
-  }, []);
-
-  useEffect(() => {
-    if (initialProduct) {
-      setProductInputState({
-        name: initialProduct.name,
-        phoneNumber: initialProduct.phoneNumber,
-        price: String(initialProduct.price),
-        tradingPlace: initialProduct.tradingPlace,
-        content: initialProduct.content,
-      });
-      setLocationState(initialProduct.tradingPlace);
-      setStatusState(initialProduct.status);
-
-      const date = new Date(String(initialProduct.endingAt));
-      setEndingAtState(
-        dayjs(
-          `${date.getFullYear()}-${
-            date.getMonth() + 1
-          }-${date.getDate()} 00:00:00`
-        )
-      );
-    } else {
-      resetProductInputState();
-      resetEndingAtState();
-      resetLocationState();
-      resetStatusState();
-    }
-    resetImageFileState();
-  }, [initialProduct]);
+  useInitialize(initialProduct);
   return (
     <Form>
       <StatusSelection />
       <ImageUpload
         errorInfo={errorInfo.imageFile}
-        imageUrl={
-          initialProduct ? getImageUrl(initialProduct.image) : undefined
-        }
+        imageUrl={initialProduct ? initialProduct.imageUrl : undefined}
       />
       <CustomInput
         label="🛍️ Product's Name"
@@ -151,33 +91,13 @@ const ProductRegisterForm = ({ initialProduct }: Props) => {
           onChange={handleChange("tradingPlace")}
           isPassword={false}
           errorInfo={errorInfo.tradingPlace}
-          icon={<SearchButton />}
+          icon={<MapSearchButton />}
           defaultValue={initialProduct?.tradingPlace}
         />
-        <Map setLocationErrorInfo={setLocationErrorInfo} />
+        <Map />
       </div>
       <SubmitButton initialProduct={initialProduct} />
     </Form>
-  );
-};
-
-// ---------------------------------------------------
-
-const SearchButton = () => {
-  const setProductInputState = useSetRecoilState(productInputState);
-  const setLocationState = useSetRecoilState(locationState);
-  const changeLocation = useCallback(() => {
-    setProductInputState((state) => {
-      setLocationState(state.tradingPlace);
-      return state;
-    });
-  }, []);
-  return (
-    <InputAdornment position="end">
-      <IconButton aria-label="search icon" edge="end" onClick={changeLocation}>
-        <BiSearchAlt />
-      </IconButton>
-    </InputAdornment>
   );
 };
 
@@ -190,7 +110,7 @@ interface PriceInputProps {
 }
 
 const PriceInput = ({ onChange, errorInfo, defaultValue }: PriceInputProps) => {
-  const status = useRecoilValue(productStatusState);
+  const status = useRecoilValue(statusState);
   return status === "PROGRESS" ? (
     <CustomInput
       label="💲Price"
@@ -207,108 +127,32 @@ const PriceInput = ({ onChange, errorInfo, defaultValue }: PriceInputProps) => {
 
 const SubmitButton = ({ initialProduct }: Props) => {
   const [loading, setLoading] = useState(false);
-  const setErrorInfo = useSetRecoilState(errorInfoState);
-  const { name, content, tradingPlace, price, phoneNumber } =
-    useRecoilValue(productInputState);
   const location = useRecoilValue(locationState);
-  const status = useRecoilValue(productStatusState);
-  const endingAt = useRecoilValue(endingAtState);
-  const imageFile = useRecoilValue(imageFileState);
+  const {
+    status,
+    endingAt,
+    imageFile,
+    name,
+    content,
+    tradingPlace,
+    price,
+    phoneNumber,
+  } = useRecoilValue(productFormState);
+  const { validate } = useValidation();
   const onSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (imageFile === null && !initialProduct?.image) {
-      setErrorInfo((errorInfo) => ({
-        ...errorInfo,
-        imageFile: createErrorObject("사진을 업로드해주세요"),
-      }));
-      return;
-    } else {
-      setErrorInfo((errorInfo) => ({
-        ...errorInfo,
-        imageFile: noError,
-      }));
-    }
-    if (name === "") {
-      setErrorInfo((errorInfo) => ({
-        ...errorInfo,
-        name: createErrorObject("상품 이름을 입력해주세요"),
-      }));
-      return;
-    } else {
-      setErrorInfo((errorInfo) => ({
-        ...errorInfo,
-        name: noError,
-      }));
-    }
-    if (content === "") {
-      setErrorInfo((errorInfo) => ({
-        ...errorInfo,
-        content: createErrorObject("상품 설명을 입력해주세요"),
-      }));
-      return;
-    } else {
-      setErrorInfo((errorInfo) => ({
-        ...errorInfo,
-        content: noError,
-      }));
-    }
-    if (phoneNumber === "") {
-      setErrorInfo((errorInfo) => ({
-        ...errorInfo,
-        phoneNumber: createErrorObject("전화번호를 입력해주세요"),
-      }));
-      return;
-    } else if (!/01[016789]-[^0][0-9]{3,4}-[0-9]{4}/.test(phoneNumber)) {
-      setErrorInfo((errorInfo) => ({
-        ...errorInfo,
-        phoneNumber: createErrorObject("전화번호 형식에 맞춰 입력해주세요"),
-      }));
-      return;
-    } else {
-      setErrorInfo((errorInfo) => ({
-        ...errorInfo,
-        phoneNumber: noError,
-      }));
-    }
-    if (tradingPlace === "") {
-      setErrorInfo((errorInfo) => ({
-        ...errorInfo,
-        tradingPlace: createErrorObject("거래 장소를 입력해주세요."),
-      }));
-      return;
-    } else if (tradingPlace !== location) {
-      setErrorInfo((errorInfo) => ({
-        ...errorInfo,
-        tradingPlace: createErrorObject("옆에 있는 돋보기 버튼을 눌러주세요."),
-      }));
-      return;
-    }
-    if (status === "PROGRESS") {
-      if (price === "") {
-        setErrorInfo((errorInfo) => ({
-          ...errorInfo,
-          price: createErrorObject("상품 가격을 입력해주세요"),
-        }));
-        return;
-      } else if (Number.isNaN(Number(price))) {
-        setErrorInfo((errorInfo) => ({
-          ...errorInfo,
-          price: createErrorObject("숫자만 입력해주세요"),
-        }));
-        return;
-      } else if (Number(price) < 0) {
-        setErrorInfo((errorInfo) => ({
-          ...errorInfo,
-          price: createErrorObject("0 이상의 가격만 가능합니다."),
-        }));
-        return;
-      } else {
-        setErrorInfo((errorInfo) => ({
-          ...errorInfo,
-          price: noError,
-        }));
-      }
-    }
+    validate({
+      location,
+      status,
+      imageFile,
+      name,
+      content,
+      tradingPlace,
+      price,
+      phoneNumber,
+      imageId: initialProduct?.imageId,
+    });
+    /*
     try {
       setLoading(true);
       if (initialProduct) {
@@ -338,7 +182,7 @@ const SubmitButton = ({ initialProduct }: Props) => {
           }
         } else {
           // 이미지 수정 있음
-          await axios.delete(`/api/product/image/${initialProduct.image.id}`);
+          await axios.delete(`/api/product/image/${initialProduct.imageId}`);
           const formData = new FormData();
           formData.append("file", imageFile);
           formData.append(
@@ -457,14 +301,10 @@ const SubmitButton = ({ initialProduct }: Props) => {
       setLoading(false);
       alert("상품 등록에 실패하였습니다. 다시 등록해주세요.");
     }
+    */
   };
   return (
-    <Button
-      variant="contained"
-      type="submit"
-      disabled={loading}
-      onClick={onSubmit}
-    >
+    <Button variant="contained" type="submit" disabled={loading}>
       {loading
         ? initialProduct
           ? "수정 중..."
@@ -483,6 +323,7 @@ const Form = styled.form`
   button[type="submit"] {
     max-width: 400px;
     margin: 0 auto;
+    background-color: black;
   }
   p.warning {
     color: red;
