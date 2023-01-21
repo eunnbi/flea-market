@@ -11,13 +11,14 @@ declare type ProductCreateRequest = Pick<
   | "endingAt"
   | "imageId"
 >;
-
 declare type ProductCreateResponse = SuccessResponse & {
   productId: Product["id"];
 };
 
 declare type ProductUpdateRequest = Partial<ProductCreateRequest>;
 declare type ProductUpdateResponse = ProductCreateResponse;
+
+declare type ProductDeleteResponse = SuccessResponse;
 
 declare type ProductItem = Pick<
   Product,

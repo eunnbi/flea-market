@@ -21,6 +21,7 @@ import {
   ProductCreateResponse,
   ProductUpdateRequest,
   ProductUpdateResponse,
+  ProductDeleteResponse,
 } from "types/product";
 import { BaseAPI } from "./base";
 
@@ -33,6 +34,9 @@ class ProductAPI extends BaseAPI {
   }
   updateProduct(id: Product["id"], payload: ProductUpdateRequest) {
     return axios.patch<ProductUpdateResponse>(`${this.baseUrl}/${id}`, payload);
+  }
+  deleteProduct(id: Product["id"]) {
+    return axios.delete<ProductDeleteResponse>(`${this.baseUrl}/${id}`);
   }
   getProducts({ absoluteUrl, token }: CommonParams) {
     this.setAuthorizationHeader(token);

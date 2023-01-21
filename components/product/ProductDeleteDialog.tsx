@@ -1,6 +1,6 @@
-import axios from "axios";
 import Router from "next/router";
 import SimpleDialog from "@components/common/SimpleDialog";
+import { productAPI } from "api/product";
 
 interface Props {
   id: string;
@@ -10,7 +10,7 @@ interface Props {
 const ProductDeleteDialog = ({ id, handleClose }: Props) => {
   const onDelete = async () => {
     try {
-      await axios.delete(`/api/product/${id}`);
+      await productAPI.deleteProduct(id);
       Router.push(`/sell?alert=✂️ 상품이 정상적으로 삭제되었습니다`, "/sell");
     } catch (e) {
       alert("상품을 삭제할 수 없습니다. 다시 시도해주세요.");
