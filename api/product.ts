@@ -1,4 +1,3 @@
-import { deleteWish } from "@db/wishlist";
 import { Product } from "@prisma/client";
 import axios from "axios";
 import {
@@ -17,6 +16,7 @@ import {
   RatingCreateResponse,
   RatingUpdateRequest,
   RatingUpdateResponse,
+  ProductGetResponse,
 } from "types/product";
 import { BaseAPI } from "./base";
 
@@ -36,23 +36,38 @@ class ProductAPI extends BaseAPI {
     this.setAuthorizationHeader(token);
     return axios.get<ProductsGetResponse>(`${this.baseUrl}?name=${name}`);
   }
+  getProductById(absoluteUrl: CommonParams["absoluteUrl"], id: Product["id"]) {
+    return axios.get<ProductGetResponse>(
+      `${this.getFullBaseUrl(absoluteUrl)}?id=${id}`
+    );
+  }
+  getProductDetails({ absoluteUrl, token }: CommonParams, id: Product["id"]) {
+    this.setAuthorizationHeader(token);
+    return axios.get<ProductDetailResponse>(
+      `${this.getFullBaseUrl(absoluteUrl)}/detail?id=${id}`
+    );
+  }
+
   getWishList({ absoluteUrl, token }: CommonParams) {
     this.setAuthorizationHeader(token);
     return axios.get<WishListGetResponse>(
       `${this.getFullBaseUrl(absoluteUrl)}/wishlist`
     );
   }
+  updateWish(payload: WishUpdateRequest) {
+    return axios.post<WishUpdateResponse>(`${this.baseUrl}/wishlist`, payload);
+  }
+
   getShoppingList({ absoluteUrl, token }: CommonParams) {
     this.setAuthorizationHeader(token);
     return axios.get<ShoppingListResponse>(
       `${this.getFullBaseUrl(absoluteUrl)}/shopping`
     );
   }
-
-  getProductDetails({ absoluteUrl, token }: CommonParams, id: Product["id"]) {
-    this.setAuthorizationHeader(token);
-    return axios.get<ProductDetailResponse>(
-      `${this.getFullBaseUrl(absoluteUrl)}?id=${id}`
+  createShopping(payload: ShoppingCreateRequest) {
+    return axios.post<ShoppingCreateResponse>(
+      `${this.baseUrl}/shopping`,
+      payload
     );
   }
 
@@ -63,21 +78,9 @@ class ProductAPI extends BaseAPI {
     );
   }
 
-  createShopping(payload: ShoppingCreateRequest) {
-    return axios.post<ShoppingCreateResponse>(
-      `${this.baseUrl}/shopping`,
-      payload
-    );
-  }
-
-  updateWish(payload: WishUpdateRequest) {
-    return axios.post<WishUpdateResponse>(`${this.baseUrl}/wishlist`, payload);
-  }
-
   createRating(payload: RatingCreateRequest) {
     return axios.post<RatingCreateResponse>(`${this.baseUrl}/rating`, payload);
   }
-
   updateRating(payload: RatingUpdateRequest) {
     return axios.patch<RatingUpdateResponse>(`${this.baseUrl}/rating`, payload);
   }
