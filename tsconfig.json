@@ -23,7 +23,8 @@
       "@db/*": ["prisma/*"],
       "@styles/*": ["styles/*"],
       "@store/*": ["store/*"],
-      "@hooks/*": ["hooks/*"]
+      "@hooks/*": ["hooks/*"],
+      "@context/*": ["context/*"]
     },
     "typeRoots": ["node_modules/@types", "@types/*"]
   },

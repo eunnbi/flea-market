@@ -2,18 +2,19 @@ import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import ThemeProvider from "@mui/material/styles/ThemeProvider";
 import { theme } from "styles/theme";
-import { createContext, useEffect } from "react";
+import { useEffect } from "react";
 import { RecoilRoot } from "recoil";
 import { Modal } from "@components/common/Modal";
 import Header from "@components/common/Header";
 import axios from "axios";
+import ToastMessage from "@components/common/ToastMessage";
+import TokenProvider from "@context/TokenProvider";
+import ToastMessageProvider from "@context/ToastMessageProvider";
 
 interface CommonPageProps {
   isLogin: boolean;
-  token?: string | null;
+  token: Token;
 }
-
-export const tokenContext = createContext<string | null | undefined>("");
 
 export default function App({
   Component,
@@ -30,14 +31,11 @@ export default function App({
     let timerId: NodeJS.Timeout;
     if (query && query.alert) {
       timerId = setTimeout(() => {
-        alert(query.alert);
         if (query.login) {
           router.replace(
             `${window.location.pathname}?login=true`,
             window.location.pathname
           );
-        } else {
-          router.replace(window.location.pathname);
         }
       }, 1000);
     }
@@ -50,11 +48,23 @@ export default function App({
   return (
     <RecoilRoot>
       <ThemeProvider theme={theme}>
-        <tokenContext.Provider value={token}>
+        <ToastMessageProvider
+          state={
+            query.alert
+              ? {
+                  show: true,
+                  message: query.alert as string,
+                }
+              : undefined
+          }
+        >
+          <ToastMessage />
+        </ToastMessageProvider>
+        <TokenProvider token={token}>
           <Header isLogin={isLogin} pathname={pathname} query={query} />
           <Component {...pageProps} />
           <Modal />
-        </tokenContext.Provider>
+        </TokenProvider>
       </ThemeProvider>
     </RecoilRoot>
   );
