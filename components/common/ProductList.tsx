@@ -9,6 +9,8 @@ import styles from "@styles/ProductList.module.css";
 import EmptyText from "./EmptyText";
 import { ProductItem } from "types/product";
 import { useEffect, useState } from "react";
+import { getStatusLabel } from "@lib/getStatusLabel";
+import { getFinalPrice } from "@lib/getFinalPrice";
 
 const ProductList = ({
   products,
@@ -113,16 +115,7 @@ const DefaultItem = ({ product }: { product: ProductItem }) => {
             blurDataURL="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg=="
           />
         </div>
-        <Chip
-          label={
-            status === "AUCTION"
-              ? "경매"
-              : status === "PROGRESS"
-              ? "판매 진행중"
-              : "판매 완료"
-          }
-          className={styles.status}
-        />
+        <Chip label={getStatusLabel(status)} className={styles.status} />
         {status === "AUCTION" && (
           <Chip label={`D-${getDiffDay(endingDate)}`} className={styles.dday} />
         )}
@@ -130,13 +123,11 @@ const DefaultItem = ({ product }: { product: ProductItem }) => {
       <div className={styles.wrapper}>
         <h3 className={styles.title}>{name}</h3>
         {!bidding ? (
-          <p className={styles.price}>{price.toLocaleString()}원</p>
+          <p className={styles.price}>{getFinalPrice({ status, price })}</p>
         ) : (
           <div className={styles.row}>
             <p className={styles.price}>
-              {bidding.maxPrice
-                ? `${bidding.maxPrice.toLocaleString()}원`
-                : "입찰 없음"}
+              {getFinalPrice({ status, price, maxPrice: bidding.maxPrice })}
             </p>
             <p className={styles.cnt}>
               <BsFillPeopleFill />

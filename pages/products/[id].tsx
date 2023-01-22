@@ -20,6 +20,8 @@ import BiddingDialog from "@components/product/BiddingDialog";
 import useModal from "@hooks/useModal";
 import BuyingDialog from "@components/product/BuyingDialog";
 import { verifyUser } from "@lib/verifyUser";
+import { getStatusLabel } from "@lib/getStatusLabel";
+import { getFinalPrice } from "@lib/getFinalPrice";
 
 const ProductDetail = ({
   token,
@@ -77,27 +79,13 @@ const ProductDetail = ({
         <section>
           <img src={imageUrl} alt={name} />
           <h2>{name}</h2>
-          {status !== "AUCTION" ? (
-            <p className={styles.price}>{price.toLocaleString()}원</p>
-          ) : (
-            <p className={styles.price}>
-              {bidding.length === 0
-                ? "입찰 없음"
-                : `${bidding[0].price.toLocaleString()}원`}
-            </p>
-          )}
+          <p className={styles.price}>
+            {getFinalPrice({ status, price, bidding })}
+          </p>
         </section>
         <section className={styles.contentBox}>
           <div className={styles.row}>
-            <Chip
-              label={
-                status === "AUCTION"
-                  ? "경매"
-                  : status === "PROGRESS"
-                  ? "판매 진행중"
-                  : "판매 완료"
-              }
-            />
+            <Chip label={getStatusLabel(status)} />
             {status === "AUCTION" && (
               <Chip label={`D-${getDiffDay(endingDate)}`} />
             )}

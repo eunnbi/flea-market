@@ -6,6 +6,8 @@ import Image from "next/image";
 import { BsFillPeopleFill } from "react-icons/bs";
 import styles from "@styles/ProductList.module.css";
 import { ProductItem } from "types/product";
+import { getStatusLabel } from "@lib/getStatusLabel";
+import { getFinalPrice } from "@lib/getFinalPrice";
 
 const WishList = ({ wishList }: { wishList: ProductItem[] }) => {
   return (
@@ -35,16 +37,7 @@ export const Item = ({ product }: { product: ProductItem }) => {
             blurDataURL="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg=="
           />
         </div>
-        <Chip
-          label={
-            status === "AUCTION"
-              ? "경매"
-              : status === "PROGRESS"
-              ? "판매 진행중"
-              : "판매 완료"
-          }
-          className={styles.status}
-        />
+        <Chip label={getStatusLabel(status)} className={styles.status} />
         {status === "AUCTION" && (
           <Chip
             label={`D-${getDiffDay(endingDate)}`}
@@ -58,13 +51,17 @@ export const Item = ({ product }: { product: ProductItem }) => {
         <h3 className={styles.title}>{name}</h3>
         <div className={styles.row}>
           {!bidding ? (
-            <p className={styles.price}>{price.toLocaleString()}원</p>
+            <p className={styles.price}>{getFinalPrice({ status, price })}</p>
           ) : (
-            <p className={styles.price}>
-              {bidding.maxPrice
-                ? `${bidding.maxPrice.toLocaleString()}원`
-                : "입찰 없음"}
-            </p>
+            <div className={styles.row}>
+              <p className={styles.price}>
+                {getFinalPrice({ status, price, maxPrice: bidding.maxPrice })}
+              </p>
+              <p className={styles.cnt}>
+                <BsFillPeopleFill />
+                <span>{bidding.cnt}</span>
+              </p>
+            </div>
           )}
           <div className={styles.row}>
             {bidding && (

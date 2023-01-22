@@ -15,6 +15,8 @@ import useModal from "@hooks/useModal";
 import ProductDeleteDialog from "@components/product/ProductDeleteDialog";
 import { productAPI } from "api/product";
 import { verifyUser } from "@lib/verifyUser";
+import { getStatusLabel } from "@lib/getStatusLabel";
+import { getFinalPrice } from "@lib/getFinalPrice";
 
 const ProductDetail = ({
   product,
@@ -58,27 +60,13 @@ const ProductDetail = ({
         <section>
           <img src={imageUrl} alt={name} />
           <h2>{name}</h2>
-          {status !== "AUCTION" ? (
-            <p className={styles.price}>{price.toLocaleString()}원</p>
-          ) : (
-            <p className={styles.price}>
-              {bidding.length === 0
-                ? "입찰 없음"
-                : `${bidding[0].price.toLocaleString()}원`}
-            </p>
-          )}
+          <p className={styles.price}>
+            {getFinalPrice({ status, price, bidding })}
+          </p>
         </section>
         <section className={styles.contentBox}>
           <div className={styles.row}>
-            <Chip
-              label={
-                status === "AUCTION"
-                  ? "경매"
-                  : status === "PROGRESS"
-                  ? "판매 진행중"
-                  : "판매 완료"
-              }
-            />
+            <Chip label={getStatusLabel(status)} />
             {status === "AUCTION" && endingAt && (
               <Chip label={`D-${getDiffDay(endingDate)}`} variant="outlined" />
             )}
@@ -122,7 +110,7 @@ const ProductDetail = ({
           <IoMdHeartEmpty className={styles.heartIcon} />
           {likeCnt}
         </p>
-        {status !== "PURCHASED" && (
+        {status !== "PURCHASED" && status !== "AUCTION_OFF" && (
           <div className={styles.buttonWrapper}>
             <Button variant="outlined" onClick={onClickEditButton}>
               수정
