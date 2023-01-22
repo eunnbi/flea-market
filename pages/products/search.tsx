@@ -31,7 +31,7 @@ const ProductsSearch = ({
   }, [name]);
   return (
     <>
-      <CustomHead title="Search Products" />
+      <CustomHead title="Search Product" />
       <main className="flex flex-col items-center gap-4">
         <SearchBar />
         <div className="flex items-center gap-4">

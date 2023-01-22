@@ -72,7 +72,7 @@ const ProductDetail = ({
   }, [tradingPlace]);
   return (
     <>
-      <CustomHead title={product.name} />
+      <CustomHead title="Product" />
       <main className={styles.main}>
         <section>
           <img src={imageUrl} alt="product" />

@@ -11,7 +11,7 @@ const MyShopping = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <>
-      <CustomHead title="My Page" />
+      <CustomHead title="Shopping List" />
       <main className="flex flex-col">
         <h1 className="text-center mb-6 font-bold text-2xl">
           {userId}님의 구매 목록

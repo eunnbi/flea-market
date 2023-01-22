@@ -53,7 +53,7 @@ const ProductDetail = ({
   };
   return (
     <>
-      <CustomHead title="Product Name" />
+      <CustomHead title="Product" />
       <main className={styles.main}>
         <section>
           <img src={imageUrl} alt="product" />

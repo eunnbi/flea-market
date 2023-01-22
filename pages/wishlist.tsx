@@ -11,7 +11,7 @@ const MyWishList = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <>
-      <CustomHead title="My Page" />
+      <CustomHead title="Wish List" />
       <main className="flex flex-col items-center max-w-screen-xl">
         <h1 className="font-bold text-2xl text-center mb-6">
           {userId}님의 위시리스트
