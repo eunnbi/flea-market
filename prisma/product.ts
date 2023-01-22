@@ -76,7 +76,6 @@ export const getAllProducts = async (
       const imageUrl = await getProductImageUrl(product.imageId);
       let isLike = undefined;
       if (userId) {
-        console.log("userId", userId);
         isLike = await getIsLike({
           productId: product.id,
           buyerId: userId,
