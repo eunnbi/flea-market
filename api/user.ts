@@ -29,14 +29,7 @@ class UserAPI extends BaseAPI {
       `${this.getFullBaseUrl(absoluteUrl)}?role=SELLER`
     );
   }
-  verify({
-    absoluteUrl,
-    token,
-  }: {
-    absoluteUrl: string;
-    token: string | undefined;
-  }) {
-    this.setAuthorizationHeader(token);
+  verify(absoluteUrl: AbsoluteUrl) {
     return axios.get<UserVerifyResponse>(
       `${absoluteUrl}${this.baseUrl}/verify`
     );

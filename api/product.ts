@@ -38,32 +38,27 @@ class ProductAPI extends BaseAPI {
   deleteProduct(id: Product["id"]) {
     return axios.delete<ProductDeleteResponse>(`${this.baseUrl}/${id}`);
   }
-  getProducts({ absoluteUrl, token }: CommonParams) {
-    this.setAuthorizationHeader(token);
+  getProducts(absoluteUrl: AbsoluteUrl) {
     return axios.get<ProductsGetResponse>(this.getFullBaseUrl(absoluteUrl));
   }
-  getSellerProducts({ absoluteUrl, token }: CommonParams) {
-    this.setAuthorizationHeader(token);
+  getSellerProducts(absoluteUrl: AbsoluteUrl) {
     return axios.get<ProductsGetResponse>(this.getFullBaseUrl(absoluteUrl));
   }
-  getProductsByName(token: CommonParams["token"], name: ProductItem["name"]) {
-    this.setAuthorizationHeader(token);
+  getProductsByName(name: ProductItem["name"]) {
     return axios.get<ProductsGetResponse>(`${this.baseUrl}?name=${name}`);
   }
-  getProductById(absoluteUrl: CommonParams["absoluteUrl"], id: Product["id"]) {
+  getProductById(absoluteUrl: AbsoluteUrl, id: Product["id"]) {
     return axios.get<ProductGetResponse>(
       `${this.getFullBaseUrl(absoluteUrl)}?id=${id}`
     );
   }
-  getProductDetails({ absoluteUrl, token }: CommonParams, id: Product["id"]) {
-    this.setAuthorizationHeader(token);
+  getProductDetails(absoluteUrl: AbsoluteUrl, id: Product["id"]) {
     return axios.get<ProductDetailResponse>(
       `${this.getFullBaseUrl(absoluteUrl)}/detail?id=${id}`
     );
   }
 
-  getWishList({ absoluteUrl, token }: CommonParams) {
-    this.setAuthorizationHeader(token);
+  getWishList(absoluteUrl: AbsoluteUrl) {
     return axios.get<WishListGetResponse>(
       `${this.getFullBaseUrl(absoluteUrl)}/wishlist`
     );
@@ -72,8 +67,7 @@ class ProductAPI extends BaseAPI {
     return axios.post<WishUpdateResponse>(`${this.baseUrl}/wishlist`, payload);
   }
 
-  getShoppingList({ absoluteUrl, token }: CommonParams) {
-    this.setAuthorizationHeader(token);
+  getShoppingList(absoluteUrl: AbsoluteUrl) {
     return axios.get<ShoppingListResponse>(
       `${this.getFullBaseUrl(absoluteUrl)}/shopping`
     );
