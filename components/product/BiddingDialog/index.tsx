@@ -11,6 +11,7 @@ import { productAPI } from "api/product";
 import Router from "next/router";
 import { useState } from "react";
 import { BiddingCreateRequest } from "types/product";
+import { useValidation } from "./useValidation";
 
 export interface Props extends Pick<BiddingCreateRequest, "productId"> {
   maxPrice: number;
@@ -20,27 +21,20 @@ export interface Props extends Pick<BiddingCreateRequest, "productId"> {
 const BiddingDialog = ({ productId, maxPrice, handleClose }: Props) => {
   const [loading, setLoading] = useState(false);
   const [price, setPrice] = useState("");
-  const [errorText, setErrorText] = useState("");
+  const { errorText, validate, initializeErrorText } = useValidation();
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPrice(e.target.value);
   };
   const onClickCancelButton = () => {
-    setErrorText("");
     setPrice("");
     setLoading(false);
+    initializeErrorText();
     handleClose();
   };
-  const onClickOkButton = async () => {
-    if (price === "") {
-      setErrorText("입찰 가격을 입력해주세요");
+  const onClickConfirmButton = async () => {
+    if (!validate({ price, maxPrice })) {
       return;
     }
-    //Suggested bidding price must be higher than the current price
-    if (Number(price) <= maxPrice) {
-      setErrorText("현재 가장 높은 입찰 가격보다 작습니다. 다시 입력해주세요");
-      return;
-    }
-    setErrorText("");
     setLoading(true);
     try {
       const { data } = await productAPI.createBidding({
@@ -53,9 +47,9 @@ const BiddingDialog = ({ productId, maxPrice, handleClose }: Props) => {
           `/products/${productId}?alert=🎉 입찰 완료되었습니다!`,
           `/products/${productId}`
         );
-        handleClose();
         setPrice("");
         setLoading(false);
+        handleClose();
       } else {
         setLoading(false);
         alert("⚠️ 입찰에 실패했습니다. 다시 시도해주세요.");
@@ -84,7 +78,7 @@ const BiddingDialog = ({ productId, maxPrice, handleClose }: Props) => {
           취소
         </Button>
         <Button
-          onClick={onClickOkButton}
+          onClick={onClickConfirmButton}
           autoFocus
           color="secondary"
           disabled={loading}
