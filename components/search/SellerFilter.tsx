@@ -25,7 +25,7 @@ const SellerFilter = ({ sellers }: { sellers: SellersGetResponse }) => {
     setSeller({ id, name });
     handleClose();
   };
-  const onDelete = () => {
+  const initialize = () => {
     setSeller({ id: "", name: "" });
   };
   return (
@@ -35,7 +35,7 @@ const SellerFilter = ({ sellers }: { sellers: SellersGetResponse }) => {
         label={`판매자 : ${seller.name}`}
         variant={seller.name === "" ? "outlined" : "filled"}
         onClick={handleOpen}
-        onDelete={seller.name === "" ? undefined : onDelete}
+        onDelete={seller.name === "" ? undefined : initialize}
         sx={{ textTransform: "capitalize" }}
         className="filterChip"
       />

@@ -51,7 +51,7 @@ const PriceFilter = () => {
     setPrice({ startPrice: Number(min), lastPrice: Number(max) });
     handleClose();
   };
-  const onDelete = () => {
+  const initialize = () => {
     setPrice({ startPrice: 0, lastPrice: 0 });
   };
   const { startPrice, lastPrice } = price;
@@ -68,7 +68,7 @@ const PriceFilter = () => {
         }`}
         variant={startPrice === 0 && lastPrice === 0 ? "outlined" : "filled"}
         onClick={handleOpen}
-        onDelete={startPrice === 0 && lastPrice === 0 ? undefined : onDelete}
+        onDelete={startPrice === 0 && lastPrice === 0 ? undefined : initialize}
         className="filterChip"
       />
       <Dialog
