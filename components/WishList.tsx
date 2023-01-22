@@ -28,7 +28,7 @@ export const Item = ({ product }: { product: ProductItem }) => {
           <Image
             className={styles.img}
             src={imageUrl}
-            alt="product thumbnail"
+            alt={name}
             fill
             sizes="250px"
             placeholder="blur"
