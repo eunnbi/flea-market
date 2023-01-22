@@ -81,4 +81,5 @@ enum Status {
   AUCTION
   PURCHASED
   PROGRESS
+  AUCTION_OFF
 }
