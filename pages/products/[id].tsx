@@ -15,9 +15,9 @@ import { useSetRecoilState } from "recoil";
 import { locationState } from "@store/mapState";
 import LikeButton from "@components/product/LikeButton";
 import TradingPlaceMap from "@components/product/TradingPlaceMap";
-import { productAPI } from "api/product";
+import { productAPI } from "@api/product";
 import BiddingDialog from "@components/product/BiddingDialog";
-import useModal from "hooks/useModal";
+import useModal from "@hooks/useModal";
 import BuyingDialog from "@components/product/BuyingDialog";
 import { verifyUser } from "@lib/verifyUser";
 

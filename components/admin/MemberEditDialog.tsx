@@ -16,7 +16,7 @@ import { useState, useEffect } from "react";
 import { useSetRecoilState } from "recoil";
 import { membersState } from "@store/admin/membersState";
 import { alertMessageState } from "@store/admin/alertMessageState";
-import { userAPI } from "api/user";
+import { userAPI } from "@api/user";
 import { UserPatchResquest } from "types/user";
 
 interface Props {

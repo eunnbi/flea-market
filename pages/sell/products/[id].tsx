@@ -11,9 +11,9 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { getDiffDay } from "@lib/getDiffDay";
 import AuctionHistory from "@components/product/AuctionHistory";
 import { RiHistoryLine } from "react-icons/ri";
-import useModal from "hooks/useModal";
+import useModal from "@hooks/useModal";
 import ProductDeleteDialog from "@components/product/ProductDeleteDialog";
-import { productAPI } from "api/product";
+import { productAPI } from "@api/product";
 import { verifyUser } from "@lib/verifyUser";
 
 const ProductDetail = ({

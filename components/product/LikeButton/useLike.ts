@@ -1,5 +1,5 @@
-import { productAPI } from "api/product";
-import { useToken } from "hooks/useToken";
+import { productAPI } from "@api/product";
+import { useToken } from "@hooks/useToken";
 import Router from "next/router";
 
 export const useLike = ({

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button, Rating } from "@mui/material";
 import EmptyText from "@components/common/EmptyText";
-import useModal from "hooks/useModal";
+import useModal from "@hooks/useModal";
 import RatingDialog from "./RatingDialog";
 import { ShoppingListResponse, ShoppingItem } from "types/product";
 import { changeDateFormat } from "@lib/datetimeFormat";

@@ -2,7 +2,7 @@ import CustomHead from "@components/common/CustomHead";
 import WishList from "@components/WishList";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
-import { productAPI } from "api/product";
+import { productAPI } from "@api/product";
 import { verifyUser } from "@lib/verifyUser";
 
 const MyWishList = ({

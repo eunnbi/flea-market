@@ -19,7 +19,7 @@ import { changeDateTimeFormat } from "@lib/datetimeFormat";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { membersState } from "@store/admin/membersState";
 import { roleFilterState } from "@store/admin/roleFilterState";
-import useModal from "hooks/useModal";
+import useModal from "@hooks/useModal";
 import MemberDeleteDialog from "./MemberDeleteDialog";
 import MemberEditDialog from "./MemberEditDialog";
 import { UsersGetResponse } from "types/user";

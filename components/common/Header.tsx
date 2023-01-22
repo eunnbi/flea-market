@@ -4,7 +4,7 @@ import Router from "next/router";
 import React, { useState } from "react";
 import LoginForm from "@components/auth/LoginForm";
 import { BiMenu } from "react-icons/bi";
-import { authAPI } from "api/auth";
+import { authAPI } from "@api/auth";
 import type { ParsedUrlQuery } from "querystring";
 
 const getHeaderInfo = (pathname: string, isLogin: boolean) => {

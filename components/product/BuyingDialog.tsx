@@ -1,5 +1,5 @@
 import SimpleDialog from "@components/common/SimpleDialog";
-import { productAPI } from "api/product";
+import { productAPI } from "@api/product";
 import Router from "next/router";
 import { ShoppingCreateRequest } from "types/product";
 

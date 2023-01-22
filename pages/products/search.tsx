@@ -10,9 +10,9 @@ import { useRecoilValue } from "recoil";
 import { priceState } from "@store/search/priceState";
 import { nameState } from "@store/search/nameState";
 import { sellerState } from "@store/search/sellerState";
-import { userAPI } from "api/user";
+import { userAPI } from "@api/user";
 import { ProductItem } from "types/product";
-import { productAPI } from "api/product";
+import { productAPI } from "@api/product";
 import { verifyUser } from "@lib/verifyUser";
 
 const ProductsSearch = ({

@@ -7,7 +7,7 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { useRecoilValue } from "recoil";
 import { statusFilterState } from "@store/statusFilterState";
 import { sortFilterState } from "@store/sortFilterState";
-import { productAPI } from "api/product";
+import { productAPI } from "@api/product";
 import { verifyUser } from "@lib/verifyUser";
 
 const Home = ({

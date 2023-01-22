@@ -1,6 +1,6 @@
 import { noError, createErrorObject } from "@lib/createErrorObject";
 import { registerFormState } from "@store/auth/registerFormState";
-import { authAPI } from "api/auth";
+import { authAPI } from "@api/auth";
 import Router from "next/router";
 import { useState, useRef } from "react";
 import { useSetRecoilState } from "recoil";

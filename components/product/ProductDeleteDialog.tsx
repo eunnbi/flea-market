@@ -1,6 +1,6 @@
 import Router from "next/router";
 import SimpleDialog from "@components/common/SimpleDialog";
-import { productAPI } from "api/product";
+import { productAPI } from "@api/product";
 
 interface Props {
   id: string;

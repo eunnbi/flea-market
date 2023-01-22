@@ -1,8 +1,8 @@
 import { ProductForm } from "@store/product/productFormState";
-import { imageAPI } from "api/image";
+import { imageAPI } from "@api/image";
+import { productAPI } from "@api/product";
 import { useState } from "react";
 import Router from "next/router";
-import { productAPI } from "api/product";
 
 export const usePostProduct = () => {
   const [loading, setLoading] = useState(false);

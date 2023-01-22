@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import Router from "next/router";
-import { productAPI } from "api/product";
+import { productAPI } from "@api/product";
 
 interface Props {
   initialRating: number;

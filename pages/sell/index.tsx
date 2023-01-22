@@ -8,7 +8,7 @@ import { useRecoilValue } from "recoil";
 import { statusFilterState } from "@store/statusFilterState";
 import { sortFilterState } from "@store/sortFilterState";
 import styles from "@styles/Main.module.css";
-import { productAPI } from "api/product";
+import { productAPI } from "@api/product";
 import { verifyUser } from "@lib/verifyUser";
 
 const mainClassName = `${styles.main} max-w-screen-xl`;

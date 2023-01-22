@@ -19,10 +19,11 @@
     "paths": {
       "@components/*": ["components/*"],
       "@lib/*": ["lib/*"],
-      "@api/*": ["pages/api/*"],
+      "@api/*": ["api/*"],
       "@db/*": ["prisma/*"],
       "@styles/*": ["styles/*"],
-      "@store/*": ["store/*"]
+      "@store/*": ["store/*"],
+      "@hooks/*": ["hooks/*"]
     },
     "typeRoots": ["node_modules/@types", "@types/*"]
   },
