@@ -1,4 +1,4 @@
-# Flea market
+# Flea Market
 
 > 2022 Fall Web Programming Lab Final Project
 
