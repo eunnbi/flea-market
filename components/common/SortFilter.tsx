@@ -1,7 +1,6 @@
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import { BiSortDown } from "react-icons/bi";
 import React, { useState } from "react";
-import styled from "@emotion/styled";
 import { useRecoilState } from "recoil";
 import { sortFilterState } from "@store/sortFilterState";
 
@@ -19,7 +18,7 @@ const SortFilter = () => {
     setAnchorEl(null);
   };
   return (
-    <Div>
+    <div className="mt-4 self-end">
       <span>{sort}</span>
       <IconButton
         id="basic-button"
@@ -42,13 +41,8 @@ const SortFilter = () => {
         <MenuItem onClick={handleClose}>최신순</MenuItem>
         <MenuItem onClick={handleClose}>좋아요순</MenuItem>
       </Menu>
-    </Div>
+    </div>
   );
 };
-
-const Div = styled.div`
-  align-self: flex-end;
-  margin-top: 1rem;
-`;
 
 export default React.memo(SortFilter);

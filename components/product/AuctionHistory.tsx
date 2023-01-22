@@ -1,4 +1,4 @@
-import { changeDateFormat } from "@lib/changeDateFormat";
+import { changeDateTimeFormat } from "@lib/datetimeFormat";
 import {
   TableContainer,
   Paper,
@@ -8,11 +8,9 @@ import {
   TableCell,
   TableBody,
 } from "@mui/material";
-import { Bidding, User } from "@prisma/client";
+import { BiddingItem } from "types/product";
 
-type Props = Bidding & User;
-
-const AuctionHistory = ({ history }: { history: Props[] }) => {
+const AuctionHistory = ({ history }: { history: BiddingItem[] }) => {
   return (
     <TableContainer
       component={Paper}
@@ -44,7 +42,7 @@ const AuctionHistory = ({ history }: { history: Props[] }) => {
                   {row.price.toLocaleString()}원
                 </TableCell>
                 <TableCell align="center">
-                  {changeDateFormat(biddingDate)}
+                  {changeDateTimeFormat(biddingDate)}
                 </TableCell>
               </TableRow>
             );

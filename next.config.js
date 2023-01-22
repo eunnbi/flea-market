@@ -1,9 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   images: {
-    domains: ['res.cloudinary.com'],
+    domains: ["res.cloudinary.com"],
+  },
+  modularizeImports: {
+    "@mui/material": {
+      transform: "@mui/material/{{member}}",
+    },
+  },
+  compiler: {
+    emotion: true,
+    removeConsole: true,
   },
 };
 

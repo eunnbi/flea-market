@@ -1,114 +1,92 @@
-import styled from "@emotion/styled";
-import { getImageUrl } from "@lib/getImageUrl";
-import { User } from "@prisma/client";
 import { BiUser } from "react-icons/bi";
 import { IoLocationOutline } from "react-icons/io5";
 import Image from "next/image";
 import Link from "next/link";
 import { Button, Rating } from "@mui/material";
-import { useSetRecoilState } from "recoil";
-import { ratingState } from "@store/ratingState";
+import EmptyText from "@components/common/EmptyText";
+import useModal from "@hooks/useModal";
+import RatingDialog from "./RatingDialog";
+import { ShoppingListResponse, ShoppingItem } from "types/product";
+import { changeDateFormat } from "@lib/datetimeFormat";
 
 const ShoppingList = ({
-  list,
-  dates,
+  shoppingList,
 }: {
-  list: ShoppingItem[];
-  dates: string[];
+  shoppingList: ShoppingListResponse;
 }) => {
-  const setRatingState = useSetRecoilState(ratingState);
+  const { openModal, closeModal } = useModal();
   const handleOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const id = e.currentTarget.dataset.itemid;
+    const id = e.currentTarget.dataset.id;
     const rating = e.currentTarget.dataset.rating;
     if (id === undefined || rating === undefined) return;
-    setRatingState({
-      open: true,
-      initialRating: Number(rating),
+    openModal(RatingDialog, {
       id,
+      initialRating: Number(rating),
+      handleClose: closeModal,
     });
   };
 
-  const newDates = [
-    ...new Set(
-      dates
-        .map((date) => new Date(date))
-        .map(
-          (date) =>
-            `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`
-        )
-    ),
-  ];
-
-  return dates.length === 0 ? (
-    <p className="emptyText">구매 목록이 없습니다.</p>
+  return shoppingList.length === 0 ? (
+    <EmptyText>구매 목록이 없습니다.</EmptyText>
   ) : (
-    <Section>
-      {newDates.map((date, index) => (
-        <article key={index}>
-          <h3>{date}</h3>
+    <section className="flex flex-col gap-4 w-full">
+      {shoppingList.map(({ date, list }) => (
+        <article key={String(date)}>
+          <h3 className="font-bold mb-4">{changeDateFormat(new Date(date))}</h3>
           <div>
-            {list
-              .filter(({ item }) => {
-                const buyingDate = new Date(item.createdAt);
-                return (
-                  `${buyingDate.getFullYear()}.${
-                    buyingDate.getMonth() + 1
-                  }.${buyingDate.getDate()}` === date
-                );
-              })
-              .map(({ item, product }) => (
-                <Item key={product.id}>
-                  <Product product={product} />
-                  {item.rating === 0 ? (
+            {list.map((product) => (
+              <div
+                key={product.id}
+                className="flex justify-between items-center mb-8 pb-4 border-b-2 border-solid border-lightGray max-sm:flex-col max-sm:gap-8"
+              >
+                <Product product={product} />
+                {product.rating === 0 ? (
+                  <Button
+                    variant="outlined"
+                    onClick={handleOpen}
+                    data-id={product.id}
+                    data-rating={product.rating}
+                  >
+                    판매자 평가하기
+                  </Button>
+                ) : (
+                  <div className="flex flex-col gap-4">
+                    <Rating
+                      defaultValue={product.rating}
+                      precision={0.5}
+                      value={product.rating}
+                      readOnly
+                    />
                     <Button
                       variant="outlined"
-                      data-itemid={item.id}
-                      data-rating={item.rating}
                       onClick={handleOpen}
+                      data-id={product.id}
+                      data-rating={product.rating}
                     >
-                      {item.rating === 0 ? "판매자 평가하기" : "평가 수정하기"}
+                      평가 수정하기
                     </Button>
-                  ) : (
-                    <RatingBox>
-                      <Rating
-                        defaultValue={item.rating}
-                        precision={0.5}
-                        value={item.rating}
-                        readOnly
-                      />
-                      <Button
-                        variant="outlined"
-                        data-itemid={item.id}
-                        data-rating={item.rating}
-                        onClick={handleOpen}
-                      >
-                        {item.rating === 0
-                          ? "판매자 평가하기"
-                          : "평가 수정하기"}
-                      </Button>
-                    </RatingBox>
-                  )}
-                </Item>
-              ))}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </article>
       ))}
-    </Section>
+    </section>
   );
 };
 
-const Product = ({
-  product,
-}: {
-  product: ProductItem & {
-    user: User;
-  };
-}) => {
-  const { id, name, price, image, user, tradingPlace } = product;
+const Product = ({ product }: { product: ShoppingItem }) => {
+  const { id, name, price, imageUrl, tradingPlace, seller } = product;
   return (
-    <Link href={`/products/${id}`} passHref>
+    <Link
+      href={`/products/${id}`}
+      passHref
+      className="flex gap-4 items-center max-sm:w-full"
+    >
       <Image
-        src={getImageUrl(image)}
+        className="w-32 h-32 object-cover rounded"
+        src={imageUrl}
         width={130}
         height={130}
         alt="product thumbnail"
@@ -116,15 +94,13 @@ const Product = ({
         blurDataURL="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg=="
       />
       <div>
-        <h4>{name}</h4>
-        <p className="price">{price.toLocaleString()}원</p>
-        <p className="row">
+        <h4 className="mb-2 font-medium capitalize">{name}</h4>
+        <p className="font-bold mb-2">{price.toLocaleString()}원</p>
+        <p className="flex items-center gap-1 mb-2 text-gray capitalize">
           <BiUser />
-          <span>
-            {user.firstName} {user.lastName}
-          </span>
+          <span>{seller.name}</span>
         </p>
-        <p className="row">
+        <p className="flex items-center gap-1 mb-2 text-gray capitalize">
           <IoLocationOutline />
           {tradingPlace}
         </p>
@@ -132,64 +108,5 @@ const Product = ({
     </Link>
   );
 };
-
-const Section = styled.section`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  h3 {
-    margin-bottom: 1rem;
-  }
-`;
-
-const Item = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid lightgray;
-  padding-bottom: 1rem;
-  a {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-  }
-  img {
-    object-fit: cover;
-    border-radius: 5px;
-  }
-  h4 {
-    font-weight: 500;
-    margin: 0;
-    margin-bottom: 8px;
-    text-transform: capitalize;
-  }
-  .price {
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-  p.row {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-bottom: 0.5rem;
-    color: gray;
-    font-size: 0.9rem;
-    text-transform: capitalize;
-  }
-  @media screen and (max-width: 420px) {
-    flex-direction: column;
-    gap: 2rem;
-    a {
-      width: 100%;
-    }
-  }
-`;
-
-const RatingBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
 
 export default ShoppingList;

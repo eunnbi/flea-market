@@ -8,44 +8,45 @@ import {
   TableBody,
   IconButton,
   Tooltip,
-  Alert,
-} from '@mui/material';
-import { User } from '@prisma/client';
-import { styled } from '@mui/material/styles';
-import { IoMdTrash } from 'react-icons/io';
-import { FaEdit } from 'react-icons/fa';
-import { tableCellClasses } from '@mui/material/TableCell';
-import { useState, useEffect } from 'react';
-import { BsArrowUpShort, BsArrowDownShort } from 'react-icons/bs';
-import { changeDateFormat } from '@lib/changeDateFormat';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { memberEditState } from '@store/admin/memberEditState';
-import { memberDeleteState } from '@store/admin/memberDeleteState';
-import { membersState } from '@store/admin/membersState';
-import { roleFilterState } from '@store/admin/roleFilterState';
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { IoMdTrash } from "react-icons/io";
+import { FaEdit } from "react-icons/fa";
+import { tableCellClasses } from "@mui/material/TableCell";
+import { useState, useEffect } from "react";
+import { BsArrowUpShort, BsArrowDownShort } from "react-icons/bs";
+import { changeDateTimeFormat } from "@lib/datetimeFormat";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { membersState } from "@store/admin/membersState";
+import { roleFilterState } from "@store/admin/roleFilterState";
+import useModal from "@hooks/useModal";
+import MemberDeleteDialog from "./MemberDeleteDialog";
+import MemberEditDialog from "./MemberEditDialog";
+import { UsersGetResponse } from "types/user";
 
-const MemberTable = ({ initialMembers }: { initialMembers: User[] }) => {
+const MemberTable = ({
+  initialMembers,
+}: {
+  initialMembers: UsersGetResponse;
+}) => {
   const [isAscending, setIsAscending] = useState(true);
   const { admin, seller, buyer } = useRecoilValue(roleFilterState);
   const [members, setMembers] = useRecoilState(membersState);
-  const setMemberDeleteState = useSetRecoilState(memberDeleteState);
-  const setMemberEditState = useSetRecoilState(memberEditState);
+  const { openModal, closeModal } = useModal();
 
   const onClickDeleteButton = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setMemberDeleteState({
-      open: true,
+    openModal(MemberDeleteDialog, {
       id: String(e.currentTarget.dataset.memberid),
+      handleClose: closeModal,
     });
   };
 
   const onClickEditButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     const id = String(e.currentTarget.dataset.memberid);
-    console.log(id);
-    const user = members.find(member => member.id === id);
+    const user = members.find((member) => member.id === id);
     if (user === undefined) return;
     const { userId, firstName, lastName, role } = user;
-    setMemberEditState({
-      open: true,
+    openModal(MemberEditDialog, {
       id,
       initialState: {
         userId,
@@ -53,6 +54,7 @@ const MemberTable = ({ initialMembers }: { initialMembers: User[] }) => {
         lastName,
         role,
       },
+      handleClose: closeModal,
     });
   };
 
@@ -68,8 +70,11 @@ const MemberTable = ({ initialMembers }: { initialMembers: User[] }) => {
             <StyledTableCell>ID</StyledTableCell>
             <StyledTableCell>Name</StyledTableCell>
             <StyledTableCell>Role</StyledTableCell>
-            <StyledTableCell onClick={() => setIsAscending(state => !state)}>
-              Create At<StyledButton>{isAscending ? <BsArrowDownShort /> : <BsArrowUpShort />}</StyledButton>
+            <StyledTableCell onClick={() => setIsAscending((state) => !state)}>
+              Create At
+              <StyledButton>
+                {isAscending ? <BsArrowDownShort /> : <BsArrowUpShort />}
+              </StyledButton>
             </StyledTableCell>
             <StyledTableCell align="center">Actions</StyledTableCell>
           </StyledTableRow>
@@ -85,33 +90,55 @@ const MemberTable = ({ initialMembers }: { initialMembers: User[] }) => {
                 return 0;
               }
             })
-            .filter(member => {
-              if (admin && member.role === 'ADMIN') return true;
-              if (seller && member.role === 'SELLER') return true;
-              if (buyer && member.role === 'BUYER') return true;
+            .filter((member) => {
+              if (admin && member.role === "ADMIN") return true;
+              if (seller && member.role === "SELLER") return true;
+              if (buyer && member.role === "BUYER") return true;
               return false;
             })
-            .map(member => (
-              <StyledTableRow key={member.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+            .map((member) => (
+              <StyledTableRow
+                key={member.id}
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              >
                 <StyledTableCell component="th" scope="row">
                   {member.userId}
                 </StyledTableCell>
-                <StyledTableCell sx={{ textTransform: 'capitalize' }}>
+                <StyledTableCell sx={{ textTransform: "capitalize" }}>
                   {member.firstName} {member.lastName}
                 </StyledTableCell>
                 <StyledTableCell
-                  color={member.role === 'ADMIN' ? 'warning' : member.role === 'SELLER' ? 'info' : 'success'}>
+                  color={
+                    member.role === "ADMIN"
+                      ? "warning"
+                      : member.role === "SELLER"
+                      ? "info"
+                      : "success"
+                  }
+                >
                   {member.role}
                 </StyledTableCell>
-                <StyledTableCell>{changeDateFormat(new Date(String(member.createdAt)))}</StyledTableCell>
+                <StyledTableCell>
+                  {changeDateTimeFormat(new Date(String(member.createdAt)))}
+                </StyledTableCell>
                 <StyledTableCell align="center">
                   <Tooltip title="edit" arrow>
-                    <IconButton size="small" data-memberid={member.id} onClick={onClickEditButton} className="margin">
+                    <IconButton
+                      size="small"
+                      data-memberid={member.id}
+                      onClick={onClickEditButton}
+                      className="margin"
+                    >
                       <FaEdit />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="delete" arrow>
-                    <IconButton size="small" data-memberid={member.id} onClick={onClickDeleteButton} className="margin">
+                    <IconButton
+                      size="small"
+                      data-memberid={member.id}
+                      onClick={onClickDeleteButton}
+                      className="margin"
+                    >
                       <IoMdTrash />
                     </IconButton>
                   </Tooltip>
@@ -126,26 +153,26 @@ const MemberTable = ({ initialMembers }: { initialMembers: User[] }) => {
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: '#222222',
+    backgroundColor: "#222222",
     color: theme.palette.common.white,
-    fontFamily: 'Pretendard',
-    fontSize: '1.1rem',
+    fontFamily: "Pretendard",
+    fontSize: "1.1rem",
   },
   [`&.${tableCellClasses.body}`]: {
-    fontSize: '1rem',
-    fontFamily: 'Pretendard',
+    fontSize: "1rem",
+    fontFamily: "Pretendard",
   },
-  'button.margin': {
-    marginLeft: '10px',
+  "button.margin": {
+    marginLeft: "10px",
   },
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
+  "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
   },
   // hide last border
-  '&:last-child td, &:last-child th': {
+  "&:last-child td, &:last-child th": {
     border: 0,
   },
 }));

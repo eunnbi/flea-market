@@ -1,12 +1,14 @@
-import styled from "@emotion/styled";
 import { getDiffDay } from "@lib/getDiffDay";
-import { getImageUrl } from "@lib/getImageUrl";
 import { getTimeForToday } from "@lib/getTimeForToday";
 import { Chip } from "@mui/material";
 import Link from "next/link";
 import { IoMdHeartEmpty, IoMdHeart } from "react-icons/io";
 import { BsFillPeopleFill } from "react-icons/bs";
 import Image from "next/image";
+import styles from "@styles/ProductList.module.css";
+import EmptyText from "./EmptyText";
+import { ProductItem } from "types/product";
+import { useEffect, useState } from "react";
 
 const ProductList = ({
   products,
@@ -23,17 +25,18 @@ const ProductList = ({
 }) => {
   return (
     <>
-      {result && <p className="result">{products.length}개의 상품</p>}
+      {result && <p className={styles.result}>{products.length}개의 상품</p>}
       {products.length === 0 ? (
         emptyText ? (
-          <p className="emptyText">{emptyText}</p>
+          <EmptyText>{emptyText}</EmptyText>
         ) : null
       ) : (
         <>
           {products.length <= 2 ? (
-            <FlexSection>
+            <section className="flex justify-center flex-wrap gap-8">
               {products.map((product) => (
-                <StyledLink
+                <Link
+                  className={styles.link}
                   href={
                     seller
                       ? `/sell/products/${product.id}`
@@ -47,13 +50,14 @@ const ProductList = ({
                   ) : (
                     <Item product={product} key={product.id} />
                   )}
-                </StyledLink>
+                </Link>
               ))}
-            </FlexSection>
+            </section>
           ) : (
-            <GridSection>
+            <section className="grid grid-cols-3 gap-8 max-lg:grid-cols-2 max-md:grid-cols-1">
               {products.map((product) => (
-                <StyledLink
+                <Link
+                  className={styles.link}
                   href={
                     seller
                       ? `/sell/products/${product.id}`
@@ -67,9 +71,9 @@ const ProductList = ({
                   ) : (
                     <Item product={product} key={product.id} />
                   )}
-                </StyledLink>
+                </Link>
               ))}
-            </GridSection>
+            </section>
           )}
         </>
       )}
@@ -77,51 +81,38 @@ const ProductList = ({
   );
 };
 
-const FlexSection = styled.section`
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 2rem;
-`;
-
-const GridSection = styled.section`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 2rem;
-  @media screen and (max-width: 920px) {
-    grid-template-columns: 1fr 1fr;
-  }
-  @media screen and (max-width: 600px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
 const DefaultItem = ({ product }: { product: ProductItem }) => {
   const {
     id,
     name,
     price,
     status,
-    image,
+    imageUrl,
     createdAt,
     likeCnt,
     endingAt,
-    wish,
-    bid,
+    isLike,
+    bidding,
   } = product;
   const endingDate = new Date(String(endingAt));
+  const [timeForToday, setTimeForToday] = useState("");
+  useEffect(() => {
+    setTimeForToday(getTimeForToday(String(createdAt)));
+  }, [createdAt]);
   return (
     <article>
-      <div className="imageBox">
-        <ImageWrapper>
+      <div className={styles.imageBox}>
+        <div className={styles.imageWrapper}>
           <Image
-            src={getImageUrl(image)}
+            className={styles.img}
+            src={imageUrl}
             alt="product thumbnail"
             fill
+            sizes="250px"
             placeholder="blur"
             blurDataURL="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg=="
           />
-        </ImageWrapper>
+        </div>
         <Chip
           label={
             status === "AUCTION"
@@ -130,40 +121,36 @@ const DefaultItem = ({ product }: { product: ProductItem }) => {
               ? "판매 진행중"
               : "판매 완료"
           }
-          className="status"
+          className={styles.status}
         />
         {status === "AUCTION" && (
-          <Chip label={`D-${getDiffDay(endingDate)}`} className="dday" />
+          <Chip label={`D-${getDiffDay(endingDate)}`} className={styles.dday} />
         )}
       </div>
-      <div className="wrapper">
-        <div>
-          <h3>{name}</h3>
-          {status != "AUCTION" ? (
-            <p className="price">{price.toLocaleString()}원</p>
-          ) : (
-            <div className="row">
-              <p className="price">
-                {bid.length === 0
-                  ? "입찰 없음"
-                  : `${Math.max(
-                      ...bid.map((elem) => elem.price)
-                    ).toLocaleString()}원`}
-              </p>
-              <p className="cnt">
-                <BsFillPeopleFill />
-                <span>{bid.length}</span>
-              </p>
-            </div>
-          )}
-        </div>
-        <div className="row">
-          <p className="date">{getTimeForToday(String(createdAt))}</p>
-          <div className="cnt">
-            {wish ? (
-              <IoMdHeart className="heart_icon" />
+      <div className={styles.wrapper}>
+        <h3 className={styles.title}>{name}</h3>
+        {!bidding ? (
+          <p className={styles.price}>{price.toLocaleString()}원</p>
+        ) : (
+          <div className={styles.row}>
+            <p className={styles.price}>
+              {bidding.maxPrice
+                ? `${bidding.maxPrice.toLocaleString()}원`
+                : "입찰 없음"}
+            </p>
+            <p className={styles.cnt}>
+              <BsFillPeopleFill />
+              <span>{bidding.cnt}</span>
+            </p>
+          </div>
+        )}
+        <div className={styles.row}>
+          <p className={styles.date}>{timeForToday}</p>
+          <div className={styles.cnt}>
+            {isLike ? (
+              <IoMdHeart className={styles.heartIcon} />
             ) : (
-              <IoMdHeartEmpty className="heart_icon" />
+              <IoMdHeartEmpty className={styles.heartIcon} />
             )}
             <span>{likeCnt}</span>
           </div>
@@ -172,66 +159,5 @@ const DefaultItem = ({ product }: { product: ProductItem }) => {
     </article>
   );
 };
-
-export const StyledLink = styled(Link)`
-  border-radius: 5px;
-  h3 {
-    font-weight: normal;
-    margin: 3px 0;
-    font-size: 1.3rem;
-    text-transform: capitalize;
-  }
-  .price {
-    font-weight: bold;
-  }
-  .date {
-    font-size: 0.9rem;
-    color: gray;
-  }
-  .row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .imageBox {
-    position: relative;
-    .status {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      z-index: 2;
-      background-color: #222222;
-      color: white;
-      height: 30px;
-    }
-    .dday {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 2;
-      background-color: #fff;
-      color: gray;
-      border: 1px solid gray;
-    }
-  }
-`;
-
-export const ImageWrapper = styled.div`
-  width: 80vmin;
-  height: 80vmin;
-  max-width: 250px;
-  max-height: 250px;
-  border-radius: 5px;
-  position: relative;
-  img {
-    border-radius: 5px;
-    object-fit: cover;
-  }
-`;
 
 export default ProductList;

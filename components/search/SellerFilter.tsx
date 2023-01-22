@@ -8,19 +8,16 @@ import {
   ListItemButton,
   ListItemText,
 } from "@mui/material";
-import { User } from "@prisma/client";
 import React, { useState } from "react";
 import { useRecoilState } from "recoil";
 import { BiUser } from "react-icons/bi";
 import { sellerState } from "@store/search/sellerState";
+import { SellersGetResponse } from "types/user";
 
-type State = User & {
-  rating: string;
-};
-
-const SellerFilter = ({ sellers }: { sellers: State[] }) => {
+const SellerFilter = ({ sellers }: { sellers: SellersGetResponse }) => {
   const [open, setOpen] = useState(false);
   const [seller, setSeller] = useRecoilState(sellerState);
+  const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const onClick = (e: React.MouseEvent<HTMLLIElement>) => {
     const { id, name } = e.currentTarget.dataset;
@@ -28,7 +25,7 @@ const SellerFilter = ({ sellers }: { sellers: State[] }) => {
     setSeller({ id, name });
     handleClose();
   };
-  const onDelete = () => {
+  const initialize = () => {
     setSeller({ id: "", name: "" });
   };
   return (
@@ -37,8 +34,8 @@ const SellerFilter = ({ sellers }: { sellers: State[] }) => {
         icon={<BiUser />}
         label={`판매자 : ${seller.name}`}
         variant={seller.name === "" ? "outlined" : "filled"}
-        onClick={() => setOpen(true)}
-        onDelete={seller.name === "" ? undefined : onDelete}
+        onClick={handleOpen}
+        onDelete={seller.name === "" ? undefined : initialize}
         sx={{ textTransform: "capitalize" }}
         className="filterChip"
       />
@@ -55,7 +52,7 @@ const SellerFilter = ({ sellers }: { sellers: State[] }) => {
               <ListItem
                 disablePadding
                 key={seller.id}
-                data-id={seller.userId}
+                data-id={seller.id}
                 data-name={`${seller.firstName} ${seller.lastName}`}
                 onClick={onClick}
               >

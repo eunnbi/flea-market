@@ -1,47 +1,30 @@
 import CustomHead from "@components/common/CustomHead";
 import ProductList from "@components/common/ProductList";
-import { useState, useEffect } from "react";
 import StatusFilter from "@components/common/StatusFilter";
 import SortFilter from "@components/common/SortFilter";
-import styled from "@emotion/styled";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
-import Header from "@components/common/Header";
 import { useRecoilValue } from "recoil";
 import { statusFilterState } from "@store/statusFilterState";
 import { sortFilterState } from "@store/sortFilterState";
+import { productAPI } from "@api/product";
+import { verifyUser } from "@lib/verifyUser";
 
 const Home = ({
-  isLogin,
-  token,
+  products,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const filter = useRecoilValue(statusFilterState);
   const sort = useRecoilValue(sortFilterState);
-  const [products, setProducts] = useState<ProductItem[] | []>([]);
-  useEffect(() => {
-    if (!isLogin) {
-      fetch(`/api/product`)
-        .then((res) => res.json())
-        .then((data) => setProducts(data));
-    } else {
-      fetch(`/api/product`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => setProducts(data));
-    }
-  }, [isLogin, token]);
+
   return (
     <>
       <CustomHead title="Home" />
-      <Header isLogin={isLogin} />
-      <Main>
-        <h1>Products</h1>
+      <main className="flex flex-col items-center max-w-screen-xl">
+        <h1 className="font-bold text-3xl mb-8">Products</h1>
         <StatusFilter />
         <SortFilter />
         <ProductList
+          emptyText="상품이 없습니다."
           products={
             sort === "최신순"
               ? products
@@ -84,68 +67,26 @@ const Home = ({
                   })
           }
         />
-      </Main>
+      </main>
     </>
   );
 };
 
-const Main = styled.main`
-  max-width: 1200px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  h1 {
-    margin-bottom: 2rem;
-  }
-`;
-
 export const getServerSideProps = async ({
   req,
 }: GetServerSidePropsContext) => {
-  const { cookies } = req;
-  const baseUrl = getAbsoluteUrl(req);
-  const response = await fetch(`${baseUrl}/api/user/verify`, {
-    headers: {
-      Authorization: cookies.access_token
-        ? `Bearer ${cookies.access_token}`
-        : "Bearer",
-    },
+  const absoluteUrl = getAbsoluteUrl(req);
+  const { redirect, isLogin, token } = await verifyUser(req, {
+    role: "BUYER",
+    login: false,
   });
-  const { verify, user } = await response.json();
-  if (verify) {
-    if (user.role === "SELLER") {
-      return {
-        redirect: {
-          destination: "/sell",
-          permanent: false,
-        },
-      };
-    }
-    if (user.role === "ADMIN") {
-      return {
-        redirect: {
-          destination: "/admin",
-          permanent: false,
-        },
-      };
-    }
-    const response = await fetch(`${baseUrl}/api/product`, {
-      headers: {
-        Authorization: `Bearer ${cookies.access_token}`,
-      },
-    });
-    const data = await response.json();
+  if (redirect) {
     return {
-      props: {
-        isLogin: verify,
-        token: cookies.access_token,
-        data,
-      },
+      redirect,
     };
   }
-  const res = await fetch(`${baseUrl}/api/product`);
-  const data = await res.json();
-  return { props: { isLogin: verify, token: null, data } };
+  const { data: products } = await productAPI.getProducts(absoluteUrl);
+  return { props: { isLogin, products } };
 };
 
 export default Home;

@@ -1,29 +1,24 @@
 import CustomHead from "@components/common/CustomHead";
-import { getImageUrl } from "@lib/getImageUrl";
 import Router from "next/router";
-import { useState } from "react";
 import styles from "@styles/ProductDetail.module.css";
 import { IoLocationOutline, IoCallOutline } from "react-icons/io5";
 import { FaRegComment } from "react-icons/fa";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { BsCalendarDate } from "react-icons/bs";
 import { Button, Chip } from "@mui/material";
-import SimpleDialog from "@components/common/SimpleDialog";
-import axios from "axios";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
-import Header from "@components/common/Header";
 import { getDiffDay } from "@lib/getDiffDay";
 import AuctionHistory from "@components/product/AuctionHistory";
 import { RiHistoryLine } from "react-icons/ri";
+import useModal from "@hooks/useModal";
 import ProductDeleteDialog from "@components/product/ProductDeleteDialog";
-import { useSetRecoilState } from "recoil";
-import { productDeleteState } from "@store/product/deleteState";
+import { productAPI } from "@api/product";
+import { verifyUser } from "@lib/verifyUser";
 
 const ProductDetail = ({
   product,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const setProductDeleteState = useSetRecoilState(productDeleteState);
   const {
     id,
     name,
@@ -31,14 +26,15 @@ const ProductDetail = ({
     tradingPlace,
     endingAt,
     status,
-    image,
+    imageUrl,
     content,
     likeCnt,
     phoneNumber,
-    bid,
+    bidding,
     rating,
   } = product;
   const endingDate = new Date(String(endingAt));
+  const { openModal, closeModal } = useModal();
   const onClickEditButton = () =>
     Router.push(
       {
@@ -50,23 +46,25 @@ const ProductDetail = ({
       "/sell/register"
     );
   const onClickDeleteButton = () => {
-    setProductDeleteState({ open: true, id });
+    openModal(ProductDeleteDialog, {
+      id,
+      handleClose: closeModal,
+    });
   };
   return (
     <>
-      <CustomHead title="Product Name" />
-      <Header isLogin={true} />
+      <CustomHead title="Product" />
       <main className={styles.main}>
         <section>
-          <img src={getImageUrl(image)} alt="product" />
+          <img src={imageUrl} alt="product" />
           <h2>{name}</h2>
           {status !== "AUCTION" ? (
             <p className={styles.price}>{price.toLocaleString()}원</p>
           ) : (
             <p className={styles.price}>
-              {bid.length === 0
+              {bidding.length === 0
                 ? "입찰 없음"
-                : `${bid[0].price.toLocaleString()}원`}
+                : `${bidding[0].price.toLocaleString()}원`}
             </p>
           )}
         </section>
@@ -92,8 +90,9 @@ const ProductDetail = ({
             <p className={styles.content}>
               <BsCalendarDate />
               <span>
-                {endingDate.getFullYear()}-{endingDate.getMonth() + 1}-
-                {endingDate.getDate()}
+                {endingDate.getFullYear()}-
+                {(endingDate.getMonth() + 1).toString().padStart(2, "0")}-
+                {endingDate.getDate().toString().padStart(2, "0")}
               </span>
             </p>
           )}
@@ -113,18 +112,18 @@ const ProductDetail = ({
             <div className={styles.contentStart}>
               <RiHistoryLine />
               <div className={styles.bidTable}>
-                <span>입찰목록 ({bid.length})</span>
-                <AuctionHistory history={bid} />
+                <span>입찰목록 ({bidding.length})</span>
+                <AuctionHistory history={bidding} />
               </div>
             </div>
           )}
         </section>
         <p className={styles.likeCnt}>
-          <IoMdHeartEmpty className="heart_icon" />
+          <IoMdHeartEmpty className={styles.heartIcon} />
           {likeCnt}
         </p>
         {status !== "PURCHASED" && (
-          <div>
+          <div className={styles.buttonWrapper}>
             <Button variant="outlined" onClick={onClickEditButton}>
               수정
             </Button>
@@ -134,7 +133,6 @@ const ProductDetail = ({
           </div>
         )}
       </main>
-      <ProductDeleteDialog />
     </>
   );
 };
@@ -143,41 +141,23 @@ export const getServerSideProps = async ({
   req,
   query,
 }: GetServerSidePropsContext) => {
-  const { cookies } = req;
-  const baseUrl = getAbsoluteUrl(req);
-  const res = await fetch(`${baseUrl}/api/user/verify`, {
-    headers: {
-      Authorization: cookies.access_token
-        ? `Bearer ${cookies.access_token}`
-        : "Bearer",
-    },
+  const absoluteUrl = getAbsoluteUrl(req);
+  const { redirect, isLogin, token } = await verifyUser(req, {
+    role: "SELLER",
   });
-  const { verify, user } = await res.json();
-  if (verify) {
-    if (user.role === "ADMIN") {
-      return {
-        redirect: {
-          destination: "/admin",
-          permanent: false,
-        },
-      };
-    }
-    if (user.role === "SELLER") {
-      const response = await fetch(
-        `${baseUrl}/api/product?id=${query.id as string}`
-      );
-      const product = await response.json();
-      return {
-        props: {
-          product,
-        },
-      };
-    }
+  if (redirect) {
+    return {
+      redirect,
+    };
   }
+  const { data: product } = await productAPI.getProductDetails(
+    absoluteUrl,
+    query.id as string
+  );
   return {
-    redirect: {
-      destination: "/",
-      permanent: false,
+    props: {
+      product,
+      isLogin,
     },
   };
 };

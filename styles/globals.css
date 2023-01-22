@@ -1,71 +1,29 @@
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.6/dist/web/static/pretendard.css');
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.6/dist/web/static/pretendard.css");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --vh: 100%;
   --hh: 80px;
 }
 
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: Pretendard, sans-serif;
-  height: calc(100vh - var(--hh));
-}
-
-#__next {
-  min-height: 100%;
-  position: relative;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
 * {
   box-sizing: border-box;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-p {
-  margin: 0;
-}
-
-input,
-button {
   font-family: Pretendard, sans-serif !important;
 }
 
-ul,
-li,
-ol {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
 main {
-  max-width: 1020px;
+  max-width: 920px;
   margin: 0 auto;
-  padding: 3rem 1rem 8rem;
   margin-top: var(--hh) !important;
-}
-
-button {
-  cursor: pointer;
-  background-color: transparent;
-  border: none;
-  padding: 0;
+  padding: 2rem 1rem 3rem;
 }
 
 #map {
   width: 100%;
   height: 500px;
+  margin-top: 1rem;
 }
 
 #date-picker .MuiFormControl-root label,
@@ -74,30 +32,13 @@ button {
   -webkit-text-fill-color: #000;
 }
 
-.heart_icon {
-  color: red;
-  font-size: 1.2rem;
-}
-
-.cnt {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  margin-left: 6px;
-}
-
-.emptyText {
-  text-align: center;
-  color: gray;
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .MuiChip-root {
   font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
 .filterChip {
   font-size: 0.9rem;
 }
@@ -116,7 +57,7 @@ button {
     font-size: 12px;
   }
   :root {
-    --hh: 60px;
+    --hh: 66px;
   }
 }
 

@@ -1,27 +1,40 @@
-import { User } from '@prisma/client';
-import prisma from './prisma';
+import { User } from "@prisma/client";
+import prisma from "./prisma";
+import { getSellerRating } from "./rating";
 
 // READ
 export const getAllUsers = async () => {
-  const users = await prisma.user.findMany({});
+  const users = await prisma.user.findMany({
+    select: {
+      id: true,
+      userId: true,
+      firstName: true,
+      lastName: true,
+      role: true,
+      createdAt: true,
+    },
+  });
   return users;
 };
 
-export const getUserById = async (id: User['id']) => {
+export const getUserById = async (id: User["id"]) => {
   const user = await prisma.user.findUnique({
     where: { id },
   });
   return user;
 };
 
-export const getUserByUserId = async (userId: User['userId']) => {
+export const getUserByUserId = async (userId: User["userId"]) => {
   const user = await prisma.user.findUnique({
     where: { userId },
   });
   return user;
 };
 
-export const getUserByLogin = async ({ userId, password }: Pick<User, 'userId' | 'password'>) => {
+export const getUserByLogin = async ({
+  userId,
+  password,
+}: Pick<User, "userId" | "password">) => {
   const user = await prisma.user.findFirst({
     where: {
       userId,
@@ -31,29 +44,26 @@ export const getUserByLogin = async ({ userId, password }: Pick<User, 'userId' |
   return user;
 };
 
-export const getUsersByRole = async (role: User['role']) => {
+export const getUsersByRole = async (role: User["role"]) => {
   const users = await prisma.user.findMany({
     where: { role },
+    select: {
+      id: true,
+      userId: true,
+      firstName: true,
+      lastName: true,
+    },
   });
-  if (role === 'SELLER') {
+  if (role === "SELLER") {
     const res = await Promise.all(
-      users.map(user => {
-        return getSellerWithRating(user);
-      }),
+      users.map(async (user) => {
+        const rating = await getSellerRating(user.id);
+        return { ...user, rating };
+      })
     );
     return res;
   }
   return users;
-};
-
-const getSellerWithRating = async (user: User) => {
-  const res = await prisma.shopping.findMany({
-    where: { sellerId: user.userId },
-    select: { rating: true },
-  });
-  if (res.length === 0) return { ...user, rating: 0 };
-  const rating = res.reduce((acc, cur) => acc + cur.rating, 0) / res.length;
-  return { ...user, rating: rating.toFixed(1) };
 };
 
 // CREATE
@@ -63,7 +73,7 @@ export const createUser = async ({
   userId,
   password,
   role,
-}: Pick<User, 'firstName' | 'lastName' | 'userId' | 'password' | 'role'>) => {
+}: Pick<User, "firstName" | "lastName" | "userId" | "password" | "role">) => {
   const user = await prisma.user.create({
     data: {
       firstName,
@@ -77,7 +87,7 @@ export const createUser = async ({
 };
 
 // UPDATE
-export const updateUser = async (id: User['id'], updateData: Partial<User>) => {
+export const updateUser = async (id: User["id"], updateData: Partial<User>) => {
   const user = await prisma.user.update({
     where: {
       id,
@@ -90,7 +100,7 @@ export const updateUser = async (id: User['id'], updateData: Partial<User>) => {
 };
 
 // DELETE
-export const deleteUser = async (id: User['id']) => {
+export const deleteUser = async (id: User["id"]) => {
   const user = await prisma.user.delete({
     where: {
       id,

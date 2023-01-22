@@ -1,39 +1,29 @@
 import CustomHead from "@components/common/CustomHead";
 import ProductList from "@components/common/ProductList";
-import { useState, useEffect } from "react";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import StatusFilter from "@components/common/StatusFilter";
 import SortFilter from "@components/common/SortFilter";
-import styled from "@emotion/styled";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
-import Header from "@components/common/Header";
 import { useRecoilValue } from "recoil";
 import { statusFilterState } from "@store/statusFilterState";
 import { sortFilterState } from "@store/sortFilterState";
+import styles from "@styles/Main.module.css";
+import { productAPI } from "@api/product";
+import { verifyUser } from "@lib/verifyUser";
+
+const mainClassName = `${styles.main} max-w-screen-xl`;
 
 const Sell = ({
-  token,
-  data,
-  user,
+  products,
+  userId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const filter = useRecoilValue(statusFilterState);
   const sort = useRecoilValue(sortFilterState);
-  const [products, setProducts] = useState<ProductItem[]>(data);
-  useEffect(() => {
-    fetch(`/api/product`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => setProducts(data));
-  }, [token]);
   return (
     <>
       <CustomHead title="Home" />
-      <Header isLogin={true} />
-      <Main>
-        <h1>{user.userId}님의 상품들</h1>
+      <main className={mainClassName}>
+        <h1 className="font-bold text-3xl mb-8">{userId}님의 상품들</h1>
         <StatusFilter />
         <SortFilter />
         <ProductList
@@ -81,64 +71,26 @@ const Sell = ({
                   })
           }
         />
-      </Main>
+      </main>
     </>
   );
 };
 
-const Main = styled.main`
-  max-width: 1200px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: calc(100vh - var(--hh));
-  h1 {
-    margin-bottom: 2rem;
-  }
-  @media screen and (max-width: 620px) {
-    min-height: calc(var(--vh, 1vh) * 100 - var(--hh));
-  }
-`;
-
 export const getServerSideProps = async ({
   req,
 }: GetServerSidePropsContext) => {
-  const { cookies } = req;
-  const baseUrl = getAbsoluteUrl(req);
-  const res = await fetch(`${baseUrl}/api/user/verify`, {
-    headers: {
-      Authorization: cookies.access_token
-        ? `Bearer ${cookies.access_token}`
-        : "Bearer",
-    },
+  const absoluteUrl = getAbsoluteUrl(req);
+  const { redirect, isLogin, token, user } = await verifyUser(req, {
+    role: "SELLER",
   });
-  const { verify, user } = await res.json();
-  if (verify) {
-    if (user.role === "ADMIN") {
-      return {
-        redirect: {
-          destination: "/admin",
-          permanent: false,
-        },
-      };
-    }
-    if (user.role === "SELLER") {
-      const response = await fetch(`${baseUrl}/api/product`, {
-        headers: {
-          Authorization: `Bearer ${cookies.access_token}`,
-        },
-      });
-      const data = await response.json();
-      return {
-        props: { token: cookies.access_token, data, user },
-      };
-    }
+  if (redirect) {
+    return {
+      redirect,
+    };
   }
+  const { data: products } = await productAPI.getSellerProducts(absoluteUrl);
   return {
-    redirect: {
-      destination: "/",
-      permanent: false,
-    },
+    props: { products, userId: user!.userId, isLogin },
   };
 };
 

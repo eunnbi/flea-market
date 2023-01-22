@@ -1,4 +1,3 @@
-import styled from "@emotion/styled";
 import { IconButton, Input } from "@mui/material";
 import { nameState } from "@store/search/nameState";
 import React, { useState } from "react";
@@ -7,8 +6,8 @@ import { IoCloseCircle } from "react-icons/io5";
 import { useRecoilState } from "recoil";
 
 const SearchBar = () => {
-  const [input, setInput] = useState("");
   const [name, setName] = useRecoilState(nameState);
+  const [input, setInput] = useState(name);
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.currentTarget.value);
   };
@@ -20,8 +19,9 @@ const SearchBar = () => {
     setInput("");
   };
   return (
-    <Div>
+    <div className="max-w-3xl w-full flex items-center gap-4">
       <Input
+        className="flex-1"
         placeholder="상품 이름 검색"
         onChange={onChange}
         value={input}
@@ -34,24 +34,10 @@ const SearchBar = () => {
         }
       />
       <IconButton onClick={onClickSearchButton}>
-        <BiSearchAlt />
+        <BiSearchAlt className="text-xl" />
       </IconButton>
-    </Div>
+    </div>
   );
 };
-
-const Div = styled.div`
-  max-width: 720px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  & > div {
-    flex-grow: 1;
-  }
-  svg {
-    font-size: 1.5rem;
-  }
-`;
 
 export default React.memo(SearchBar);

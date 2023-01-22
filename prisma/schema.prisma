@@ -27,10 +27,9 @@ model Product {
   tradingPlace String
   content      String
   phoneNumber  String
-  sellerId     String
+  sellerId     String    @db.ObjectId()
   imageId      String    @db.ObjectId()
   status       Status
-  likeCnt      Int       @default(0)
   endingAt     DateTime?
   createdAt    DateTime  @default(now())
 }
@@ -46,26 +45,31 @@ model Bidding {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   price     Int
   productId String   @db.ObjectId()
-  bidderId  String 
+  bidderId  String   @db.ObjectId()
   createdAt DateTime @default(now())
 }
 
 model Wish {
   id        String @id @default(auto()) @map("_id") @db.ObjectId
   productId String @db.ObjectId()
-  buyerId   String
+  buyerId   String @db.ObjectId()
 }
 
 model Shopping {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   price     Int
   productId String   @unique @db.ObjectId
-  buyerId   String
-  sellerId  String
-  rating    Float    @default(0.0)
+  buyerId   String   @db.ObjectId()
+  sellerId  String   @db.ObjectId()
   createdAt DateTime @default(now())
 }
 
+model Rating {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId String   @unique @db.ObjectId
+  rating    Float    @default(0.0)
+  sellerId  String   @db.ObjectId()
+}
 
 enum Role {
   ADMIN

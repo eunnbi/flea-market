@@ -1,4 +1,3 @@
-import styled from "@emotion/styled";
 import {
   Button,
   Dialog,
@@ -44,6 +43,7 @@ const PRICE_FILTER: { startPrice: number; lastPrice: number }[] = [
 const PriceFilter = () => {
   const [open, setOpen] = useState(false);
   const [price, setPrice] = useRecoilState(priceState);
+  const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const onClick = (e: React.MouseEvent<HTMLLIElement>) => {
     const { min, max } = e.currentTarget.dataset;
@@ -51,7 +51,7 @@ const PriceFilter = () => {
     setPrice({ startPrice: Number(min), lastPrice: Number(max) });
     handleClose();
   };
-  const onDelete = () => {
+  const initialize = () => {
     setPrice({ startPrice: 0, lastPrice: 0 });
   };
   const { startPrice, lastPrice } = price;
@@ -67,8 +67,8 @@ const PriceFilter = () => {
               }`
         }`}
         variant={startPrice === 0 && lastPrice === 0 ? "outlined" : "filled"}
-        onClick={() => setOpen(true)}
-        onDelete={startPrice === 0 && lastPrice === 0 ? undefined : onDelete}
+        onClick={handleOpen}
+        onDelete={startPrice === 0 && lastPrice === 0 ? undefined : initialize}
         className="filterChip"
       />
       <Dialog
@@ -105,19 +105,19 @@ const PriceFilter = () => {
             ))}
           </List>
         </DialogContent>
-        <Inputs handleClose={handleClose} />
+        <PriceInputs handleClose={handleClose} />
       </Dialog>
     </>
   );
 };
 
-const Inputs = ({ handleClose }: { handleClose: () => void }) => {
+const PriceInputs = ({ handleClose }: { handleClose: () => void }) => {
   const setPrice = useSetRecoilState(priceState);
+  const [errorText, setErrorText] = useState("");
   const [inputs, setInputs] = useState({
     min: "",
     max: "",
   });
-  const [errorText, setErrorText] = useState("");
   const handleChange =
     (type: "min" | "max") => (e: React.ChangeEvent<HTMLInputElement>) => {
       setInputs((inputs) => ({
@@ -143,7 +143,7 @@ const Inputs = ({ handleClose }: { handleClose: () => void }) => {
   };
   return (
     <>
-      <Div>
+      <div className="flex items-center gap-4 px-5">
         <OutlinedInput
           sx={{ width: "150px" }}
           type="number"
@@ -155,7 +155,7 @@ const Inputs = ({ handleClose }: { handleClose: () => void }) => {
           type="number"
           onChange={handleChange("max")}
         />
-      </Div>
+      </div>
       {errorText && (
         <FormHelperText sx={{ padding: "0 20px" }} error>
           {errorText}
@@ -167,12 +167,5 @@ const Inputs = ({ handleClose }: { handleClose: () => void }) => {
     </>
   );
 };
-
-const Div = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0 20px;
-`;
 
 export default React.memo(PriceFilter);

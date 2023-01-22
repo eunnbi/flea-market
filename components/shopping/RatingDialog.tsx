@@ -7,37 +7,38 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import { ratingState } from "@store/ratingState";
-import { useRecoilState } from "recoil";
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState } from "react";
 import Router from "next/router";
+import { productAPI } from "@api/product";
 
-const RatingDialog = () => {
+interface Props {
+  initialRating: number;
+  id: string;
+  handleClose: () => void;
+}
+
+const RatingDialog = ({ initialRating, id, handleClose }: Props) => {
   const [loading, setLoading] = useState(false);
   const [errorText, setErrorText] = useState("");
-  const [rating, setRating] = useState(0);
-  const [{ open, id, initialRating }, setRatingState] =
-    useRecoilState(ratingState);
-  const handleClose = () => {
-    setRatingState({
-      open: false,
-      initialRating: 0,
-      id: "",
-    });
-    setErrorText("");
-  };
+  const [rating, setRating] = useState(initialRating);
   const onConfirm = async () => {
     if (rating === 0) {
       setErrorText("0점 평가는 불가합니다.");
       return;
     }
-
     try {
       setLoading(true);
-      const { data } = await axios.patch(`/api/product/buy/${id}`, {
-        rating,
-      });
+      if (initialRating === 0) {
+        await productAPI.createRating({
+          productId: id,
+          rating,
+        });
+      } else {
+        await productAPI.updateRating({
+          productId: id,
+          rating,
+        });
+      }
       setLoading(false);
       handleClose();
       Router.replace("/shopping");
@@ -46,12 +47,9 @@ const RatingDialog = () => {
       handleClose();
     }
   };
-  useEffect(() => {
-    setRating(initialRating);
-  }, [initialRating]);
   return (
     <Dialog
-      open={open}
+      open={true}
       onClose={handleClose}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"

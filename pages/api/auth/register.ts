@@ -1,13 +1,16 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { createUser } from '@db/user';
+import { NextApiRequest, NextApiResponse } from "next";
+import { createUser } from "@db/user";
 
-export default async function register(req: NextApiRequest, res: NextApiResponse) {
+export default async function register(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   try {
     switch (req.method) {
-      case 'POST': {
+      case "POST": {
         // Create a new user
         const user = await createUser(req.body);
-        return res.status(200).json({ success: true, user });
+        return res.status(200).json({ success: true });
       }
       default:
         break;

@@ -1,14 +1,11 @@
 import React, { useEffect } from "react";
 import Script from "next/script";
-import { useRecoilValue, useResetRecoilState } from "recoil";
-import { locationState } from "@store/locationState";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { locationState, mapState } from "@store/mapState";
 
-interface Props {
-  setLocationErrorInfo?: (isError: boolean) => void;
-}
-
-function Map({ setLocationErrorInfo }: Props) {
+function Map() {
   const location = useRecoilValue(locationState);
+  const setMapState = useSetRecoilState(mapState);
   const onLoadKakaoMap = () => {
     if (!window.kakao || !window.kakao.maps || !window.kakao.maps.services)
       return;
@@ -49,9 +46,9 @@ function Map({ setLocationErrorInfo }: Props) {
             position: markerPosition,
           });
           marker.setMap(map);
-          if (setLocationErrorInfo) setLocationErrorInfo(false);
+          setMapState((state) => ({ ...state, isError: false }));
         } else {
-          if (setLocationErrorInfo) setLocationErrorInfo(true);
+          setMapState((state) => ({ ...state, isError: true }));
         }
       });
     }

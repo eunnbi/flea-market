@@ -1,0 +1,81 @@
+.result {
+  color: gray;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.link {
+  border-radius: 5px;
+}
+
+.title {
+  font-weight: normal;
+  font-size: 1.3rem;
+  text-transform: capitalize;
+}
+
+.price {
+  font-weight: bold;
+  margin-bottom: 1px;
+}
+
+.date {
+  font-size: 0.9rem;
+  color: gray;
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.wrapper {
+  display: flex;
+  flex-direction: column;
+}
+.imageBox {
+  position: relative;
+}
+.status {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 2;
+  background-color: #222222;
+  color: white;
+  height: 30px;
+}
+.dday {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  background-color: #fff;
+  color: gray;
+  border: 1px solid gray;
+}
+
+.cnt {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 6px;
+}
+
+.heartIcon {
+  color: red;
+  font-size: 1.2rem;
+}
+
+.imageWrapper {
+  width: 80vmin;
+  height: 80vmin;
+  max-width: 250px;
+  max-height: 250px;
+  border-radius: 5px;
+  position: relative;
+}
+
+.img {
+  border-radius: 5px;
+  object-fit: cover;
+}

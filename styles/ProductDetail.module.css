@@ -11,6 +11,8 @@
   font-weight: normal;
   text-align: center;
   margin-top: 5px;
+  font-size: 1.5rem;
+  text-transform: capitalize;
 }
 
 .contentBox {
@@ -30,7 +32,7 @@
   font-weight: bold;
   text-align: center;
   font-size: 1.2rem;
-  margin-top: 0.5rem;
+  margin-top: 0.1rem;
 }
 
 .content {
@@ -47,9 +49,6 @@
   gap: 10px;
   font-size: 1.05rem;
   width: 100%;
-}
-.content svg {
-  margin-top: 3px;
 }
 
 .contentStart svg {
@@ -68,25 +67,26 @@
   width: 100%;
 }
 
-.main > div {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
 .likeCnt {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 5px;
   font-size: 1rem;
-}
-
-.likeCnt svg {
-  margin-top: 2px;
 }
 
 .row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.heartIcon {
+  color: red;
+  font-size: 1.2rem;
+}
+
+.buttonWrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
