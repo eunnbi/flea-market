@@ -4,28 +4,26 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import StatusFilter from "@components/common/StatusFilter";
 import SortFilter from "@components/common/SortFilter";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
-import Header from "@components/common/Header";
 import { useRecoilValue } from "recoil";
 import { statusFilterState } from "@store/statusFilterState";
 import { sortFilterState } from "@store/sortFilterState";
 import styles from "@styles/Main.module.css";
-import { userAPI } from "api/user";
 import { productAPI } from "api/product";
+import { verifyUser } from "@lib/verifyUser";
 
 const mainClassName = `${styles.main} max-w-screen-xl`;
 
 const Sell = ({
   products,
-  user,
+  userId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const filter = useRecoilValue(statusFilterState);
   const sort = useRecoilValue(sortFilterState);
   return (
     <>
       <CustomHead title="Home" />
-      <Header isLogin={true} />
       <main className={mainClassName}>
-        <h1 className="font-bold text-3xl mb-8">{user.userId}님의 상품들</h1>
+        <h1 className="font-bold text-3xl mb-8">{userId}님의 상품들</h1>
         <StatusFilter />
         <SortFilter />
         <ProductList
@@ -81,38 +79,18 @@ const Sell = ({
 export const getServerSideProps = async ({
   req,
 }: GetServerSidePropsContext) => {
-  const { cookies } = req;
   const absoluteUrl = getAbsoluteUrl(req);
-  const token = cookies.access_token;
-  const { data } = await userAPI.verify({
-    absoluteUrl,
-    token,
+  const { redirect, isLogin, token, user } = await verifyUser(req, {
+    role: "SELLER",
   });
-  const { verify, user } = data;
-  if (verify && user) {
-    if (user.role === "ADMIN") {
-      return {
-        redirect: {
-          destination: "/admin",
-          permanent: false,
-        },
-      };
-    }
-    if (user.role === "SELLER") {
-      const { data: products } = await productAPI.getSellerProducts({
-        absoluteUrl,
-        token,
-      });
-      return {
-        props: { products, user },
-      };
-    }
+  if (redirect) {
+    return {
+      redirect,
+    };
   }
+  const { data: products } = await productAPI.getSellerProducts(absoluteUrl);
   return {
-    redirect: {
-      destination: "/",
-      permanent: false,
-    },
+    props: { products, userId: user!.userId, isLogin },
   };
 };
 

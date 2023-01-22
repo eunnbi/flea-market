@@ -8,14 +8,13 @@ import { BsCalendarDate } from "react-icons/bs";
 import { Button, Chip } from "@mui/material";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
-import Header from "@components/common/Header";
 import { getDiffDay } from "@lib/getDiffDay";
 import AuctionHistory from "@components/product/AuctionHistory";
 import { RiHistoryLine } from "react-icons/ri";
 import useModal from "hooks/useModal";
 import ProductDeleteDialog from "@components/product/ProductDeleteDialog";
-import { userAPI } from "api/user";
 import { productAPI } from "api/product";
+import { verifyUser } from "@lib/verifyUser";
 
 const ProductDetail = ({
   product,
@@ -55,7 +54,6 @@ const ProductDetail = ({
   return (
     <>
       <CustomHead title="Product Name" />
-      <Header isLogin={true} />
       <main className={styles.main}>
         <section>
           <img src={imageUrl} alt="product" />
@@ -143,42 +141,23 @@ export const getServerSideProps = async ({
   req,
   query,
 }: GetServerSidePropsContext) => {
-  const { cookies } = req;
   const absoluteUrl = getAbsoluteUrl(req);
-  const token = cookies.access_token;
-  const { data } = await userAPI.verify({
-    absoluteUrl,
-    token,
+  const { redirect, isLogin, token } = await verifyUser(req, {
+    role: "SELLER",
   });
-  const { verify, user } = data;
-  if (verify && user) {
-    if (user.role === "ADMIN") {
-      return {
-        redirect: {
-          destination: "/admin",
-          permanent: false,
-        },
-      };
-    }
-    if (user.role === "SELLER") {
-      const { data: product } = await productAPI.getProductDetails(
-        {
-          absoluteUrl,
-          token,
-        },
-        query.id as string
-      );
-      return {
-        props: {
-          product,
-        },
-      };
-    }
+  if (redirect) {
+    return {
+      redirect,
+    };
   }
+  const { data: product } = await productAPI.getProductDetails(
+    absoluteUrl,
+    query.id as string
+  );
   return {
-    redirect: {
-      destination: "/",
-      permanent: false,
+    props: {
+      product,
+      isLogin,
     },
   };
 };

@@ -2,16 +2,12 @@ import CustomHead from "@components/common/CustomHead";
 import styles from "@styles/Main.module.css";
 import RegisterForm from "@components/auth/RegisterForm";
 import { useEffect } from "react";
-import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
-import Header from "@components/common/Header";
+import { GetServerSidePropsContext } from "next";
 import { useResetRecoilState } from "recoil";
 import { registerFormState } from "@store/auth/registerFormState";
-import { userAPI } from "api/user";
+import { verifyUser } from "@lib/verifyUser";
 
-const Register = ({
-  isLogin,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const Register = () => {
   const resetRegisterFormState = useResetRecoilState(registerFormState);
   useEffect(() => {
     resetRegisterFormState();
@@ -19,7 +15,6 @@ const Register = ({
   return (
     <>
       <CustomHead title="Register" />
-      <Header isLogin={isLogin} />
       <main className={styles.main}>
         <h1 className="font-bold text-2xl">회원가입</h1>
         <RegisterForm />
@@ -31,32 +26,16 @@ const Register = ({
 export const getServerSideProps = async ({
   req,
 }: GetServerSidePropsContext) => {
-  const { cookies } = req;
-  const absoluteUrl = getAbsoluteUrl(req);
-  const { data } = await userAPI.verify({
-    absoluteUrl,
-    token: cookies.access_token,
+  const { redirect, isLogin } = await verifyUser(req, {
+    role: "BUYER",
+    login: false,
   });
-  const { verify, user } = data;
-  if (verify && user) {
-    if (user.role === "SELLER") {
-      return {
-        redirect: {
-          destination: "/sell",
-          permanent: false,
-        },
-      };
-    }
-    if (user.role === "ADMIN") {
-      return {
-        redirect: {
-          destination: "/admin",
-          permanent: false,
-        },
-      };
-    }
+  if (redirect) {
+    return {
+      redirect,
+    };
   }
-  return { props: { isLogin: verify } };
+  return { props: { isLogin } };
 };
 
 export default Register;

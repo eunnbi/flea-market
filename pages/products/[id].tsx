@@ -9,24 +9,21 @@ import { RiHistoryLine } from "react-icons/ri";
 import { Button, Chip } from "@mui/material";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
-import Header from "@components/common/Header";
 import AuctionHistory from "@components/product/AuctionHistory";
 import { getDiffDay } from "@lib/getDiffDay";
 import { useSetRecoilState } from "recoil";
-import { locationState } from "@store/locationState";
+import { locationState } from "@store/mapState";
 import LikeButton from "@components/product/LikeButton";
 import TradingPlaceMap from "@components/product/TradingPlaceMap";
-import { userAPI } from "api/user";
 import { productAPI } from "api/product";
 import BiddingDialog from "@components/product/BiddingDialog";
 import useModal from "hooks/useModal";
-import axios from "axios";
 import BuyingDialog from "@components/product/BuyingDialog";
+import { verifyUser } from "@lib/verifyUser";
 
 const ProductDetail = ({
   token,
   product,
-  isLogin,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const {
     id,
@@ -44,12 +41,11 @@ const ProductDetail = ({
     isLike,
   } = product;
   const endingDate = new Date(String(endingAt));
-  const setLocationState = useSetRecoilState(locationState);
+  const setLocation = useSetRecoilState(locationState);
   const { openModal, closeModal } = useModal();
 
   const onClickBiddingButton = () => {
     if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       openModal(BiddingDialog, {
         productId: id,
         maxPrice: bidding.length === 0 ? 0 : bidding[0].price,
@@ -62,7 +58,6 @@ const ProductDetail = ({
 
   const onClickBuyingButton = () => {
     if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       openModal(BuyingDialog, {
         productId: id,
         handleClose: closeModal,
@@ -73,12 +68,11 @@ const ProductDetail = ({
   };
 
   useEffect(() => {
-    setLocationState(tradingPlace);
+    setLocation(tradingPlace);
   }, [tradingPlace]);
   return (
     <>
       <CustomHead title={product.name} />
-      <Header isLogin={isLogin} />
       <main className={styles.main}>
         <section>
           <img src={imageUrl} alt="product" />
@@ -147,7 +141,7 @@ const ProductDetail = ({
           )}
         </section>
         <div className={styles.likeCnt}>
-          <LikeButton token={token} id={id} isLike={isLike} />
+          <LikeButton id={id} isLike={isLike} />
           <span>{likeCnt}</span>
         </div>
         {status !== "PURCHASED" &&
@@ -169,58 +163,25 @@ export const getServerSideProps = async ({
   req,
   query,
 }: GetServerSidePropsContext) => {
-  const { cookies } = req;
   const absoluteUrl = getAbsoluteUrl(req);
-  const token = cookies.access_token;
-  const { data } = await userAPI.verify({
-    absoluteUrl,
-    token,
+  const { redirect, isLogin, token } = await verifyUser(req, {
+    role: "BUYER",
+    login: false,
   });
-  const { verify, user } = data;
-  if (verify && user) {
-    if (user.role === "ADMIN") {
-      return {
-        redirect: {
-          destination: "/admin",
-          permanent: false,
-        },
-      };
-    }
-    if (user.role === "SELLER") {
-      return {
-        redirect: {
-          destination: "/sell",
-          permanent: false,
-        },
-      };
-    }
-    const { data: product } = await productAPI.getProductDetails(
-      {
-        absoluteUrl,
-        token,
-      },
-      query.id as string
-    );
+  if (redirect) {
     return {
-      props: {
-        product,
-        token: token === undefined ? null : token,
-        isLogin: verify,
-      },
+      redirect,
     };
   }
   const { data: product } = await productAPI.getProductDetails(
-    {
-      absoluteUrl,
-      token,
-    },
+    absoluteUrl,
     query.id as string
   );
   return {
     props: {
       product,
-      token: token === undefined ? null : token,
-      isLogin: verify,
+      token: token || null,
+      isLogin,
     },
   };
 };

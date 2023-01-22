@@ -4,15 +4,13 @@ import StatusFilter from "@components/common/StatusFilter";
 import SortFilter from "@components/common/SortFilter";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
-import Header from "@components/common/Header";
 import { useRecoilValue } from "recoil";
 import { statusFilterState } from "@store/statusFilterState";
 import { sortFilterState } from "@store/sortFilterState";
-import { userAPI } from "api/user";
 import { productAPI } from "api/product";
+import { verifyUser } from "@lib/verifyUser";
 
 const Home = ({
-  isLogin,
   products,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const filter = useRecoilValue(statusFilterState);
@@ -21,7 +19,6 @@ const Home = ({
   return (
     <>
       <CustomHead title="Home" />
-      <Header isLogin={isLogin} />
       <main className="flex flex-col items-center max-w-screen-xl">
         <h1 className="font-bold text-3xl mb-8">Products</h1>
         <StatusFilter />
@@ -77,37 +74,18 @@ const Home = ({
 export const getServerSideProps = async ({
   req,
 }: GetServerSidePropsContext) => {
-  const { cookies } = req;
   const absoluteUrl = getAbsoluteUrl(req);
-  const token = cookies.access_token;
-  const { data } = await userAPI.verify({
-    absoluteUrl,
-    token,
+  const { redirect, isLogin, token } = await verifyUser(req, {
+    role: "BUYER",
+    login: false,
   });
-  const { verify, user } = data;
-  if (verify && user) {
-    if (user.role === "SELLER") {
-      return {
-        redirect: {
-          destination: "/sell",
-          permanent: false,
-        },
-      };
-    }
-    if (user.role === "ADMIN") {
-      return {
-        redirect: {
-          destination: "/admin",
-          permanent: false,
-        },
-      };
-    }
+  if (redirect) {
+    return {
+      redirect,
+    };
   }
-  const { data: products } = await productAPI.getProducts({
-    absoluteUrl,
-    token,
-  });
-  return { props: { isLogin: verify, products } };
+  const { data: products } = await productAPI.getProducts(absoluteUrl);
+  return { props: { isLogin, products } };
 };
 
 export default Home;
