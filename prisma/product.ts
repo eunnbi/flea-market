@@ -356,6 +356,9 @@ export const updateAuctionProduct = async () => {
         price: bidding[0].price,
       });
     } else {
+      updateProduct(product.id, {
+        status: "AUCTION_OFF",
+      });
     }
   });
 };
