@@ -24,6 +24,7 @@ const Home = ({
         <StatusFilter />
         <SortFilter />
         <ProductList
+          emptyText="상품이 없습니다."
           products={
             sort === "최신순"
               ? products
