@@ -1,5 +1,5 @@
 import {
-  getProductById,
+  getProductDetails,
   updateAuctionProduct,
   updateProduct,
 } from "@db/product";
@@ -26,7 +26,7 @@ export default async function handler(
           const decoded = jwt.verify(token, KEY);
           const { id }: User = decoded as User;
           const { productId } = req.body;
-          const { price, seller } = await getProductById(productId);
+          const { price, seller } = await getProductDetails(productId);
           await createShopping({
             price,
             productId,
