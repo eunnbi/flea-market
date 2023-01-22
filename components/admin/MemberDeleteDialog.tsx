@@ -1,7 +1,7 @@
 import SimpleDialog from "@components/common/SimpleDialog";
 import { alertMessageState } from "@store/admin/alertMessageState";
 import { membersState } from "@store/admin/membersState";
-import { userAPI } from "@api/user";
+import { userAPI } from "api/user";
 import { useSetRecoilState } from "recoil";
 
 interface Props {

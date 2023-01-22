@@ -3,12 +3,12 @@ import ProductList from "@components/common/ProductList";
 import StatusFilter from "@components/common/StatusFilter";
 import SortFilter from "@components/common/SortFilter";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
+import { verifyUser } from "@lib/verifyUser";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { useRecoilValue } from "recoil";
 import { statusFilterState } from "@store/statusFilterState";
 import { sortFilterState } from "@store/sortFilterState";
-import { productAPI } from "@api/product";
-import { verifyUser } from "@lib/verifyUser";
+import { productAPI } from "api/product";
 
 const Home = ({
   products,

@@ -7,7 +7,7 @@ import {
   OutlinedInput,
   FormHelperText,
 } from "@mui/material";
-import { productAPI } from "@api/product";
+import { productAPI } from "api/product";
 import Router from "next/router";
 import { useState } from "react";
 import { BiddingCreateRequest } from "types/product";

@@ -1,7 +1,7 @@
 import { noError, createErrorObject } from "@lib/createErrorObject";
 import { getRedirectInfo } from "@lib/getRedirectInfo";
 import { loginFormState } from "@store/auth/loginFormState";
-import { authAPI } from "@api/auth";
+import { authAPI } from "api/auth";
 import { useState } from "react";
 import { useSetRecoilState } from "recoil";
 import { LoginRequest } from "types/auth";

@@ -1,6 +1,6 @@
 import { ProductForm } from "@store/product/productFormState";
-import { imageAPI } from "@api/image";
-import { productAPI } from "@api/product";
+import { imageAPI } from "api/image";
+import { productAPI } from "api/product";
 import Router from "next/router";
 import { useState } from "react";
 

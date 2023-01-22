@@ -2,7 +2,7 @@ import CustomHead from "@components/common/CustomHead";
 import ProductRegisterForm from "@components/product/ProductRegisterForm";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import { verifyUser } from "@lib/verifyUser";
-import { productAPI } from "@api/product";
+import { productAPI } from "api/product";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 
 const ProductRegister = ({

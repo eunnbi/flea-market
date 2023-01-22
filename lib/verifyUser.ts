@@ -1,5 +1,5 @@
 import { User } from "@prisma/client";
-import { userAPI } from "@api/user";
+import { userAPI } from "api/user";
 import { IncomingMessage } from "http";
 import axios from "axios";
 import { getAbsoluteUrl } from "./getAbsoluteUrl";

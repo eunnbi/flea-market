@@ -19,7 +19,6 @@
     "paths": {
       "@components/*": ["components/*"],
       "@lib/*": ["lib/*"],
-      "@api/*": ["api/*"],
       "@db/*": ["prisma/*"],
       "@styles/*": ["styles/*"],
       "@store/*": ["store/*"],

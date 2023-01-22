@@ -1,4 +1,4 @@
-import { productAPI } from "@api/product";
+import { productAPI } from "api/product";
 import { useToken } from "@hooks/useToken";
 import Router from "next/router";
 

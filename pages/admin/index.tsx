@@ -4,7 +4,7 @@ import RoleFilter from "@components/admin/RoleFilter";
 import CustomHead from "@components/common/CustomHead";
 import { getAbsoluteUrl } from "@lib/getAbsoluteUrl";
 import { verifyUser } from "@lib/verifyUser";
-import { userAPI } from "@api/user";
+import { userAPI } from "api/user";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 
 const Admin = ({
