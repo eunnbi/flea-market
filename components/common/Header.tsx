@@ -1,10 +1,11 @@
 import { Button, IconButton } from "@mui/material";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import Router from "next/router";
 import React, { useState } from "react";
 import LoginForm from "@components/auth/LoginForm";
 import { BiMenu } from "react-icons/bi";
 import { authAPI } from "api/auth";
+import type { ParsedUrlQuery } from "querystring";
 
 const getHeaderInfo = (pathname: string, isLogin: boolean) => {
   const page = pathname.split("/")[1];
@@ -41,14 +42,18 @@ const navClassName =
 const linkClassName = "max-md:w-full max-md:text-center max-md:py-4";
 const activeLinkClassName = `${linkClassName} font-bold`;
 
-const Header = ({ isLogin }: { isLogin: boolean }) => {
-  const router = useRouter();
-  const { pathname, query } = router;
+interface Props {
+  isLogin: boolean;
+  pathname: string;
+  query: ParsedUrlQuery;
+}
+
+const Header = ({ isLogin, pathname, query }: Props) => {
   const [open, setOpen] = useState(false);
   const { basePath, NAV } = getHeaderInfo(pathname, isLogin);
   const onLogout = () => {
     authAPI.logout().then(() => {
-      router.push("/");
+      Router.push("/");
     });
   };
   const onToggle = () => setOpen((open) => !open);
@@ -89,7 +94,7 @@ const Header = ({ isLogin }: { isLogin: boolean }) => {
                 variant="outlined"
                 className={buttonClassName}
                 onClick={() =>
-                  router.push(
+                  Router.push(
                     `${window.location.pathname}?login=true`,
                     window.location.pathname
                   )
@@ -124,7 +129,7 @@ const Header = ({ isLogin }: { isLogin: boolean }) => {
             {!isLogin ? (
               <Button
                 onClick={() =>
-                  router.push(
+                  Router.push(
                     `${window.location.pathname}?login=true`,
                     window.location.pathname
                   )
