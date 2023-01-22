@@ -1,6 +1,5 @@
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
 import React, { ChangeEvent, useRef } from "react";
-import styled from "@emotion/styled";
 import { noError } from "@lib/createErrorObject";
 import { useRecoilState } from "recoil";
 import { imageFileState } from "@store/product/productFormState";
@@ -21,64 +20,36 @@ const ImageUpload = ({ imageUrl, errorInfo }: Props) => {
     e.target.value = "";
   };
   return (
-    <Wrapper>
+    <div className="flex flex-col items-center gap-8 relative">
       {imageFile ? (
-        <img src={URL.createObjectURL(imageFile)} />
+        <img src={URL.createObjectURL(imageFile)} className="max-w-full" />
       ) : (
         imageUrl && <img src={imageUrl} />
       )}
       <div>
-        <button onClick={() => ref.current?.click()} type="button">
-          <MdOutlineAddPhotoAlternate />
+        <button
+          onClick={() => ref.current?.click()}
+          type="button"
+          className="flex items-center gap-3 p-4 rounded-md border-2 border-solid border-black"
+        >
+          <MdOutlineAddPhotoAlternate className="text-2xl" />
           사진 업로드
         </button>
         <input
           type="file"
           accept="image/*"
+          className="hidden"
           ref={ref}
           onChange={changeImageFile}
         />
         {errorInfo.isError && (
-          <p className="text-xs mt-2 text-red-600">{errorInfo.message}</p>
+          <p className="text-xs mt-2 text-red-600 text-center">
+            {errorInfo.message}
+          </p>
         )}
       </div>
-    </Wrapper>
+    </div>
   );
 };
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem;
-  position: relative;
-  input {
-    display: none;
-  }
-  svg {
-    font-size: 1.5rem;
-  }
-  button {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    border: 2px solid #000;
-    border-radius: 5px;
-    padding: 1rem;
-  }
-  p {
-    text-align: center;
-  }
-  img {
-    max-width: 100%;
-  }
-  p.warning {
-    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
-    font-weight: 400;
-    font-size: 0.75rem;
-    line-height: 1.66;
-    letter-spacing: 0.03333em;
-  }
-`;
 
 export default React.memo(ImageUpload);
