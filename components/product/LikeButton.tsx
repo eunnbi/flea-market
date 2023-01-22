@@ -1,20 +1,19 @@
 import { Tooltip } from "@mui/material";
-import axios from "axios";
 import Router from "next/router";
 import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import styles from "@styles/ProductDetail.module.css";
 import { productAPI } from "api/product";
+import { useToken } from "hooks/useToken";
 
 interface Props {
   isLike?: boolean;
-  token: string | null;
   id: string;
 }
 
-const LikeButton = ({ isLike, token, id }: Props) => {
+const LikeButton = ({ isLike, id }: Props) => {
+  const token = useToken();
   const onClickLikeButton = async () => {
     if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       let wish = true;
       let alertMessage = "❤️ 위시리스트에 추가되었습니다.";
       if (isLike) {
