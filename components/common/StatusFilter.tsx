@@ -31,6 +31,17 @@ const StatusFilter = () => {
         variant={filter.PURCHASED ? "filled" : "outlined"}
         className="filterChip"
       />
+      <Chip
+        label="경매 종료"
+        onClick={() =>
+          setFilter((filter) => ({
+            ...filter,
+            AUCTION_OFF: !filter.AUCTION_OFF,
+          }))
+        }
+        variant={filter.AUCTION_OFF ? "filled" : "outlined"}
+        className="filterChip"
+      />
     </div>
   );
 };

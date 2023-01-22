@@ -35,6 +35,8 @@ const Home = ({
                       return true;
                     if (product.status === "PURCHASED" && filter.PURCHASED)
                       return true;
+                    if (product.status === "AUCTION_OFF" && filter.AUCTION_OFF)
+                      return true;
                     return false;
                   })
                   .sort(({ createdAt: a }, { createdAt: b }) => {
