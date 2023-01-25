@@ -4,7 +4,12 @@ import {
   ProductItem,
   ProductsGetResponse,
 } from "types/product";
-import { getBidCnt, getBiddingList, getBidMaxPrice } from "./bidding";
+import {
+  getBidCnt,
+  getBiddingList,
+  getBidMaxPrice,
+  getFinalBidding,
+} from "./bidding";
 import { getProductImageUrl } from "./image";
 import prisma from "./prisma";
 import { getProductRating, getSellerRating } from "./rating";
@@ -342,21 +347,20 @@ export const updateAuctionProduct = async () => {
     },
   });
   products.forEach(async (product) => {
-    const bidding = await getBiddingList(product.id);
-    if (bidding.length !== 0) {
-      const buyerId = bidding[0].userId!;
+    const bidding = await getFinalBidding(product.id);
+    if (bidding) {
       await createShopping({
-        price: bidding[0].price,
-        buyerId,
+        price: bidding.price,
+        buyerId: bidding.bidderId,
         productId: product.id,
         sellerId: product.sellerId,
       });
       await updateProduct(product.id, {
         status: "PURCHASED",
-        price: bidding[0].price,
+        price: bidding.price,
       });
     } else {
-      updateProduct(product.id, {
+      await updateProduct(product.id, {
         status: "AUCTION_OFF",
       });
     }

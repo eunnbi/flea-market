@@ -50,6 +50,26 @@ export const getBiddingList = async (
   return res;
 };
 
+export const getFinalBidding = async (productId: Bidding["productId"]) => {
+  const biddingList = await prisma.bidding.findMany({
+    where: { productId },
+    orderBy: [
+      {
+        createdAt: "desc",
+      },
+    ],
+    select: {
+      price: true,
+      bidderId: true,
+    },
+  });
+  if (biddingList.length === 0) {
+    return null;
+  } else {
+    return biddingList[0];
+  }
+};
+
 export const deleteBiddingByProduct = async (
   productId: Bidding["productId"]
 ) => {
