@@ -29,9 +29,9 @@ const ShoppingList = ({
   return shoppingList.length === 0 ? (
     <EmptyText>구매 목록이 없습니다.</EmptyText>
   ) : (
-    <section className="flex flex-col gap-4 w-full">
+    <div className="flex flex-col gap-4 w-full">
       {shoppingList.map(({ date, list }) => (
-        <article key={String(date)}>
+        <section key={String(date)}>
           <h3 className="font-bold mb-4">{changeDateFormat(new Date(date))}</h3>
           <div>
             {list.map((product) => (
@@ -70,9 +70,9 @@ const ShoppingList = ({
               </div>
             ))}
           </div>
-        </article>
+        </section>
       ))}
-    </section>
+    </div>
   );
 };
 

@@ -35,7 +35,7 @@ const ProductList = ({
       ) : (
         <>
           {products.length <= 2 ? (
-            <section className="flex justify-center flex-wrap gap-8">
+            <div className="flex justify-center flex-wrap gap-8">
               {products.map((product) => (
                 <Link
                   className={styles.link}
@@ -54,9 +54,9 @@ const ProductList = ({
                   )}
                 </Link>
               ))}
-            </section>
+            </div>
           ) : (
-            <section className="grid grid-cols-3 gap-8 max-lg:grid-cols-2 max-md:grid-cols-1">
+            <div className="grid grid-cols-3 gap-8 max-lg:grid-cols-2 max-md:grid-cols-1">
               {products.map((product) => (
                 <Link
                   className={styles.link}
@@ -75,7 +75,7 @@ const ProductList = ({
                   )}
                 </Link>
               ))}
-            </section>
+            </div>
           )}
         </>
       )}

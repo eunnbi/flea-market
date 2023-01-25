@@ -38,7 +38,7 @@ const ProductsSearch = ({
           <SellerFilter sellers={sellers} />
           <PriceFilter />
         </div>
-        <div className="mt-4">
+        <section className="mt-4">
           <h1 className="text-2xl text-center mb-4 font-bold">검색 결과</h1>
           <ProductList
             result={true}
@@ -53,7 +53,7 @@ const ProductsSearch = ({
                     (lastPrice === 0 ? true : product.price <= lastPrice)
               )}
           />
-        </div>
+        </section>
       </main>
     </>
   );
